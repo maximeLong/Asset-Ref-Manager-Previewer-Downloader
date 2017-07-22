@@ -1,0 +1,200 @@
+// functions
+
+//
+// --- @media query factory, seriously boosts productivity when writing code for different screen sizes
+//
+$desktopWidth: 1280px
+$mobileWidth: 800px
+
+=screen($media)
+	@if $media == mobile
+		@media only screen and (max-width: $mobileWidth)
+			@content
+
+	@else if $media == tablet
+		@media only screen and (min-width: $mobileWidth + 1) and (max-width: $desktopWidth - 1)
+			@content
+
+	@else if $media == desktop
+		@media only screen and (min-width: $desktopWidth)
+			@content
+
+
+
+//
+// --- Flexbox mixins
+//
+=flexbox
+	display: -webkit-box
+	display: -webkit-flex
+	display: -moz-flex
+	display: -ms-flexbox
+	display: flex
+
+=align-items($value)
+	@if $value == flex-start
+		-webkit-box-align: start
+		-ms-flex-align: start
+	@else if $value == flex-end
+		-webkit-box-align: end
+		-ms-flex-align: end
+	@else
+		-webkit-box-align: $value
+		-ms-flex-align: $value
+	-webkit-align-items: $value
+	-moz-align-items: $value
+	align-items: $value
+
+=align-content($value: stretch)
+	-webkit-align-content: $value
+	-moz-align-content: $value
+	@if $value == flex-start
+		-ms-flex-line-pack: start
+	@else if $value == flex-end
+		-ms-flex-line-pack: end
+	@else
+		-ms-flex-line-pack: $value
+	align-content: $value
+
+=justify-content($value)
+	@if $value == flex-start
+		-webkit-box-pack: start
+		-ms-flex-pack: start
+	@else if $value == flex-end
+		-webkit-box-pack: end
+		-ms-flex-pack: end
+	@else if $value == space-between
+		-webkit-box-pack: justify
+		-ms-flex-pack: justify
+	@else if $value == space-around
+		-ms-flex-pack: distribute
+	@else
+		-webkit-box-pack: $value
+		-ms-flex-pack: $value
+	-webkit-justify-content: $value
+	-moz-justify-content: $value
+	justify-content: $value
+
+=flex-direction($value)
+	@if $value == row-reverse
+		-webkit-box-direction: reverse
+		-webkit-box-orient: horizontal
+	@else if $value == column
+		-webkit-box-direction: normal
+		-webkit-box-orient: vertical
+	@else if $value == column-reverse
+		-webkit-box-direction: reverse
+		-webkit-box-orient: vertical
+	@else
+		-webkit-box-direction: normal
+		-webkit-box-orient: horizontal
+		-webkit-flex-direction: $value
+	-moz-flex-direction: $value
+	-ms-flex-direction: $value
+	flex-direction: $value
+
+=flex-flow($values: (row nowrap))
+	// No Webkit Box fallback.
+	-webkit-flex-flow: $values
+	-moz-flex-flow: $values
+	-ms-flex-flow: $values
+	flex-flow: $values
+
+=flex($fg: 1, $fs: null, $fb: null)
+	// Set a variable to be used by box-flex properties
+	$fg-boxflex: $fg
+	// Box-Flex only supports a flex-grow value so let's grab the
+	// first item in the list and just return that.
+	@if type-of($fg) == 'list'
+		$fg-boxflex: nth($fg, 1)
+	-webkit-box-flex: $fg-boxflex
+	-webkit-flex: $fg $fs $fb
+	-moz-box-flex: $fg-boxflex
+	-moz-flex: $fg $fs $fb
+	-ms-flex: $fg $fs $fb
+	flex: $fg $fs $fb
+
+
+
+
+//
+// --- animation + transition helper functions
+//
+=keyframes($name)
+	@-webkit-keyframes #{$name}
+		@content
+	@-moz-keyframes #{$name}
+		@content
+	@-ms-keyframes #{$name}
+		@content
+	@keyframes #{$name}
+		@content
+
+=animation($str)
+	-webkit-animation: #{$str}
+	-moz-animation: #{$str}
+	-ms-animation: #{$str}
+	-o-animation: #{$str}
+	animation: #{$str}
+
+=transition($args...)
+	-webkit-transition: $args
+	-moz-transition: $args
+	-ms-transition: $args
+	-o-transition: $args
+	transition: $args
+
+=translate3d($trans...)
+	-webkit-transform: translate3d($trans)
+	transform: translate3d($trans)
+	-ms-transform: translate3d($trans)
+
+=translateX($trans...)
+	-webkit-transform: translateX($trans)
+	transform: translateX($trans)
+	-ms-transform: translateX($trans)
+
+=translateY($trans...)
+	-webkit-transform: translateY($trans)
+	transform: translateY($trans)
+	-ms-transform: translateY($trans)
+
+=translateXY($x, $y)
+	-webkit-transform: translate($x, $y)
+	transform: translate($x, $y)
+	-ms-transform: translate($x, $y)
+
+=scale($trans...)
+	-webkit-transform: scale($trans)
+	transform: scale($trans)
+	-ms-transform: scale($trans)
+
+=rotate($trans...)
+	-webkit-transform: rotate($trans)
+	-moz-transform: rotate($trans)
+	-ms-transform: rotate($trans)
+	-o-transform: rotate($trans)
+	transform: rotate($trans)
+
+=linear-gradient($args...)
+	background: -webkit-linear-gradient($args) /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient($args) /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient($args) /* For Firefox 3.6 to 15 */
+	background: linear-gradient($args) /* Standard syntax */
+
+
+
+//
+// --- clickables functionality
+//
+=prevent-select
+	-webkit-touch-callout: none
+	-webkit-user-select: none
+	-khtml-user-select: none
+	-moz-user-select: none
+	-ms-user-select: none
+	user-select: none
+
+=clickable
+	+prevent-select
+	cursor: pointer
