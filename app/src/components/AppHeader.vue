@@ -57,6 +57,7 @@ $margin_amount: 55px
     height: 100%
     margin-right: 40px
     border-right: 1px solid $border_color
+
   .middle-section
     +flexbox
     +align-items(center)
@@ -95,5 +96,11 @@ $margin_amount: 55px
       border: 1px solid $border_color
       border-radius: 100%
       margin-right: 10px
+      
+      background-size: contain
+      background-position: 50% 50%
+      background-repeat: no-repeat
+      border-radius: 100%
+      background-image: url('../assets/insta-logo.jpg')
 
 </style>

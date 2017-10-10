@@ -43,6 +43,7 @@ export default {
     width: 100px
     border: 1px solid $border_color
     height: 25px
+    color: $action_color
 
   input
     +flex(1)
