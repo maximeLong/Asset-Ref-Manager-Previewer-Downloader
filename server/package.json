@@ -10,8 +10,11 @@
   "dependencies": {
     "body-parser": "^1.17.1",
     "cors": "^2.8.3",
+    "dmx": "0.0.5",
     "express": "^4.15.2",
+    "fs": "0.0.1-security",
     "path": "^0.12.7",
+    "serialport": "^5.0.0",
     "serve-static": "^1.12.2",
     "socket.io": "^2.0.3"
   },

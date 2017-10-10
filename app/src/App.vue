@@ -1,18 +1,28 @@
 <template>
   <div id="app">
-    <h1>DMX Imposter</h1>
-    <h2>Integer to UIT8 Byte Code, and into Unity</h2>
 
-    <div id="tableContainer">
-      <slider :channel="0"></slider>
-      <slider :channel="1"></slider>
-      <slider :channel="2"></slider>
-      <slider :channel="3"></slider>
-      <slider :channel="4"></slider>
+    <!-- header -->
+    <div id="header-panel">
+      <app-header></app-header>
     </div>
 
-    <div class="lock">
-      <button @click="lockChannel">test lock channels</button>
+    <div id="main-panel">
+      <div id="side-panel">
+        <side-panel></side-panel>
+      </div>
+
+      <div id="app-content">
+
+        <!-- router hack -->
+        <div v-if="activePanel == 'dmxBoard'">
+          <dmx-board></dmx-board>
+        </div>
+        <div v-if="activePanel == 'cameraFX'">
+          <camera-fx></camera-fx>
+        </div>
+
+      </div>
+      <!-- end app content -->
     </div>
 
   </div>
@@ -20,59 +30,53 @@
 
 <script>
 
-import Slider from './components/Slider'
+import DmxBoard from './components/DmxBoard'
+import CameraFx from './components/CameraFx'
+import AppHeader from './components/AppHeader'
+import SidePanel from './components/SidePanel'
+
 export default {
   name: 'app',
   components: {
-    Slider
+    DmxBoard,
+    CameraFx,
+    AppHeader,
+    SidePanel
   },
-  methods: {
-    lockChannel: function(){
-      this.$store.commit('UPDATE_LOCK', !this.lock)
+  data: function() {
+    return {
     }
   },
+  methods: {
+  },
   computed: {
-    lock: function() { return this.$store.state.lock }
+    activePanel: function() {
+      return this.$store.state.activePanel;
+    }
   }
 }
 </script>
 
 <style lang="sass">
 @import src/styles/main
+
 #app
-  position: relative
-  width: 100vw
-  height: 100vh
-  overflow: hidden
-  background-color: #f5e6e3
-  border: 20px solid white
-  padding: 50px
   +consoleType(normal)
   color: $ink_black
 
-  #tableContainer
-    margin-top: 50px
-    +flexbox
-    +flex-direction(row)
+  .content-box
+    background-color: $content_box_background
+    border-radius: 3px
+    margin-bottom: 30px
+    box-shadow: 2px 2px 10px rgba(103, 103, 103, 0.3)
+    &:last-of-type
+      margin-bottom: 0
 
-  h1
-    +headerType(big)
-    color: $ink_black
-  h2
-    +consoleType(normal)
-    color: $action_red
-    padding-top: 5px
-
-  .lock
-    padding: 15px 0 0 15px
-    button
-      background-color: transparent
-      border: none
-      outline: 0
-      +consoleType(normal)
-      color: $action_red
-      +clickable
-
+    h2.content-header
+      padding: 15px 30px
+      border-bottom: 1px solid $border_color
+    .content-content
+      padding: 30px
 
 
 </style>

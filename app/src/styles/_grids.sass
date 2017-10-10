@@ -1,0 +1,40 @@
+// -- panel properties
+//
+$panel_height: 70px
+
+#app
+	#header-panel
+		height: $panel_height
+	#main-panel
+		height: calc(100vh - 70px)
+		+flexbox
+		+flex-direction(row)
+		#side-panel
+			width: 75px
+			height: 100%
+
+		#app-content
+			+flex(1)
+			padding: 40px
+			background-color: $background_color
+			overflow-y: scroll
+
+
+
+// --- @media query factory, seriously boosts productivity when writing code for different screen sizes
+//
+$desktopWidth: 1280px
+$mobileWidth: 800px
+
+=screen($media)
+	@if $media == mobile
+		@media only screen and (max-width: $mobileWidth)
+			@content
+
+	@else if $media == tablet
+		@media only screen and (min-width: $mobileWidth + 1) and (max-width: $desktopWidth - 1)
+			@content
+
+	@else if $media == desktop
+		@media only screen and (min-width: $desktopWidth)
+			@content

@@ -1,7 +1,7 @@
 // type
 
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700,700i)
-@import url(https://fonts.googleapis.com/css?family=Playfair+Display:400,400i,700,700i,900,900i)
+@import url(https://fonts.googleapis.com/css?family=Karla:400,700)
 @import url(https://fonts.googleapis.com/css?family=Quicksand:400,700)
 @import url(https://fonts.googleapis.com/css?family=VT323)
 
@@ -29,7 +29,7 @@ $regular_line_height: 22px
 
 =consoleType($type)
   font-family: 'VT323', monospace
-  letter-spacing: 2px
+  letter-spacing: 1px
   color: white
   @if $type == big
     font-size: 27px
@@ -40,30 +40,23 @@ $regular_line_height: 22px
 
 
 =headerType($type)
-  font-family: 'Playfair Display', serif
+  font-family: 'Karla', sans-serif
   font-weight: 700
-  font-style: italic
-  letter-spacing: 2px
-  color: white
+  letter-spacing: 1px
   @if $type == big
     font-size: 50px
     line-height: 55px
     font-weight: 900
     letter-spacing: 4px
   @if $type == normal
-    font-size: 43px
-    letter-spacing: 3px
-    line-height: 40px
+    font-size: 22px
+    letter-spacing: 0px
+    line-height: 30px
   @if $type == small
     font-size: 15px
+    letter-spacing: 0px
     line-height: 20px
     font-weight: 400
-  @if $type == h2
-    font-size: 37px
-    font-weight: 900
-    line-height: 40px
-    letter-spacing: 2px
-
 
 
 =defaultType($type)
@@ -76,3 +69,11 @@ $regular_line_height: 22px
     line-height: 25px
     +screen(mobile)
       font-size: 15px
+
+
+h1
+  +headerType(big)
+  color: $header_type_color
+h2
+  +headerType(normal)
+  color: $header_type_color

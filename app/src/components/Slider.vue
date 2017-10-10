@@ -70,15 +70,15 @@ export default {
     padding-top: 160px
     padding-left: 20px
     span
-      color: $action_red
+      color: $action_color
 
   .lock-sign
     position: absolute
     display: block
     width: 75px
     height: 15px
-    border-top: 2px solid $action_red
-    border-bottom: 2px solid $action_red
+    border-top: 2px solid $action_color
+    border-bottom: 2px solid $action_color
     top: 50%
     left: 185px
 

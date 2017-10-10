@@ -5,8 +5,8 @@ import Vuex from 'vuex'
 
 import App from './App'
 
-import VueSocketio from 'vue-socket.io';
-Vue.use(VueSocketio, 'http://localhost:3000');
+// import VueSocketio from 'vue-socket.io';
+// Vue.use(VueSocketio, 'http://localhost:3000');
 Vue.use(Vuex)
 const store = require('./store/store')
 
@@ -17,10 +17,10 @@ new Vue({
   el: '#app',
   template: '<App/>',
   components: { App },
-  store,
-  sockets:{
-    connect: function(){
-      console.log('socket connected')
-    }
-  },
+  store
+  // sockets:{
+  //   connect: function(){
+  //     console.log('socket connected')
+  //   }
+  // },
 })
