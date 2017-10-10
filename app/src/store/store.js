@@ -33,6 +33,13 @@ state = {
     saturation:   0
   },
 
+  //contrast sliders
+  contrast: {
+    contrast:   0,
+    brightness: 0,
+    tone:       0
+  },
+
   //2D sliders
   two_d_sliders: {
     lift:   [0,0],
@@ -68,6 +75,9 @@ mutations = {
   },
   UPDATE_TONEMAPPING: function(state, val) {
     state.tonemapping[val.name] = val.value;
+  },
+  UPDATE_CONTRAST: function(state, val) {
+    state.contrast[val.name] = val.value;
   },
   UPDATE_2D_SLIDER: function(state, slider, xVal, yVal){
     state.two_d_sliders[slider] = [xVal,yVal];

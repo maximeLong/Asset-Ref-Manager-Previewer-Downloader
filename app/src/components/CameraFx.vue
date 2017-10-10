@@ -31,6 +31,17 @@
       </div>
     </div>
 
+    <div class="content-box">
+      <h2 class="content-header">Contrast</h2>
+      <div class="content-content">
+
+        <fx-slider :name="'contrast'" :sliderValue="contrastValue('contrast')" :onUpdate="updateContrast"></fx-slider>
+        <fx-slider :name="'brightness'"  :sliderValue="contrastValue('brightness')" :onUpdate="updateContrast"></fx-slider>
+        <fx-slider :name="'tone'"        :sliderValue="contrastValue('tone')" :onUpdate="updateContrast"></fx-slider>
+
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -68,6 +79,16 @@ export default {
     },
     updateToneMapper: function(value, name){
       this.$store.commit('UPDATE_TONEMAPPING', {
+        name: name,
+        value: value
+      });
+    },
+
+    contrastValue: function(value){
+      return this.$store.state.contrast[value];
+    },
+    updateContrast: function(value, name){
+      this.$store.commit('UPDATE_CONTRAST', {
         name: name,
         value: value
       });

@@ -1,7 +1,9 @@
 <template>
   <div id="header-content">
 
-    <div class="logo">hi</div>
+    <div class="logo">
+      <div class="icon"></div>
+    </div>
 
     <div class="middle-section">
       <div class="options">
@@ -57,6 +59,13 @@ $margin_amount: 55px
     height: 100%
     margin-right: 40px
     border-right: 1px solid $border_color
+    .icon
+      width: 45px
+      height: 45px
+      background-size: contain
+      background-position: 50% 50%
+      background-repeat: no-repeat
+      background-image: url('../assets/logo-icon.svg')
 
   .middle-section
     +flexbox
@@ -96,7 +105,7 @@ $margin_amount: 55px
       border: 1px solid $border_color
       border-radius: 100%
       margin-right: 10px
-      
+
       background-size: contain
       background-position: 50% 50%
       background-repeat: no-repeat
