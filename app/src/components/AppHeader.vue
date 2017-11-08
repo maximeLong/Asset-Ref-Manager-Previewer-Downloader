@@ -6,14 +6,22 @@
     </div>
 
     <div class="middle-section">
-      <div class="options">
-        <div class="icon"></div>
+      <div class="team-account" v-if="userIsLoggedIn">
+        <div class="team-name">Team Name</div>
+      </div>
+      <div class="create-account" v-if="!userIsLoggedIn" @click="openCreatePanel">
+        <div class="create-account-text">Create Account</div>
       </div>
     </div>
 
     <div class="right-section">
-      <div class="account-image"></div>
-      <div class="account-name">Hotmax Interactive</div>
+      <div class="user-account" v-if="userIsLoggedIn">
+        <div class="account-image"></div>
+        <div class="account-name">{{user.email}}</div>
+      </div>
+      <div class="sign-in" v-if="!userIsLoggedIn" @click="openSignInPanel">
+        <div class="sign-in-text">Sign In</div>
+      </div>
     </div>
 
   </div>
@@ -25,11 +33,22 @@ export default {
   name: 'appHeader',
   data: function(){
     return {
+
     }
   },
   computed: {
+    user: function()            { return this.$store.state.auth.user },
+    userIsLoggedIn: function()  { return this.user ? true : false },
+    userPanel: function()       { return this.$store.state.userPanel }
   },
   methods: {
+    openCreatePanel: function() {
+      this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'createAccount'})
+    },
+    openSignInPanel: function() {
+      this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'signIn'})
+    }
+
   }
 
 }
@@ -75,21 +94,16 @@ $margin_amount: 55px
     //border-left: 1px solid red
     +flex(1)
 
-    .options
-      width: 75px
+    .team-account,.create-account
       height: 100%
+      padding: 0 20px
       border-left: 1px solid $border_color
+      +clickable
       +flexbox
       +align-items(center)
       +justify-content(center)
-      .icon
-        width: 55px
-        height: 55px
-        background-size: contain
-        background-position: 50% 50%
-        background-repeat: no-repeat
-        border-radius: 100%
-        background-image: url('../assets/other-icon-color.svg')
+    .create-account
+      color: $action_color
 
   .right-section
     +flexbox
@@ -99,17 +113,21 @@ $margin_amount: 55px
     height: 100%
     padding-left: 25px
     border-left: 1px solid $border_color
-    .account-image
-      width: 45px
-      height: 45px
-      border: 1px solid $border_color
-      border-radius: 100%
-      margin-right: 10px
+    +clickable
+    .sign-in
+      color: $action_color
+    .user-account
+      .account-image
+        width: 45px
+        height: 45px
+        border: 1px solid $border_color
+        border-radius: 100%
+        margin-right: 10px
 
-      background-size: contain
-      background-position: 50% 50%
-      background-repeat: no-repeat
-      border-radius: 100%
-      background-image: url('../assets/insta-logo.jpg')
+        background-size: contain
+        background-position: 50% 50%
+        background-repeat: no-repeat
+        border-radius: 100%
+        background-image: url('../assets/insta-logo.jpg')
 
 </style>

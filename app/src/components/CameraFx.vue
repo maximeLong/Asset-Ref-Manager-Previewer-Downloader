@@ -1,9 +1,7 @@
 <template>
   <div id="cameraFX">
 
-    <div class="content-box">
-      <h2 class="content-header">Channel Mixer</h2>
-      <div class="content-content">
+    <content-box :title="'Channel Mixer'">
         <div class="fx-buttons">
           <div class="button"
             v-for="channel in channels"
@@ -16,42 +14,32 @@
         <fx-slider :name="'red'"   :sliderValue="mixerValue('red')" :onUpdate="updateMixer"></fx-slider>
         <fx-slider :name="'green'" :sliderValue="mixerValue('green')" :onUpdate="updateMixer"></fx-slider>
         <fx-slider :name="'blue'"  :sliderValue="mixerValue('blue')" :onUpdate="updateMixer"></fx-slider>
+    </content-box>
 
-      </div>
-    </div>
-
-    <div class="content-box">
-      <h2 class="content-header">Tonemapping</h2>
-      <div class="content-content">
-
+    <content-box :title="'Tone Mapping'">
         <fx-slider :name="'temperature'" :sliderValue="toneMappingValue('temperature')" :onUpdate="updateToneMapper"></fx-slider>
         <fx-slider :name="'saturation'"  :sliderValue="toneMappingValue('saturation')" :onUpdate="updateToneMapper"></fx-slider>
         <fx-slider :name="'tint'"        :sliderValue="toneMappingValue('tint')" :onUpdate="updateToneMapper"></fx-slider>
+    </content-box>
 
-      </div>
-    </div>
-
-    <div class="content-box">
-      <h2 class="content-header">Contrast</h2>
-      <div class="content-content">
-
+    <content-box :title="'Contrast'">
         <fx-slider :name="'contrast'" :sliderValue="contrastValue('contrast')" :onUpdate="updateContrast"></fx-slider>
         <fx-slider :name="'brightness'"  :sliderValue="contrastValue('brightness')" :onUpdate="updateContrast"></fx-slider>
         <fx-slider :name="'tone'"        :sliderValue="contrastValue('tone')" :onUpdate="updateContrast"></fx-slider>
-
-      </div>
-    </div>
+    </content-box>
 
   </div>
 </template>
 
 <script>
 import FxSlider from './FxSlider'
+import ContentBox from './ContentBox'
 
 export default {
   name: 'cameraFx',
   components: {
-    FxSlider
+    FxSlider,
+    ContentBox
   },
   data: function(){
     return {

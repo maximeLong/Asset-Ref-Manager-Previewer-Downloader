@@ -1,16 +1,16 @@
 <template>
   <div id="dmxBoard">
 
-    <div class="content-box">
-      <h2 class="content-header">DMX Sneak Controls</h2>
-      <div id="tableContainer" class="content-content">
-        <slider :channel="0"></slider>
-        <slider :channel="1"></slider>
-        <slider :channel="2"></slider>
-        <slider :channel="3"></slider>
-        <slider :channel="4"></slider>
-      </div>
-    </div>
+    <content-box :title="'DMX Controls'">
+        <div id="tableContainer">
+          <slider :channel="0"></slider>
+          <slider :channel="1"></slider>
+          <slider :channel="2"></slider>
+          <slider :channel="3"></slider>
+          <slider :channel="4"></slider>
+        </div>
+    </content-box>
+
     <div class="lock">
       <button @click="lockChannel">test lock channels</button>
     </div>
@@ -20,11 +20,13 @@
 
 <script>
 import Slider from './Slider'
+import ContentBox from './ContentBox'
 
 export default {
   name: 'dmxBoard',
   components: {
-    Slider
+    Slider,
+    ContentBox
   },
 
   computed: {

@@ -4,6 +4,7 @@
     <!-- header -->
     <div id="header-panel">
       <app-header></app-header>
+      <user-panel v-if="userPanel.open"></user-panel>
     </div>
 
     <div id="main-panel">
@@ -21,6 +22,14 @@
           <camera-fx></camera-fx>
         </div>
 
+        <div v-if="activePanel == 'teamView'">
+          <team-view></team-view>
+        </div>
+
+        <div v-if="activePanel == 'sceneView'">
+          <scene-view></scene-view>
+        </div>
+
       </div>
       <!-- end app content -->
     </div>
@@ -32,7 +41,12 @@
 
 import DmxBoard from './components/DmxBoard'
 import CameraFx from './components/CameraFx'
+import TeamView from './components/TeamView'
+import SceneView from './components/SceneView'
+
 import AppHeader from './components/AppHeader'
+import UserPanel from './components/UserPanel'
+
 import SidePanel from './components/SidePanel'
 
 export default {
@@ -40,7 +54,11 @@ export default {
   components: {
     DmxBoard,
     CameraFx,
+    TeamView,
+    SceneView,
+
     AppHeader,
+    UserPanel,
     SidePanel
   },
   data: function() {
@@ -50,9 +68,8 @@ export default {
   methods: {
   },
   computed: {
-    activePanel: function() {
-      return this.$store.state.activePanel;
-    }
+    activePanel: function() { return this.$store.state.activePanel },
+    userPanel: function() { return this.$store.state.userPanel }
   }
 }
 </script>
@@ -64,19 +81,13 @@ export default {
   +consoleType(normal)
   color: $ink_black
 
-  .content-box
-    background-color: $content_box_background
-    border-radius: 3px
+  .page-header
     margin-bottom: 30px
-    box-shadow: 2px 2px 10px rgba(103, 103, 103, 0.3)
-    &:last-of-type
-      margin-bottom: 0
-
-    h2.content-header
-      padding: 15px 30px
-      border-bottom: 1px solid $border_color
-    .content-content
-      padding: 30px
+    h2
+      +clickable
+      font-size: 15px
+      margin-top: -5px
+      color: $action_color
 
 
 </style>

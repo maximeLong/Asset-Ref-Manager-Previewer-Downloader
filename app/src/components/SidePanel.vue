@@ -1,14 +1,19 @@
 <template>
   <div id="side-panel-content">
 
+    <div class="option other"
+      @click="setPanel('teamView')"
+      :class="{ active: activePanel == 'teamView' }"></div>
+    <div class="option move"
+      @click="setPanel('sceneView')"
+      :class="{ active: activePanel == 'sceneView' }"></div>
+
     <div class="option fx"
       @click="setPanel('cameraFX')"
       :class="{ active: activePanel == 'cameraFX' }"></div>
-    <div class="option move"></div>
     <div class="option dmx"
       @click="setPanel('dmxBoard')"
       :class="{ active: activePanel == 'dmxBoard' }"></div>
-    <div class="option other"></div>
 
   </div>
 </template>
