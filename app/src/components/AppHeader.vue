@@ -15,8 +15,8 @@
     </div>
 
     <div class="right-section">
-      <div class="user-account" v-if="userIsLoggedIn">
-        <div class="account-image"></div>
+      <div class="user-account" v-if="userIsLoggedIn" @click="openUserInfoPanel">
+        <div class="account-image" :style="{ 'background-image' : 'url(' + user.profileImage.big + ')'}"></div>
         <div class="account-name">{{user.email}}</div>
       </div>
       <div class="sign-in" v-if="!userIsLoggedIn" @click="openSignInPanel">
@@ -44,6 +44,9 @@ export default {
   methods: {
     openCreatePanel: function() {
       this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'createAccount'})
+    },
+    openUserInfoPanel: function() {
+      this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'userInfo'})
     },
     openSignInPanel: function() {
       this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'signIn'})
@@ -117,17 +120,17 @@ $margin_amount: 55px
     .sign-in
       color: $action_color
     .user-account
+      +flexbox
+      +align-items(center)
+      +justify-content(center)
       .account-image
         width: 45px
         height: 45px
         border: 1px solid $border_color
         border-radius: 100%
         margin-right: 10px
-
         background-size: contain
         background-position: 50% 50%
         background-repeat: no-repeat
-        border-radius: 100%
-        background-image: url('../assets/insta-logo.jpg')
 
 </style>

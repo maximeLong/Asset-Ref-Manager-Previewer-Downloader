@@ -10,7 +10,11 @@ export const store = new Vuex.Store({
 
   state: {
       activePanel: 'teamView',
-      userPanel: { open: false, panelType: 'userInfo' } //panelType can be : 'signIn', 'createAccount', 'userInfo'
+      userPanel: { open: false, panelType: 'userInfo' }, //panelType can be : 'signIn', 'createAccount', 'userInfo'
+
+      formEmail: '',
+      formTeamName: '',
+      formPassword: '',
 
       //dmx board
       // lock: false,
@@ -48,7 +52,6 @@ export const store = new Vuex.Store({
       //   gamma:  [0,0],
       //   gain:   [0,0]
       // },
-
       //team scenes dummy
       // scenes: [
       //   {
@@ -101,6 +104,7 @@ export const store = new Vuex.Store({
 
   plugins: [
       auth({userService: '/users'}),
+      service('users'),
       service('scenes'),
       service('teams'),
       service('variants'),
@@ -108,9 +112,6 @@ export const store = new Vuex.Store({
   ],
 
   actions: {
-    createAccount: function({dispatch, commit}, {email, password, team}) {
-      dispatch('users/create')
-    }
 
   },
 
@@ -121,8 +122,14 @@ export const store = new Vuex.Store({
       },
       SET_USER_PANEL: function(state, {open, panelType}) {
         state.userPanel.open = open;
-        state.userPanel.panelType = panelType;
+        if (panelType != undefined) {
+          state.userPanel.panelType = panelType;
+        }
       },
+
+      SET_FORM_EMAIL: function(state, val) { state.formEmail = val; },
+      SET_FORM_TEAMNAME: function(state, val) { state.formTeamName = val; },
+      SET_FORM_PASSWORD: function(state, val) { state.formPassword = val; },
 
       //DMX board
       SET_CHANNELS_COLLECTION: function(state, {channel, value}) {
