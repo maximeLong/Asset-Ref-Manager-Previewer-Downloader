@@ -1,13 +1,12 @@
 <template>
   <div id="header-content">
 
-    <div class="logo">
-      <div class="icon"></div>
-    </div>
-
     <div class="middle-section">
-      <div class="team-account" v-if="userIsLoggedIn">
-        <div class="team-name">Team Name</div>
+      <div class="team-account" v-if="userIsLoggedIn" @click="openTeamPanel">
+
+        <div class="team-name" v-if="user.teams.length == 0">Your Teams</div>
+        <div class="team-name" v-else>{{user.teams[0].name}}</div>
+
       </div>
       <div class="create-account" v-if="!userIsLoggedIn" @click="openCreatePanel">
         <div class="create-account-text">Create Account</div>
@@ -45,6 +44,9 @@ export default {
     openCreatePanel: function() {
       this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'createAccount'})
     },
+    openTeamPanel: function() {
+      this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'team'})
+    },
     openUserInfoPanel: function() {
       this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'userInfo'})
     },
@@ -70,7 +72,7 @@ $margin_amount: 55px
   +justify-content(space-between)
   background-color: $header_color
   border-bottom: 1px solid $border_color
-  +headerType(small)
+  +userType(small)
   //font-weight: bold
 
   .logo
@@ -109,17 +111,22 @@ $margin_amount: 55px
       color: $action_color
 
   .right-section
-    +flexbox
-    +align-items(center)
-    +justify-content(center)
     margin-right: $margin_amount
     height: 100%
-    padding-left: 25px
     border-left: 1px solid $border_color
     +clickable
     .sign-in
+      height: 100%
+      width: 100%
+      padding-left: 25px
+      +flexbox
+      +align-items(center)
+      +justify-content(center)
       color: $action_color
     .user-account
+      height: 100%
+      width: 100%
+      padding-left: 25px
       +flexbox
       +align-items(center)
       +justify-content(center)

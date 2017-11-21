@@ -68,8 +68,7 @@ export default {
     &:last-of-type
       margin: 0
     .scene-title
-      +headerType(normal)
-      font-size: 17px
+      +userType(average)
       +clickable
       color: $action_color
     .scene-information

@@ -59,7 +59,7 @@ export default {
       background-color: transparent
       border: none
       outline: 0
-      +consoleType(normal)
+      +systemType(average)
       color: $action_color
       +clickable
 

@@ -10,11 +10,15 @@ export const store = new Vuex.Store({
 
   state: {
       activePanel: 'teamView',
-      userPanel: { open: false, panelType: 'userInfo' }, //panelType can be : 'signIn', 'createAccount', 'userInfo'
+      userPanel: { open: false, panelType: 'userInfo' }, //panelType can be : 'signIn', 'createAccount', 'userInfo', 'team'
 
       formEmail: '',
       formTeamName: '',
       formPassword: '',
+
+      //current team
+      currentTeam: {},
+
 
       //dmx board
       // lock: false,
@@ -131,6 +135,9 @@ export const store = new Vuex.Store({
       SET_FORM_TEAMNAME: function(state, val) { state.formTeamName = val; },
       SET_FORM_PASSWORD: function(state, val) { state.formPassword = val; },
 
+      SET_CURRENT_TEAM: function(state, val) { state.currentTeam = val },
+
+
       //DMX board
       SET_CHANNELS_COLLECTION: function(state, {channel, value}) {
         //hard coding channels 1 - 5 (pos 0 -4)
@@ -143,7 +150,6 @@ export const store = new Vuex.Store({
       UPDATE_LOCK: function(state, val) {
         state.lock = val;
       },
-
       //FX Board
       UPDATE_CHANNEL_MIXER: function(state, val) {
         state.channel_mixer[val.channel][val.name] = val.value;

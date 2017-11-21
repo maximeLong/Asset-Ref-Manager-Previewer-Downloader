@@ -7,8 +7,14 @@ module.exports = function (app) {
   const { Schema } = mongooseClient;
   const teams = new Schema({
 
-    title:  { type: String, unique: true, required: [true, 'team must have title'] },
-    users:  [{ type: Schema.Types.ObjectId, ref: 'users' }],
+    name:       { type: String, required: [true, 'team must have title'], unique: true },
+    creator:    { type: Schema.Types.ObjectId, ref: 'users', required: [true, 'team must have creator']},
+
+    users:      [{ type: Schema.Types.ObjectId, ref: 'users' }],
+    scenes:     [{ type: Schema.Types.ObjectId, ref: 'scenes'}],
+    assets:     [{ type: Schema.Types.ObjectId, ref: 'assets'}],
+
+    invites:    [{ type: String }],
 
     createdAt:  { type: Date, 'default': Date.now },
     updatedAt:  { type: Date, 'default': Date.now }

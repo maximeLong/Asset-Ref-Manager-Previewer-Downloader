@@ -11,7 +11,6 @@ module.exports = function (app) {
     googleId:   { type: String },
     password:   { type: String, required: [true, 'users must have password'], minlength : [1, 'password cannot be empty'] },
 
-    role:       { type: String, 'default': 'visitor' },
     teams:      [{ type: Schema.Types.ObjectId, ref: 'teams' }],
 
     profileImage: {

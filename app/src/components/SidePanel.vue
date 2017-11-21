@@ -1,7 +1,28 @@
 <template>
   <div id="side-panel-content">
 
-    <div class="option other"
+    <div id="logo">
+      <div class="icon"></div>
+    </div>
+
+    <!-- main layouts bar, add layout -->
+    <div class="sidebar-title">My Layouts</div>
+    <div class="layouts">
+      <div class="layouts-list">
+        <div class="layout-item" v-for="n in 4">layout {{n}}</div>
+      </div>
+    </div>
+
+    <!-- team layouts bar, add team -->
+    <div class="sidebar-title">Team Layouts</div>
+    <div class="sidebar-subtitle">Team Name</div>
+    <div class="layouts team">
+      <div class="layouts-list">
+        <div class="layout-item" v-for="n in 4">layout {{n}}</div>
+      </div>
+    </div>
+
+    <!-- <div class="option other"
       @click="setPanel('teamView')"
       :class="{ active: activePanel == 'teamView' }"></div>
     <div class="option move"
@@ -13,7 +34,7 @@
       :class="{ active: activePanel == 'cameraFX' }"></div>
     <div class="option dmx"
       @click="setPanel('dmxBoard')"
-      :class="{ active: activePanel == 'dmxBoard' }"></div>
+      :class="{ active: activePanel == 'dmxBoard' }"></div> -->
 
   </div>
 </template>
@@ -44,37 +65,48 @@ export default {
 @import src/styles/main
 #side-panel-content
   height: 100%
-  border-right: 1px solid $border_color
-  +flexbox
-  +align-items(center)
-  +flex-direction(column)
-  +justify-content(center)
+  width: 100%
 
-  .option
-    +clickable
-    height: 40px
-    width: 40px
-    margin: 25px 0
+  #logo
     +flexbox
     +align-items(center)
+    +justify-content(center)
+    width: 60px
+    height: $header_panel_height
+    margin-bottom: 20px
+    background-color: white
+    +clickable
+    .icon
+      height: 30px
+      width: 30px
+      border: 2px solid $action_color
+      border-radius: 100px
 
-    background-size: contain
-    background-position: 50% 50%
-    background-repeat: no-repeat
-    border-radius: 100%
-    background-color: #d0cfcf
+  .sidebar-title, .sidebar-subtitle
+    +systemType(big)
+    color: white
+    padding: 0 0 0 15px
+  .sidebar-subtitle
+    +systemType(average)
+    color: white
 
-    &.active
-      background-color: $action_color
-      box-shadow: 0px 0px 13px $action_color
+  .layouts
+    border-top: 1px solid $border_color_mid
+    padding-top: 10px
+    margin: 10px 0 50px 0
+    +userType(average)
+    color: white
+    &.teams
+      margin-bottom: 0
 
-    &.dmx
-      background-image: url('../assets/dmx-icon.svg')
-    &.fx
-      background-image: url('../assets/camera-icon.svg')
-    &.move
-      background-image: url('../assets/resize-icon.svg')
-    &.other
-      background-image: url('../assets/other-icon.svg')
+    .layouts-list
+      .layout-item
+        padding: 3px 15px
+        +clickable
+        &:hover
+          background-color: $side_panel_hover
+          +transition(.25s ease-in-out all)
+
+
 
 </style>

@@ -1,15 +1,16 @@
 <template>
   <div id="app">
 
-    <!-- header -->
-    <div id="header-panel">
-      <app-header></app-header>
-      <user-panel v-if="userPanel.open"></user-panel>
+    <!-- side panel -->
+    <div id="side-panel">
+      <side-panel></side-panel>
     </div>
 
     <div id="main-panel">
-      <div id="side-panel">
-        <side-panel></side-panel>
+
+      <div id="header-panel">
+        <app-header></app-header>
+        <options-panel v-if="userPanel.open"></options-panel>
       </div>
 
       <div id="app-content">
@@ -45,7 +46,7 @@ import TeamView from './components/TeamView'
 import SceneView from './components/SceneView'
 
 import AppHeader from './components/AppHeader'
-import UserPanel from './components/UserPanel'
+import OptionsPanel from './components/OptionsPanel'
 
 import SidePanel from './components/SidePanel'
 
@@ -58,12 +59,18 @@ export default {
     SceneView,
 
     AppHeader,
-    UserPanel,
+    OptionsPanel,
     SidePanel
   },
   data: function() {
     return {
     }
+  },
+  mounted () {
+    //see if auth is stored locally (on refreshes for instance)
+    this.$store.dispatch('auth/authenticate').catch(error => {
+      console.log(error)
+    })
   },
   methods: {
   },
@@ -78,16 +85,7 @@ export default {
 @import src/styles/main
 
 #app
-  +consoleType(normal)
-  color: $ink_black
-
-  .page-header
-    margin-bottom: 30px
-    h2
-      +clickable
-      font-size: 15px
-      margin-top: -5px
-      color: $action_color
+  +userType(average)
 
 
 </style>
