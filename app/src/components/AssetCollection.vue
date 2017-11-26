@@ -12,7 +12,7 @@
 
     <div class="asset-info">
       <div class="mesh-total">total number of meshes in variant: ______</div>
-      <div class="upload-asset button-solid">upload new model</div>
+      <div class="upload-asset">upload new model</div>
     </div>
 
   </div>
@@ -56,6 +56,7 @@ export default {
     padding: 30px
     +flex(1)
     .upload-asset
+      +button(false,false,$action_color)
       margin-top: 10px
 
 </style>

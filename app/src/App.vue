@@ -16,20 +16,7 @@
       <div id="app-content">
 
         <!-- router hack -->
-        <div v-if="activePanel == 'dmxBoard'">
-          <dmx-board></dmx-board>
-        </div>
-        <div v-if="activePanel == 'cameraFX'">
-          <camera-fx></camera-fx>
-        </div>
-
-        <div v-if="activePanel == 'teamView'">
-          <team-view></team-view>
-        </div>
-
-        <div v-if="activePanel == 'sceneView'">
-          <scene-view></scene-view>
-        </div>
+        <router-view></router-view>
 
       </div>
       <!-- end app content -->
@@ -40,24 +27,13 @@
 
 <script>
 
-import DmxBoard from './components/DmxBoard'
-import CameraFx from './components/CameraFx'
-import TeamView from './components/TeamView'
-import SceneView from './components/SceneView'
-
 import AppHeader from './components/AppHeader'
 import OptionsPanel from './components/OptionsPanel'
-
 import SidePanel from './components/SidePanel'
 
 export default {
   name: 'app',
   components: {
-    DmxBoard,
-    CameraFx,
-    TeamView,
-    SceneView,
-
     AppHeader,
     OptionsPanel,
     SidePanel
@@ -67,8 +43,12 @@ export default {
     }
   },
   mounted () {
-    //see if auth is stored locally (on refreshes for instance)
-    this.$store.dispatch('auth/authenticate').catch(error => {
+    //basically mirrors sign-in action without passing an argument
+    this.$store.dispatch('auth/authenticate')
+    .then(success => {
+      this.$store.dispatch('signInLoad');
+    })
+    .catch(error => {
       console.log(error)
     })
   },

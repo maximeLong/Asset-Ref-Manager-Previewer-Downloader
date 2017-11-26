@@ -3,7 +3,7 @@
 
     <div class="page-header">
       <h1>{{activeScene.name}}</h1>
-      <h2>See other scenes</h2>
+      <h2>See other layouts</h2>
     </div>
 
     <content-box :title="'Scene Varients'">

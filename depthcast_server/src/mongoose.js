@@ -8,7 +8,7 @@ module.exports = function () {
     keepAlive: 1,
     connectTimeoutMS: 30000,
     reconnectTries: 30,
-    reconnectInterval: 5000
+    reconnectInterval: 5000,
   });
   mongoose.Promise = global.Promise;
 

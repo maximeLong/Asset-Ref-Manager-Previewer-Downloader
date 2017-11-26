@@ -1,5 +1,5 @@
 <template>
-  <div id="landing">
+  <div id="create-team">
     landing content
   </div>
 </template>
@@ -7,7 +7,7 @@
 <script>
 
 export default {
-  name: 'landing',
+  name: 'createTeam',
   data: function(){
     return {
 
@@ -27,6 +27,6 @@ export default {
 <style scoped lang="sass">
 @import src/styles/main
 
-#landing
+#create-team
 
 </style>

@@ -1,8 +1,8 @@
 <template>
   <div id="teamView">
 
-    <content-box :title="'Scenes'">
-        <div class="scene-container" v-for="scene in scenes">
+    <content-box :title="'layouts'">
+        <div class="scene-container" v-for="scene in layouts">
           <div class="scene-title" @click="setPanel('sceneView')">{{scene.name}}</div>
           <div class="scene-information">
             assetCount: {{scene.assets.length}}
@@ -37,8 +37,8 @@ export default {
     }
   },
   computed: {
-    scenes: function() {
-      return this.$store.state.scenes.ids;
+    layouts: function() {
+      return this.$store.state.layouts.ids;
     }
   },
   methods: {

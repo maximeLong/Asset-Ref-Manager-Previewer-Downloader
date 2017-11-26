@@ -6,14 +6,13 @@
       <input :value="formEmail" @input="updateFormEmail" placeholder="email">
     <div class="form-subtitle">Password:</div>
       <input :value="formPassword" @input="updateFormPassword" placeholder="password">
-    <div @click="trySignIn(formEmail, formPassword)" class="button-solid">Sign In</div>
+    <button @click="trySignIn(formEmail, formPassword)" class="submit-button">Sign In</button>
 
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import { mapActions } from 'vuex'
 
 export default {
   data: function(){
@@ -37,29 +36,9 @@ export default {
     updateFormPassword: function(e) { this.$store.commit('SET_FORM_PASSWORD', e.target.value) },
 
     trySignIn: function(email, password) {
-      this.authenticate({strategy: 'local', email, password})
-      .then(response => {
-        //fill in teams from database
-        this.findTeams({
-          query: {
+      this.$store.dispatch('signInUser', {email: email, password: password})
+    }
 
-          }
-        })
-
-        //close user panel
-        this.$store.commit('SET_USER_PANEL', {open: false})
-      })
-      .catch(error => {
-        console.log(error)
-      })
-    },
-    ...mapActions('auth', [
-      'authenticate',
-      'logout'
-    ]),
-    ...mapActions('teams', {
-      findTeams: 'find'
-    })
   }
 
 }
@@ -69,6 +48,7 @@ export default {
 @import src/styles/main
 
 #options-panel-signin
-
+  .submit-button
+    +button(false, false, $action_color)
 
 </style>

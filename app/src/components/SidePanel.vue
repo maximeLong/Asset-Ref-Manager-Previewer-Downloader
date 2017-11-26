@@ -15,10 +15,10 @@
 
     <!-- team layouts bar, add team -->
     <div class="sidebar-title">Team Layouts</div>
-    <div class="sidebar-subtitle">Team Name</div>
+    <div class="sidebar-subtitle">{{currentTeam.name}}</div>
     <div class="layouts team">
       <div class="layouts-list">
-        <div class="layout-item" v-for="n in 4">layout {{n}}</div>
+        <div class="layout-item" v-for="team in teams">{{team.name}}</div>
       </div>
     </div>
 
@@ -50,7 +50,9 @@ export default {
   computed: {
     activePanel: function() {
       return this.$store.state.activePanel;
-    }
+    },
+    teams: function(){ return this.$store.getters['teams/list']},
+    currentTeam: function() { return this.$store.state.currentTeam }
   },
   methods: {
     setPanel: function(value){

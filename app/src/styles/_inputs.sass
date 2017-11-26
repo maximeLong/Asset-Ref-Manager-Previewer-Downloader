@@ -1,10 +1,42 @@
-.button-solid
-  background-color: $action_color
-  padding: 10px 0
-  text-align: center
-  border-radius: 3px
+//-- form input
+//
+input
+  border: 2px solid $border_color_mid
+  padding: 12px 11px
+  border-radius: 2px
+  +userType(small)
+  color: $text_color
+  width: 100%
 
-  +systemType(small)
-  color: white
-  font-weight: bold
+//-- button builder... so many variations
+//
+=button($rounded: false, $border: true, $color: "", $width: 100%)
+  outline: 0
   +clickable
+  padding: 13px 0
+  width: $width
+  text-align: center
+  +systemType(small)
+  font-weight: bold
+
+  @if $rounded == true
+    border-radius: 100px
+  @if $rounded == false
+    border-radius: 2px
+
+  @if $border == false
+    border: none
+    color: white
+    @if $color != ""
+      background-color: $color
+    @else
+      background-color: $action_color
+
+  @if $border == true
+    background-color: none
+    @if $color != ""
+      color: $color
+      border: 2px solid $color
+    @else
+      color: $action_color
+      border: 2px solid $action_color

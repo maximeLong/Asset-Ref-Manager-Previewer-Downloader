@@ -14,7 +14,7 @@ const server = feathers()
 server.service('/users')
 server.service('/teams')
 
-server.service('/scenes')
+server.service('/layouts')
 server.service('/variants')
 server.service('/assets')
 

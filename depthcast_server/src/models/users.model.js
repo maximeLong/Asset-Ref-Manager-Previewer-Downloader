@@ -8,15 +8,17 @@ module.exports = function (app) {
   const users = new Schema({
 
     email:      { type: String, unique: true, required: [true, 'email must exist'] },
-    googleId:   { type: String },
+    //googleId:   { type: String },
     password:   { type: String, required: [true, 'users must have password'], minlength : [1, 'password cannot be empty'] },
-
-    teams:      [{ type: Schema.Types.ObjectId, ref: 'teams' }],
 
     profileImage: {
       big: { type: String },
       small: { type: String }
     },
+
+    //-- could store these in localStorage as well to save db writes
+    currentLayout: { type: Schema.Types.ObjectId, ref: 'layout' },
+    currentTeam: { type: Schema.Types.ObjectId, ref: 'teams' },
 
     createdAt:  { type: Date, 'default': Date.now },
     updatedAt:  { type: Date, 'default': Date.now }

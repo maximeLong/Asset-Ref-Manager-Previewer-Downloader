@@ -3,10 +3,7 @@
 
     <div class="middle-section">
       <div class="team-account" v-if="userIsLoggedIn" @click="openTeamPanel">
-
-        <div class="team-name" v-if="user.teams.length == 0">Your Teams</div>
-        <div class="team-name" v-else>{{user.teams[0].name}}</div>
-
+        <div class="team-name">Your Teams</div>
       </div>
       <div class="create-account" v-if="!userIsLoggedIn" @click="openCreatePanel">
         <div class="create-account-text">Create Account</div>
