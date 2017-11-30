@@ -6,35 +6,25 @@
     </div>
 
     <!-- main layouts bar, add layout -->
-    <div class="sidebar-title">My Layouts</div>
+    <div class="sidebar-title">
+      <div>My Layouts</div>
+      <router-link to="/createlayout">+</router-link>
+    </div>
     <div class="layouts">
       <div class="layouts-list">
-        <div class="layout-item" v-for="n in 4">layout {{n}}</div>
+        <div class="layout-item" v-for="layout in layouts">{{layout.name}}</div>
       </div>
     </div>
 
     <!-- team layouts bar, add team -->
-    <div class="sidebar-title">Team Layouts</div>
-    <div class="sidebar-subtitle">{{currentTeam.name}}</div>
+    <!-- <div class="sidebar-title">Team Layouts</div>
+    <div class="sidebar-subtitle" v-if="currentTeam">{{currentTeam.name}}</div>
     <div class="layouts team">
       <div class="layouts-list">
         <div class="layout-item" v-for="team in teams">{{team.name}}</div>
       </div>
-    </div>
+    </div> -->
 
-    <!-- <div class="option other"
-      @click="setPanel('teamView')"
-      :class="{ active: activePanel == 'teamView' }"></div>
-    <div class="option move"
-      @click="setPanel('sceneView')"
-      :class="{ active: activePanel == 'sceneView' }"></div>
-
-    <div class="option fx"
-      @click="setPanel('cameraFX')"
-      :class="{ active: activePanel == 'cameraFX' }"></div>
-    <div class="option dmx"
-      @click="setPanel('dmxBoard')"
-      :class="{ active: activePanel == 'dmxBoard' }"></div> -->
 
   </div>
 </template>
@@ -48,16 +38,13 @@ export default {
     }
   },
   computed: {
-    activePanel: function() {
-      return this.$store.state.activePanel;
-    },
+
     teams: function(){ return this.$store.getters['teams/list']},
+    layouts: function(){ return this.$store.getters['layouts/list'] },
     currentTeam: function() { return this.$store.state.currentTeam }
   },
   methods: {
-    setPanel: function(value){
-      this.$store.commit('SET_ACTIVE_PANEL', value);
-    }
+
   }
 
 }
@@ -87,7 +74,10 @@ export default {
   .sidebar-title, .sidebar-subtitle
     +systemType(big)
     color: white
-    padding: 0 0 0 15px
+    padding: 0 15px
+    +flexbox
+    +align-items(center)
+    +justify-content(space-between)
   .sidebar-subtitle
     +systemType(average)
     color: white

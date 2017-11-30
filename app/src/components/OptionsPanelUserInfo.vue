@@ -28,17 +28,8 @@ export default {
 
   methods: {
     tryLogOut: function() {
-      this.logout()
-      .then(res => {
-        console.log('you were logged off')
-      })
-      .catch(error => {
-        console.log(err)
-      })
+      this.$store.dispatch('logOutUser')
     },
-    ...mapActions('auth', [
-      'logout'
-    ])
   }
 
 }

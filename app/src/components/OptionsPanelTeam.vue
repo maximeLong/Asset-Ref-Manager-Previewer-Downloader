@@ -90,7 +90,7 @@ export default {
         admins: [this.user._id]
       })
       .then(response =>
-        console.log(response)
+        this.setCurrentTeam(response)
       )
       .catch(error => {
         console.log(error)

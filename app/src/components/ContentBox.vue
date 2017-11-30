@@ -38,6 +38,7 @@ export default {
   border-radius: 3px
   margin-bottom: 30px
   box-shadow: 2px 2px 10px rgba(103, 103, 103, 0.3)
+  z-index: 9
   &:last-of-type
     margin-bottom: 0
 

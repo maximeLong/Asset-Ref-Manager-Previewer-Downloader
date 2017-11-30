@@ -46,7 +46,13 @@ export default {
     //basically mirrors sign-in action without passing an argument
     this.$store.dispatch('auth/authenticate')
     .then(success => {
-      this.$store.dispatch('signInLoad');
+      this.$store.dispatch('signInLoad')
+      .then(success => {
+        //check what the entry route is and if user isn't trying to access an endpoint - send to loading route
+        if (this.$store.state.route.name !== 'Layout') {
+          this.$router.push({ name: 'LayoutLoading' })
+        }
+      })
     })
     .catch(error => {
       console.log(error)

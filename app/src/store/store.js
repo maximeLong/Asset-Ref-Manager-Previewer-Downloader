@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import feathersVuex from 'feathers-vuex'
 import server from '../server'
+import router from '../router'
 
 //feathers actions
 const { service, auth } = feathersVuex(server, { idField: '_id' })
@@ -16,6 +17,7 @@ export const store = new Vuex.Store({
 
       formEmail: '',
       formTeamName: '',
+      formLayoutName: '',
       formPassword: '',
       formInviteEmail: '',
 
@@ -120,6 +122,39 @@ export const store = new Vuex.Store({
 
   actions: {
 
+    // -- first major db lookup, gets layouts and teams, and current of both
+    // -- should open websocket connection, for getter lists (store.getters['teams/list'])
+    // -- TODO: populate doesn't work when lists update from websocket
+    //
+    async signInLoad (store) {
+      const res = await store.dispatch('layouts/find', {
+        query: {
+          users: store.state.auth.user._id,
+          $populate: ['users', 'creator', 'admins', 'teams']
+        }
+      })
+
+
+      //-- find overlay and set commit
+      // store.dispatch('layouts/find', {
+      //   query: {
+      //     users: store.state.auth.user._id,
+      //     $populate: ['users', 'creator', 'admins', 'teams']
+      //   }
+      // }).then(success => {
+      //   console.log(success)
+      // }).catch(error => {
+      //   console.log(error)
+      // })
+
+      console.log(res, 'sign in load stuff is done')
+      store.commit('SET_USER_PANEL', {open: false})
+
+      return res
+    },
+
+    // -- other user actions
+    //
     createUser: function({dispatch, commit}, props) {
       dispatch('users/create', props)
       .then(success => {
@@ -127,54 +162,40 @@ export const store = new Vuex.Store({
       })
       .catch(error => { console.log(error) })
     },
-
     signInUser: function({dispatch, commit}, {email, password}) {
       dispatch('auth/authenticate', {strategy: 'local', email, password})
       .then(success => {
-        dispatch('signInLoad');
+        dispatch('signInLoad')
+        .then(success => {
+          router.push({ name: 'LayoutLoading' })
+        })
       })
       .catch(error => { console.log(error) })
     },
-
-    // -- first major db lookup, gets layouts and teams, and current of both
-    //
-    signInLoad: function(store) {
-
-      store.dispatch('teams/find', {
-        query: {
-          users: store.state.auth.user._id,
-          $populate: ['users', 'creator', 'admins']
-        }
-      }).then(success => {
-        store.commit('SET_CURRENT_TEAM', success.data.find(function(o){
-          return o._id == store.state.auth.user.currentTeam
-        }))
-      }).catch(error => { console.log(error) })
-
-      store.dispatch('layouts/find', {
-        query: {
-          users: store.state.auth.user._id,
-          $populate: ['users', 'creator', 'admins', 'teams']
-        }
-      }).then(success => {
-        store.commit('SET_CURRENT_LAYOUT', success.data.find(function(o){
-          return o._id == store.state.auth.user.currentLayout
-        }))
-      }).catch(error => { console.log(error) })
-
-      console.log('sign in load stuff is done')
-      store.commit('SET_USER_PANEL', {open: false})
-    },
-
     logOutUser: function({dispatch, commit}) {
       dispatch('auth/logout')
       .then(success => {
         //-- clear the store of user specific stuff
-        //-- go back to landing page
+        router.push({ name: 'Landing' })
+        commit('layouts/clearAll');
+        commit('SET_CURRENT_LAYOUT', {});
       })
-      .catch(error => {
-        //-- throw error
-      })
+      .catch(error => { console.log(error) })
+    },
+
+
+
+    //-- team actions -- move to router when you finish
+    //
+    findCurrentTeamLayouts: function(store, team) {
+      store.commit('SET_CURRENT_TEAM', team);
+      store.dispatch('layouts/find', {
+        query: {
+          teams: team._id,
+          $populate: ['users', 'creator', 'admins', 'teams']
+        }
+      }).then(success => { console.log(success)})
+        .catch(error => { console.log(error) })
     }
 
 
@@ -190,6 +211,7 @@ export const store = new Vuex.Store({
       },
       SET_FORM_EMAIL: function(state, val) { state.formEmail = val; },
       SET_FORM_TEAMNAME: function(state, val) { state.formTeamName = val; },
+      SET_FORM_LAYOUTNAME: function(state, val) { state.formLayoutName = val; },
       SET_FORM_PASSWORD: function(state, val) { state.formPassword = val; },
       SET_FORM_INVITEEMAIL: function(state, val) { state.formInviteEmail = val },
 
