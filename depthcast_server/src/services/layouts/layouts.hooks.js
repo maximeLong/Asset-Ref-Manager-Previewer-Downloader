@@ -1,4 +1,15 @@
 const { authenticate } = require('feathers-authentication').hooks;
+const { fastJoin, populate } = require('feathers-hooks-common');
+
+const layoutUserSchema = {
+  include: {
+    service: 'users',
+    nameAs: 'users',
+    parentField: 'users',
+    childField: '_id',
+    asArray: true
+  }
+};
 
 module.exports = {
   before: {
@@ -12,7 +23,7 @@ module.exports = {
   },
 
   after: {
-    all: [],
+    all: [populate({ schema: layoutUserSchema })],
     find: [],
     get: [],
     create: [],

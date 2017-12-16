@@ -15,6 +15,7 @@ import CreateTeam     from './views/CreateTeam'
 Vue.use(Router)
 
 export default new Router({
+
   routes: [
     {
       path: '/',
@@ -39,14 +40,10 @@ export default new Router({
       beforeEnter: (to, from, next) => {
         if (store.state.auth.user) {
 
-          store.dispatch('layouts/get', [to.params.layout_id, {
-            query: {
-              $populate: ['users', 'creator', 'admins', 'teams', 'assets']
-            }
-          }])
+          //TODO: currentLayout doesn't update on changes to "currentLayout" getter
+          store.dispatch('layouts/get', [to.params.layout_id])
           .then(success => {
             console.log('layout success', success)
-            store.commit('SET_CURRENT_LAYOUT', success)
             next(vm => {})
           })
           .catch(error => {
@@ -56,6 +53,9 @@ export default new Router({
         } else {
           next('/')
         }
+      },
+      beforeRouteUpdate: (to, from, next) => {
+        console.log('do we need this?')
       }
     },
     {

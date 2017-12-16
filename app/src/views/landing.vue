@@ -1,6 +1,9 @@
 <template>
   <div id="landing">
-    landing content
+    <div class="landing-helper">
+      <div>Log in, or create a new account!</div>
+      <div>This will be a full fledged landing page soon.</div>
+    </div>
   </div>
 </template>
 
@@ -28,5 +31,20 @@ export default {
 @import src/styles/main
 
 #landing
+  height: 100%
+  +flexbox
+  +justify-content(center)
+  +align-items(center)
+  .landing-helper
+    background-color: $border_color_light
+    width: 500px
+    height: 250px
+    border-radius: 2px
+    +flexbox
+    +justify-content(center)
+    +align-items(center)
+    +flex-direction(column)
+    div
+      margin: 10px 0
 
 </style>

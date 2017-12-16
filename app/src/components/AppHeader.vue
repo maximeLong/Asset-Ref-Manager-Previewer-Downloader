@@ -1,10 +1,16 @@
 <template>
   <div id="header-content">
 
+    <div class="left-section">
+      <div class="asset-marketplace">asset marketplace</div>
+    </div>
+
     <div class="middle-section">
+      <!--
       <div class="team-account" v-if="userIsLoggedIn" @click="openTeamPanel">
         <div class="team-name">Your Teams</div>
       </div>
+      -->
       <div class="create-account" v-if="!userIsLoggedIn" @click="openCreatePanel">
         <div class="create-account-text">Create Account</div>
       </div>
@@ -12,8 +18,8 @@
 
     <div class="right-section">
       <div class="user-account" v-if="userIsLoggedIn" @click="openUserInfoPanel">
-        <div class="account-image" :style="{ 'background-image' : 'url(' + user.profileImage.big + ')'}"></div>
         <div class="account-name">{{user.email}}</div>
+        <div class="account-image" :style="{ 'background-image' : 'url(' + user.profileImage.big + ')'}"></div>
       </div>
       <div class="sign-in" v-if="!userIsLoggedIn" @click="openSignInPanel">
         <div class="sign-in-text">Sign In</div>
@@ -58,17 +64,17 @@ export default {
 
 <style scoped lang="sass">
 @import src/styles/main
-$margin_amount: 55px
+$margin_amount: 30px
 
 #header-content
   width: 100%
-  height: 100%
+  height: 60px
   +flexbox
   +align-items(center)
   +flex-direction(row)
   +justify-content(space-between)
   background-color: $header_color
-  border-bottom: 1px solid $border_color
+  border-bottom: 1px solid $border_color_light
   +userType(small)
   //font-weight: bold
 
@@ -88,6 +94,17 @@ $margin_amount: 55px
       background-repeat: no-repeat
       background-image: url('../assets/logo-icon.svg')
 
+  .left-section
+    +flexbox
+    +align-items(center)
+    +justify-content(flex-end)
+    height: 100%
+    +flex(0 0 210px)
+    margin-left: 30px
+    .asset-marketplace
+      +button(false,false)
+      padding: 10px
+
   .middle-section
     +flexbox
     +align-items(center)
@@ -99,7 +116,6 @@ $margin_amount: 55px
     .team-account,.create-account
       height: 100%
       padding: 0 20px
-      border-left: 1px solid $border_color
       +clickable
       +flexbox
       +align-items(center)
@@ -110,7 +126,6 @@ $margin_amount: 55px
   .right-section
     margin-right: $margin_amount
     height: 100%
-    border-left: 1px solid $border_color
     +clickable
     .sign-in
       height: 100%
@@ -123,16 +138,18 @@ $margin_amount: 55px
     .user-account
       height: 100%
       width: 100%
-      padding-left: 25px
+      padding-left: 20px
+
       +flexbox
       +align-items(center)
       +justify-content(center)
+
       .account-image
         width: 45px
         height: 45px
         border: 1px solid $border_color
         border-radius: 100%
-        margin-right: 10px
+        margin-left: 15px
         background-size: contain
         background-position: 50% 50%
         background-repeat: no-repeat

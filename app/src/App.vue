@@ -10,16 +10,18 @@
 
       <div id="header-panel">
         <app-header></app-header>
+        <layout-header v-if="layoutIsOpen"></layout-header>
         <options-panel v-if="userPanel.open"></options-panel>
       </div>
 
-      <div id="app-content">
-
-        <!-- router hack -->
+      <div id="app-content" :class="{ openLayout : layoutIsOpen }">
+        <!-- views -->
         <router-view></router-view>
 
+        <!-- full screen modals -->
+        <layout-options v-if="layoutOptions"></layout-options>
       </div>
-      <!-- end app content -->
+
     </div>
 
   </div>
@@ -28,13 +30,20 @@
 <script>
 
 import AppHeader from './components/AppHeader'
+import LayoutHeader from './components/LayoutHeader'
+import LayoutOptions from './components/LayoutOptions'
 import OptionsPanel from './components/OptionsPanel'
 import SidePanel from './components/SidePanel'
+
+import { mapState } from 'vuex'
+import _ from 'lodash'
 
 export default {
   name: 'app',
   components: {
     AppHeader,
+    LayoutHeader,
+    LayoutOptions,
     OptionsPanel,
     SidePanel
   },
@@ -61,8 +70,18 @@ export default {
   methods: {
   },
   computed: {
-    activePanel: function() { return this.$store.state.activePanel },
-    userPanel: function() { return this.$store.state.userPanel }
+
+    layoutIsOpen: function() {
+      if (this.$store.getters['layouts/current'] == null || this.route.name != 'Layout') { return false } else {
+        return true
+      }
+    },
+    ...mapState([
+      'activePanel',
+      'userPanel',
+      'route',
+      'layoutOptions'
+    ])
   }
 }
 </script>

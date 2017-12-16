@@ -77,10 +77,12 @@ $margin_amount: 55px
   width: 400px
   height: auto
   position: fixed
+  z-index: 99
+  top: 60px
   right: $margin_amount
   padding: 30px
   background-color: $header_color
-  border: 1px solid $border_color
+  border: 1px solid $border_color_mid
   border-top: none
   +userType(small)
 

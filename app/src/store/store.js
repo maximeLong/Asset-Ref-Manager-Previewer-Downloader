@@ -14,6 +14,7 @@ export const store = new Vuex.Store({
 
   state: {
       userPanel: { open: false, panelType: 'userInfo' }, //panelType can be : 'signIn', 'createAccount', 'userInfo', 'team'
+      layoutOptions: false,
 
       formEmail: '',
       formTeamName: '',
@@ -23,7 +24,6 @@ export const store = new Vuex.Store({
 
       //current team
       currentTeam: {},
-      currentLayout: {},
 
       //dmx board
       // lock: false,
@@ -128,24 +128,8 @@ export const store = new Vuex.Store({
     //
     async signInLoad (store) {
       const res = await store.dispatch('layouts/find', {
-        query: {
-          users: store.state.auth.user._id,
-          $populate: ['users', 'creator', 'admins', 'teams']
-        }
+        query: { users: store.state.auth.user._id }
       })
-
-
-      //-- find overlay and set commit
-      // store.dispatch('layouts/find', {
-      //   query: {
-      //     users: store.state.auth.user._id,
-      //     $populate: ['users', 'creator', 'admins', 'teams']
-      //   }
-      // }).then(success => {
-      //   console.log(success)
-      // }).catch(error => {
-      //   console.log(error)
-      // })
 
       console.log(res, 'sign in load stuff is done')
       store.commit('SET_USER_PANEL', {open: false})
@@ -183,8 +167,6 @@ export const store = new Vuex.Store({
       .catch(error => { console.log(error) })
     },
 
-
-
     //-- team actions -- move to router when you finish
     //
     findCurrentTeamLayouts: function(store, team) {
@@ -198,6 +180,9 @@ export const store = new Vuex.Store({
         .catch(error => { console.log(error) })
     }
 
+    //-- layout action
+    //-- automatically update CurrentLayout when getter is getter stream is modified from server
+
 
   },
 
@@ -209,6 +194,10 @@ export const store = new Vuex.Store({
           state.userPanel.panelType = panelType;
         }
       },
+      SET_LAYOUT_OPTIONS: function(state, val) {
+        state.layoutOptions = val;
+      },
+
       SET_FORM_EMAIL: function(state, val) { state.formEmail = val; },
       SET_FORM_TEAMNAME: function(state, val) { state.formTeamName = val; },
       SET_FORM_LAYOUTNAME: function(state, val) { state.formLayoutName = val; },
@@ -216,7 +205,6 @@ export const store = new Vuex.Store({
       SET_FORM_INVITEEMAIL: function(state, val) { state.formInviteEmail = val },
 
       SET_CURRENT_TEAM: function(state, val) { state.currentTeam = val },
-      SET_CURRENT_LAYOUT: function(state, val) { state.currentLayout = val },
 
       //DMX board
       SET_CHANNELS_COLLECTION: function(state, {channel, value}) {

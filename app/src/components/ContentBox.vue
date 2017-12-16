@@ -44,7 +44,7 @@ export default {
 
   h2.content-header
     padding: 15px 30px
-    border-bottom: 1px solid $border_color
+    border-bottom: 1px solid $border_color_light
   .content-content
     padding: 30px
 

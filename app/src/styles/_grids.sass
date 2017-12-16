@@ -5,6 +5,8 @@ $header_panel_height: 60px
 #app
 	+flexbox
 	+flex-direction(row)
+	max-height: 100vh
+	overflow: hidden
 
 	#side-panel
 		width: 200px
@@ -15,12 +17,17 @@ $header_panel_height: 60px
 		+flex(1)
 
 		#header-panel
-			height: $header_panel_height
+			//height: $header_panel_height
+
 		#app-content
-			height: calc(100vh - 60px)
-			padding: 40px
 			background-color: $background_color
 			overflow-y: scroll
+			height: calc(100vh - 60px)
+			//hook for position absolute modals >>
+			position: relative
+
+			&.openLayout
+				height: calc(100vh - 150px)
 
 
 

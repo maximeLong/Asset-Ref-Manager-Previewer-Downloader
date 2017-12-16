@@ -12,7 +12,11 @@
     </div>
     <div class="layouts">
       <div class="layouts-list">
-        <div class="layout-item" v-for="layout in layouts">{{layout.name}}</div>
+        <div class="layout-item"
+          v-for="layout in layouts"
+          @click="goToLayout(layout._id)"
+          :class="{ active : checkActive(layout) }">
+          {{layout.name}}</div>
       </div>
     </div>
 
@@ -38,13 +42,20 @@ export default {
     }
   },
   computed: {
-
     teams: function(){ return this.$store.getters['teams/list']},
     layouts: function(){ return this.$store.getters['layouts/list'] },
-    currentTeam: function() { return this.$store.state.currentTeam }
+    currentTeam: function() { return this.$store.state.currentTeam },
+    currentLayout: function() { return this.$store.getters['layouts/current'] }
   },
   methods: {
-
+    goToLayout: function(id) {
+      this.$router.push({ name: 'Layout', params: { layout_id: id }})
+    },
+    checkActive: function(layoutIndex) {
+      if (this.currentLayout != null) {
+        if (this.currentLayout.name == layoutIndex.name) { return true } else { return false }
+      } else { return false }
+    }
   }
 
 }
@@ -98,6 +109,8 @@ export default {
         &:hover
           background-color: $side_panel_hover
           +transition(.25s ease-in-out all)
+        &.active
+          color: $action_color
 
 
 
