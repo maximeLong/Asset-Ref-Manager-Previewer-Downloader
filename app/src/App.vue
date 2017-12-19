@@ -20,6 +20,8 @@
 
         <!-- full screen modals -->
         <layout-options v-if="layoutOptions"></layout-options>
+        <prop-import></prop-import>
+
       </div>
 
     </div>
@@ -32,6 +34,9 @@
 import AppHeader from './components/AppHeader'
 import LayoutHeader from './components/LayoutHeader'
 import LayoutOptions from './components/LayoutOptions'
+
+import PropImport from './components/PropImport'
+
 import OptionsPanel from './components/OptionsPanel'
 import SidePanel from './components/SidePanel'
 
@@ -44,6 +49,7 @@ export default {
     AppHeader,
     LayoutHeader,
     LayoutOptions,
+    PropImport,
     OptionsPanel,
     SidePanel
   },
@@ -80,7 +86,8 @@ export default {
       'activePanel',
       'userPanel',
       'route',
-      'layoutOptions'
+      'layoutOptions',
+      'propImport'
     ])
   }
 }

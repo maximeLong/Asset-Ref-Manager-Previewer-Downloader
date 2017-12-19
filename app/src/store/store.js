@@ -15,12 +15,16 @@ export const store = new Vuex.Store({
   state: {
       userPanel: { open: false, panelType: 'userInfo' }, //panelType can be : 'signIn', 'createAccount', 'userInfo', 'team'
       layoutOptions: false,
+      propImport: false,
+      propInfo: false,
 
       formEmail: '',
       formTeamName: '',
       formLayoutName: '',
       formPassword: '',
       formInviteEmail: '',
+
+      formPropName: '',
 
       //current team
       currentTeam: {},
@@ -194,9 +198,12 @@ export const store = new Vuex.Store({
           state.userPanel.panelType = panelType;
         }
       },
-      SET_LAYOUT_OPTIONS: function(state, val) {
-        state.layoutOptions = val;
-      },
+
+      SET_PROP_INFO: function(state, val) { state.propInfo = val; },
+      SET_PROP_IMPORT: function(state, val) { state.propImport = val; },
+      SET_LAYOUT_OPTIONS: function(state, val) { state.layoutOptions = val; },
+
+      SET_FORM_PROPNAME: function(state, val) { state.formPropName = val },
 
       SET_FORM_EMAIL: function(state, val) { state.formEmail = val; },
       SET_FORM_TEAMNAME: function(state, val) { state.formTeamName = val; },

@@ -1,18 +1,15 @@
 <template>
 <div id="layout">
 
-
-    <div class="layout-saves">
+    <!-- modules -->
+    <div class="layout-modules">
       <content-box :title="'Stage Modules'">
         stage modules
       </content-box>
     </div>
 
-    <div class="layout-assets">
-      <content-box :title="'Stage Props'">
-        stage props stuff
-      </content-box>
-    </div>
+    <!-- palette information -->
+    <palette></palette>
 
 </div>
 
@@ -20,11 +17,13 @@
 
 <script>
 import ContentBox from '../components/ContentBox'
+import Palette from '../components/Palette'
 
 export default {
   name: 'layout',
   components: {
     ContentBox,
+    Palette
   },
   data: function() {
     return {}
