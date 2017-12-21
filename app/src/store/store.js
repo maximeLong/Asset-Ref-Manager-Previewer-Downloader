@@ -13,6 +13,7 @@ Vue.use(Vuex);
 export const store = new Vuex.Store({
 
   state: {
+
       userPanel: { open: false, panelType: 'userInfo' }, //panelType can be : 'signIn', 'createAccount', 'userInfo', 'team'
       layoutOptions: false,
       propImport: false,

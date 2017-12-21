@@ -8,7 +8,7 @@
 
     <!-- screenshot prop -->
     <div class="screenshot form" v-if="imported">
-
+        <!-- <prop-viewer></prop-viewer> -->
     </div>
 
     <!-- name and info form -->
@@ -34,6 +34,7 @@
 <script>
 import ContentBox from '../components/ContentBox'
 import propLoaderFbx from '../components/propLoaderFbx'
+
 import { mapState } from 'vuex'
 import { mapActions } from 'vuex'
 
