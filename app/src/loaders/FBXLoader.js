@@ -30,7 +30,7 @@
 
 import * as THREE from 'three'
 const {Zlib} = require("three/examples/js/libs/inflate.min.js");
-
+import {store} from '../store/store';
 
 
 
@@ -42,6 +42,7 @@ export default (function() {
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 	};
+
 
 	Object.assign( THREE.FBXLoader.prototype, {
 
@@ -57,7 +58,7 @@ export default (function() {
 
 				try {
 
-					var scene = self.parse( buffer, resourceDirectory );
+					var scene = self.parse( buffer, resourceDirectory);
 					onLoad( scene );
 
 				} catch ( error ) {
@@ -76,13 +77,14 @@ export default (function() {
 
 		},
 
-		parse: function ( FBXBuffer, resourceDirectory ) {
+		parse: function ( FBXBuffer, resourceDirectory, getParseData ) {
 
 			var FBXTree;
 
 			if ( isFbxFormatBinary( FBXBuffer ) ) {
 
 				FBXTree = new BinaryParser().parse( FBXBuffer );
+
 
 			} else {
 
@@ -101,6 +103,7 @@ export default (function() {
 				}
 
 				FBXTree = new TextParser().parse( FBXText );
+        store.commit('SET_FBX_MODEL_TYPE', 'ascii');
 
 			}
 
@@ -264,6 +267,7 @@ export default (function() {
 
 				type = 'image/png';
 				break;
+
 
 			case 'tif':
 
@@ -782,6 +786,11 @@ export default (function() {
 
 		var vertexPositions = subNodes.Vertices.properties.a;
 		var vertexIndices = subNodes.PolygonVertexIndex.properties.a;
+
+    //get the vertexs for prop information
+    var vertexFaces = vertexPositions.length / 3;
+    store.commit('SET_FBX_MODEL_VERTICES', vertexFaces);
+
 
 		// create arrays to hold the final data used to build the buffergeometry
 		var vertexBuffer = [];
@@ -2978,7 +2987,9 @@ export default (function() {
 
 			var version = reader.getUint32();
 
-			console.log( 'THREE.FBXLoader: FBX binary version: ' + version );
+			//console.log( 'THREE.FBXLoader: FBX binary version: ' + version );
+      store.commit('SET_FBX_MODEL_VERSION', version);
+      store.commit('SET_FBX_MODEL_TYPE', 'binary');
 
 			var allNodes = new FBXTree();
 

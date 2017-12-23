@@ -27,93 +27,17 @@ export const store = new Vuex.Store({
 
       formPropName: '',
 
-      //current team
-      currentTeam: {},
+      //FBX model info
+      FBXModelVertices: 0,
+      FBXModelType: '',
+      FBXModelVersion: '',
+      FBXModelSize: '',
+      FBXModelName: '',
+      FBXModelSnapshot: undefined,
+      FBXModelFile: undefined,
 
-      //dmx board
-      // lock: false,
-      // channels: [0,0,0,0,0],
-      //channel mixer sliders
-      // channel_mixer: {
-      //   red: {
-      //     red:    0,
-      //     green:  0,
-      //     blue:   0
-      //   },
-      //   green: {
-      //     red:    0,
-      //     green:  0,
-      //     blue:   0
-      //   },
-      //   blue: {
-      //     red:    0,
-      //     green:  0,
-      //     blue:   0
-      //   }
-      // },
-      // tonemapping: {
-      //   temperature:  0,
-      //   tint:         0,
-      //   saturation:   0
-      // },
-      // contrast: {
-      //   contrast:   0,
-      //   brightness: 0,
-      //   tone:       0
-      // },
-      // two_d_sliders: {
-      //   lift:   [0,0],
-      //   gamma:  [0,0],
-      //   gain:   [0,0]
-      // },
-      //team layouts dummy
-      // layouts: [
-      //   {
-      //     name: 'Sheraton 2018 Gala',
-      //     assets: [
-      //       {
-      //         name: 'someAsset',
-      //       }
-      //     ],
-      //     varients: 2,
-      //     authors: [
-      //       {
-      //         name: 'maximeLong'
-      //       }
-      //     ]
-      //   }
-      // ],
-      // activeScene: {
-      //   name: 'Sheraton 2018 Gala',
-      //   assets: [
-      //     {
-      //       name: 'someAsset',
-      //     }
-      //   ],
-      //   variants: [
-      //     {
-      //       name: 'Sheraton 2018 Varient - No podium',
-      //       assets: [
-      //         {
-      //             name: 'someAsset'
-      //         }
-      //       ]
-      //     },
-      //     {
-      //       name: 'Sheraton 2018 Varient - Extra chairs',
-      //       assets: [
-      //         {
-      //             name: 'someAsset'
-      //         }
-      //       ]
-      //     }
-      //   ],
-      //   authors: [
-      //     {
-      //       name: 'maximeLong'
-      //     }
-      //   ]
-      // }
+      //current team
+      currentTeam: {}
   },
 
   plugins: [
@@ -200,45 +124,28 @@ export const store = new Vuex.Store({
         }
       },
 
-      SET_PROP_INFO: function(state, val) { state.propInfo = val; },
-      SET_PROP_IMPORT: function(state, val) { state.propImport = val; },
-      SET_LAYOUT_OPTIONS: function(state, val) { state.layoutOptions = val; },
+      SET_PROP_INFO: function(state, val)       { state.propInfo = val; },
+      SET_PROP_IMPORT: function(state, val)     { state.propImport = val; },
+      SET_LAYOUT_OPTIONS: function(state, val)  { state.layoutOptions = val; },
 
-      SET_FORM_PROPNAME: function(state, val) { state.formPropName = val },
+      SET_FORM_PROPNAME: function(state, val)   { state.formPropName = val },
 
-      SET_FORM_EMAIL: function(state, val) { state.formEmail = val; },
-      SET_FORM_TEAMNAME: function(state, val) { state.formTeamName = val; },
-      SET_FORM_LAYOUTNAME: function(state, val) { state.formLayoutName = val; },
-      SET_FORM_PASSWORD: function(state, val) { state.formPassword = val; },
-      SET_FORM_INVITEEMAIL: function(state, val) { state.formInviteEmail = val },
+      SET_FORM_EMAIL: function(state, val)        { state.formEmail = val; },
+      SET_FORM_TEAMNAME: function(state, val)     { state.formTeamName = val; },
+      SET_FORM_LAYOUTNAME: function(state, val)   { state.formLayoutName = val; },
+      SET_FORM_PASSWORD: function(state, val)     { state.formPassword = val; },
+      SET_FORM_INVITEEMAIL: function(state, val)  { state.formInviteEmail = val },
+
+      SET_FBX_MODEL_VERTICES: function(state, val)  { state.FBXModelVertices += val },
+      SET_FBX_MODEL_TYPE: function(state, val)      { state.FBXModelType = val },
+      SET_FBX_MODEL_VERSION: function(state, val)   { state.FBXModelVersion = val },
+      SET_FBX_MODEL_NAME: function(state, val)      { state.FBXModelName = val },
+      SET_FBX_MODEL_SIZE: function(state, val)      {state.FBXModelSize = val},
+      SET_FBX_MODEL_SNAPSHOT: function(state, val)  {state.FBXModelSnapshot = val},
+      SET_FBX_MODEL_FILE: function(state, val)      {state.FBXModelFile = val},
+
 
       SET_CURRENT_TEAM: function(state, val) { state.currentTeam = val },
-
-      //DMX board
-      SET_CHANNELS_COLLECTION: function(state, {channel, value}) {
-        //hard coding channels 1 - 5 (pos 0 -4)
-        state.channels.splice(channel, 1, value);
-        //pos 5 - 520
-        for (var i = 5; i < 512; i++) {
-          state.channels[i] = 0;
-        }
-      },
-      UPDATE_LOCK: function(state, val) {
-        state.lock = val;
-      },
-      //FX Board
-      UPDATE_CHANNEL_MIXER: function(state, val) {
-        state.channel_mixer[val.channel][val.name] = val.value;
-      },
-      UPDATE_TONEMAPPING: function(state, val) {
-        state.tonemapping[val.name] = val.value;
-      },
-      UPDATE_CONTRAST: function(state, val) {
-        state.contrast[val.name] = val.value;
-      },
-      UPDATE_2D_SLIDER: function(state, slider, xVal, yVal){
-        state.two_d_sliders[slider] = [xVal,yVal];
-      }
   }
 
 });

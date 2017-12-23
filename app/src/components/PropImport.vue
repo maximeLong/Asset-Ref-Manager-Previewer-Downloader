@@ -4,17 +4,35 @@
   <content-box :title="'Create Prop'">
 
     <!-- import file -->
-    <prop-loader-fbx></prop-loader-fbx>
+    <prop-loader-fbx v-on:loaded="receiveLoaded" v-on:snap="snapTaken = true"></prop-loader-fbx>
 
-    <!-- screenshot prop -->
-    <div class="screenshot form" v-if="imported">
-        <!-- <prop-viewer></prop-viewer> -->
-    </div>
 
     <!-- name and info form -->
-    <div class="info form" v-if="imported">
+    <div class="name form" v-if="loaded">
       <div class="form-title">Prop Name</div>
-      <input :value="formPropName" @input="updateFormPropName" placeholder="prop name">
+      <input :value="formPropName" @input="updateFormPropName">
+    </div>
+
+    <div class="info form" v-if="loaded">
+      <div class="model-vertices">
+        <div class="form-title">Vertex Count</div>
+        <div class="vertex-info">
+          <div class="vertex-bar" :class="barSize"></div>
+          <div class="vertex-count">{{FBXModelVertices}}</div>
+        </div>
+      </div>
+      <div class="model-data">
+        <div class="subtitles">
+          <div class="form-title">File Type</div>
+          <div class="form-title">File Size</div>
+          <div class="form-title">Textures</div>
+        </div>
+        <div class="data-points">
+          <div class="point">{{FBXModelType}} FBX, v{{FBXModelVersion / 1000}}</div>
+          <div class="point">{{FBXModelSizeFormatted}}</div>
+          <div class="point">yes</div>
+        </div>
+      </div>
     </div>
 
     <!-- save buttons -->
@@ -51,7 +69,8 @@ export default {
   mixins: [ clickaway ],
   data: function() {
     return {
-      imported: false
+      loaded: false,
+      snapTaken: false
     }
   },
   destroyed: function() {
@@ -62,10 +81,34 @@ export default {
     user: function()            { return this.$store.state.auth.user },
     currentLayout: function()   { return this.$store.getters['layouts/current'] },
     propIsOk: function()  {
-      if (this.imported && this.formPropName.length) { return true } else { return false }
+      if (this.loaded && this.formPropName.length) { return true } else { return false }
+    },
+    barSize: function() {
+      if (this.FBXModelVertices <= 5000) {
+        return 'small'
+      }
+      if (this.FBXModelVertices >= 5001 && this.FBXModelVertices <= 20000) {
+        return 'average'
+      } else {
+        return 'big'
+      }
+    },
+    FBXModelSizeFormatted: function() {
+      const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+      let l = 0, n = parseInt(this.FBXModelSize, 10) || 0;
+      while(n >= 1024){
+          n = n/1024;
+          l++;
+      }
+      return(n.toFixed(n >= 10 || l < 1 ? 0 : 1) + ' ' + units[l]);
     },
     ...mapState([
-      'formPropName'
+      'formPropName',
+      'FBXModelVertices',
+      'FBXModelType',
+      'FBXModelVersion',
+      'FBXModelSize',
+      'FBXModelName',
     ])
   },
   methods: {
@@ -82,13 +125,14 @@ export default {
         this.tryCreateProp()
       }
     },
-    importProp: function() {
-      this.imported = true;
-    },
 
     //-- update form info
     //
     updateFormPropName: function(e) { this.$store.commit('SET_FORM_PROPNAME', e.target.value); },
+    receiveLoaded: function() {
+      this.loaded = true;
+      this.$store.commit('SET_FORM_PROPNAME', this.FBXModelName.split('.').shift())
+    },
 
     // -- patch layout
     //
@@ -156,11 +200,43 @@ export default {
         padding-left: 20px
         &.active
           border-color: $border_color_mid
-          .import-prop
-            color: $border_color_mid
-      &.screenshot
-        height: 200px
 
+      &.info
+        +flexbox
+        +align-items(center)
+        +justify-content(space-between)
+        .model-vertices
+          +flex(1)
+          +systemType(small)
+          .vertex-info
+            +flexbox
+            +align-items(center)
+            background-color: $border_color_light
+            margin-top: 10px
+            .vertex-bar
+              height: 25px
+              &.small
+                width: 10%
+                background-color: #73b2f3
+              &.average
+                width: 30%
+                background-color: #54c36c
+              &.big
+                width: 70%
+                background-color: #f55151
+
+            .vertex-count
+              padding-left: 10px
+              color: $text_color
+        .model-data
+          +flex(1)
+          +flexbox
+          +align-items(center)
+          +justify-content(center)
+          .data-points
+            margin-left: 15px
+            +systemType(small)
+            color: $text_color
 
     //buttons
     .edit-buttons

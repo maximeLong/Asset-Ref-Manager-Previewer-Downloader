@@ -20,7 +20,7 @@
 
         <!-- full screen modals -->
         <layout-options v-if="layoutOptions"></layout-options>
-        <prop-import v-if="propImport"></prop-import>
+        <prop-import></prop-import>
 
       </div>
 

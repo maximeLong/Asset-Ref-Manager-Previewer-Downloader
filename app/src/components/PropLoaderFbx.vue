@@ -1,7 +1,7 @@
 <template>
 <div id="prop-loader-fbx">
 
-  <div id="prop-loader">
+  <div id="prop-loader" v-show="!loaded">
 
     <vue-dropzone ref="myVueDropzone"
       id="dropzone-model" class="button import"
@@ -19,11 +19,13 @@
 
   </div>
 
-  <div class="button" @click="loadProp" v-if="activeModel">Load FBX</div>
-
-
-  <div id="prop-viewer">
-
+  <div id="prop-viewer" v-show="loaded">
+    <transition name="fadeup" mode="out-in">
+      <div class="button" @click="takeSnapShot" v-if="activeModel && !snapshotIsTaken" key="take">Snapshot</div>
+      <div class="prop-snapshot" v-else key="snap">
+        <img :src="snapshot">
+      </div>
+    </transition>
   </div>
 
 </div>
@@ -51,13 +53,17 @@ export default {
   data: function() {
     return {
       loaded: false,
+      snapshotIsTaken: false,
+
       //local file storage
       activeModel: {},
       activeTextures: [],
+      snapshot: undefined,
       errors: [],
       //three
       camera: {},
       scene: {},
+      controls: {},
       renderer: {},
       //dropzone params
       dropzoneModelOptions: {
@@ -71,7 +77,7 @@ export default {
           dictDefaultMessage: "Drop your .fbx file here",
           acceptedFiles: ".fbx",
           maxFiles: 1,
-          maxFilesize: 50,
+          maxFilesize: 15.5,
           url: 'whocares', //--this library needs a url because they are doing way too much
           accept: this.dropzoneValidate //--prevents library from sending server event (just never call done())
       },
@@ -113,7 +119,6 @@ export default {
   methods: {
 
     // -- drag file handler
-    //
     dropzoneValidate: function(file, done) {
       var ext = file.name.split('.').pop().toLowerCase();
       //handle fbx
@@ -151,15 +156,21 @@ export default {
       this.errors.push(file.name);
     },
 
-    //read file after basic validation
+    //turn file into ObjectURL
     readFile: function(file, ext) {
+      this.$store.commit('SET_FBX_MODEL_NAME', file.name);
+      this.$store.commit('SET_FBX_MODEL_SIZE', file.size);
+      this.$store.commit('SET_FBX_MODEL_FILE', file);
+      console.log(file)
+      this.$emit('loaded')
+      this.loaded = true;
+
       var _this = this;
       var reader = new FileReader();
       reader.onload = function(e) {
         var binaryData = [];
         binaryData.push(e.target.result);
         var url = window.URL.createObjectURL(new Blob(binaryData, {type: "fbx"}))
-
         //start scene, and load prop
         if (_.isEmpty(_this.renderer)) { _this.startScene() }
         _this.loadProp(url)
@@ -167,45 +178,50 @@ export default {
       reader.readAsArrayBuffer(file);
     },
 
+    //three js scene and model loader
     startScene: function() {
       var container = document.getElementById( 'prop-viewer' );
       var containerHeight = getComputedStyle(container).height.slice(0, -2);
       var containerWidth = getComputedStyle(container).width.slice(0, -2);
 
       //create scene and camera
-      this.camera = new THREE.PerspectiveCamera( 45, containerWidth / containerHeight, 1, 2000 );
+      this.camera = new THREE.PerspectiveCamera( 45, containerWidth / containerHeight, 1, 5000 );
       this.scene = new THREE.Scene();
 
-      // grid helper
-      var gridHelper = new THREE.GridHelper( 50, 50, 0x303030, 0x303030 );
-      gridHelper.position.set( 0, - 0.04, 0 );
-      this.scene.add( gridHelper );
-
       //render loop -- and add to container
-      //TODO: have only one renderer, and make these actions, or mutators to renderer
-      this.renderer = new THREE.WebGLRenderer();
+      //TODO: have only one renderer in app, have to mutate renderer
+      this.renderer = new THREE.WebGLRenderer({
+        preserveDrawingBuffer: true,
+        antialias: true,
+        alpha: true
+      });
       this.renderer.setPixelRatio( window.devicePixelRatio );
       this.renderer.setSize( containerWidth, containerHeight );
       container.appendChild( this.renderer.domElement );
 
       // controls, camera
-      var controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
-      controls.target.set( 0, 12, 0 );
+      this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+      this.controls.target.set( 0, 12, 0 );
       this.camera.position.set( 2, 18, 28 );
-      controls.update();
+      this.controls.update();
 
       //basic lights in scene
-      var hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
-      var dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
-      hemiLight.position.set(0, 1, 0);
-      dirLight.position.set(0, 1, 0);
-      this.scene.add(hemiLight);
-      this.scene.add(dirLight);
+      var ambientLight = new THREE.AmbientLight(0x999999 );
+      this.scene.add(ambientLight);
+      var lights = [];
+      lights[0] = new THREE.DirectionalLight( 0xc9a26f, 1 );
+      lights[0].position.set( 1, 0, 0 );
+      lights[1] = new THREE.DirectionalLight( 0x11E8BB, 1 );
+      lights[1].position.set( 0.75, 1, 0.5 );
+      lights[2] = new THREE.DirectionalLight( 0xFF5B40, 1 );
+      lights[2].position.set( -0.75, -1, 0.5 );
+      this.scene.add( lights[0] );
+      this.scene.add( lights[1] );
+      this.scene.add( lights[2] );
 
       //run loop + watch for resize
       this.animate();
     },
-
     loadProp: function(result) {
         var _this = this;
 
@@ -215,7 +231,7 @@ export default {
 				var onProgress = function( xhr ) {
 					if ( xhr.lengthComputable ) {
 						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+						//console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
 					}
 				};
 				var onError = function( xhr ) { console.error( xhr ); };
@@ -224,7 +240,26 @@ export default {
 				var loader = new THREE.FBXLoader( manager );
         loader.load( result, function( object ) {
           _this.scene.add(object)
+
+          //center the camera
+          var boundingBox = new THREE.Box3();
+          boundingBox.setFromObject( object );
+          var center = boundingBox.getCenter();
+          // set camera to rotate around center of object
+          _this.controls.target = center;
 				}, onProgress, onError );
+    },
+
+    takeSnapShot: function() {
+      var dataURL = this.renderer.domElement.toDataURL();
+      this.snapshot = dataURL;
+      this.snapshotIsTaken = true;
+      this.$store.commit('SET_FBX_MODEL_SNAPSHOT', dataURL)
+      setTimeout( ()=> {
+        this.$emit('snap');
+        this.snapshotIsTaken = false
+      }
+      , 2000)
     },
 
     //three render functions
@@ -260,22 +295,47 @@ export default {
 @import src/styles/main
 
 #prop-loader-fbx
-  #prop-viewer
-    width: 100%
-    height: 300px
   #prop-loader
     +flexbox
     +align-items(center)
-
     #dropzone-model
       +flex(0 0 175px)
       +justify-content(center)
       margin-right: 10px
+      overflow: hidden
+      .dz-message
+        padding-bottom: 10px
       .dz-preview
         margin: 0
     #dropzone-texture
       +flex(1)
 
+  #prop-viewer
+    width: 100%
+    height: 250px
+    background: radial-gradient(#f1e4d1 0%, #737373 100%)
+    position: relative
+    overflow: hidden
+    cursor: move
+    cursor: -webkit-grab
+    .prop-snapshot
+      position: absolute
+      bottom: 15px
+      left: 15px
+      height: 60px
+      width: auto
+      background: radial-gradient(#f1e4d1 0%, #9a9898 100%)
+      img
+        width: auto
+        height: 100%
+    .button
+      position: absolute
+      bottom: 15px
+      left: 15px
+      +button(false, true, white, 125px)
+      background-color: transparent
+
+  //dz override
   .import
     height: 175px
     padding: 0
@@ -294,6 +354,7 @@ export default {
     .dz-message
       width: 100%
       text-align: center
+      +systemType(small)
     .dz-preview
       width: 100px
       height: 100px
