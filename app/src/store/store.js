@@ -27,14 +27,10 @@ export const store = new Vuex.Store({
 
       formPropName: '',
 
-      //FBX model info
-      FBXModelVertices: 0,
-      FBXModelType: '',
-      FBXModelVersion: '',
-      FBXModelSize: '',
-      FBXModelName: '',
-      FBXModelSnapshot: undefined,
-      FBXModelFile: undefined,
+      //model info
+      modelGeometryInfo: {},
+      modelFileSize: '',
+      modelSnapshot: undefined,
 
       //current team
       currentTeam: {}
@@ -136,14 +132,9 @@ export const store = new Vuex.Store({
       SET_FORM_PASSWORD: function(state, val)     { state.formPassword = val; },
       SET_FORM_INVITEEMAIL: function(state, val)  { state.formInviteEmail = val },
 
-      SET_FBX_MODEL_VERTICES: function(state, val)  { state.FBXModelVertices += val },
-      SET_FBX_MODEL_TYPE: function(state, val)      { state.FBXModelType = val },
-      SET_FBX_MODEL_VERSION: function(state, val)   { state.FBXModelVersion = val },
-      SET_FBX_MODEL_NAME: function(state, val)      { state.FBXModelName = val },
-      SET_FBX_MODEL_SIZE: function(state, val)      {state.FBXModelSize = val},
-      SET_FBX_MODEL_SNAPSHOT: function(state, val)  {state.FBXModelSnapshot = val},
-      SET_FBX_MODEL_FILE: function(state, val)      {state.FBXModelFile = val},
-
+      SET_MODEL_GEOMETRY_INFO: function(state, val)   { state.modelGeometryInfo = val },
+      SET_MODEL_FILE_SIZE: function(state, val)       {state.modelFileSize = val},
+      SET_MODEL_SNAPSHOT: function(state, val)        {state.modelSnapshot = val},
 
       SET_CURRENT_TEAM: function(state, val) { state.currentTeam = val },
   }

@@ -4,8 +4,7 @@
   <content-box :title="'Create Prop'">
 
     <!-- import file -->
-    <prop-loader-fbx v-on:loaded="receiveLoaded" v-on:snap="snapTaken = true"></prop-loader-fbx>
-
+    <prop-loader-gltf v-on:loaded="receiveLoaded" v-on:snap="snapTaken = true"></prop-loader-gltf>
 
     <!-- name and info form -->
     <div class="name form" v-if="loaded">
@@ -18,7 +17,7 @@
         <div class="form-title">Vertex Count</div>
         <div class="vertex-info">
           <div class="vertex-bar" :class="barSize"></div>
-          <div class="vertex-count">{{FBXModelVertices}}</div>
+          <div class="vertex-count">{{modelVertices}}</div>
         </div>
       </div>
       <div class="model-data">
@@ -28,8 +27,8 @@
           <div class="form-title">Textures</div>
         </div>
         <div class="data-points">
-          <div class="point">{{FBXModelType}} FBX, v{{FBXModelVersion / 1000}}</div>
-          <div class="point">{{FBXModelSizeFormatted}}</div>
+          <div class="point">Gltf 2.0</div>
+          <div class="point">{{modelSizeFormatted}}</div>
           <div class="point">yes</div>
         </div>
       </div>
@@ -51,7 +50,7 @@
 </template>
 <script>
 import ContentBox from '../components/ContentBox'
-import propLoaderFbx from '../components/propLoaderFbx'
+import propLoaderGltf from '../components/propLoaderGltf'
 
 import { mapState } from 'vuex'
 import { mapActions } from 'vuex'
@@ -64,7 +63,7 @@ export default {
   name: 'propImport',
   components: {
     ContentBox: ContentBox,
-    propLoaderFbx: propLoaderFbx
+    propLoaderGltf: propLoaderGltf
   },
   mixins: [ clickaway ],
   data: function() {
@@ -83,19 +82,22 @@ export default {
     propIsOk: function()  {
       if (this.loaded && this.formPropName.length) { return true } else { return false }
     },
+    modelVertices: function() {
+      return this.modelGeometryInfo.render.vertices
+    },
     barSize: function() {
-      if (this.FBXModelVertices <= 5000) {
+      if (this.modelVertices <= 20000) {
         return 'small'
       }
-      if (this.FBXModelVertices >= 5001 && this.FBXModelVertices <= 20000) {
+      if (this.modelVertices >= 20001 && this.modelVertices <= 100000) {
         return 'average'
       } else {
         return 'big'
       }
     },
-    FBXModelSizeFormatted: function() {
+    modelSizeFormatted: function() {
       const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-      let l = 0, n = parseInt(this.FBXModelSize, 10) || 0;
+      let l = 0, n = parseInt(this.modelFileSize, 10) || 0;
       while(n >= 1024){
           n = n/1024;
           l++;
@@ -104,11 +106,9 @@ export default {
     },
     ...mapState([
       'formPropName',
-      'FBXModelVertices',
-      'FBXModelType',
-      'FBXModelVersion',
-      'FBXModelSize',
-      'FBXModelName',
+      'modelGeometryInfo',
+      'modelFileSize',
+      'modelName',
     ])
   },
   methods: {
@@ -126,12 +126,10 @@ export default {
       }
     },
 
-    //-- update form info
-    //
     updateFormPropName: function(e) { this.$store.commit('SET_FORM_PROPNAME', e.target.value); },
+
     receiveLoaded: function() {
       this.loaded = true;
-      this.$store.commit('SET_FORM_PROPNAME', this.FBXModelName.split('.').shift())
     },
 
     // -- patch layout

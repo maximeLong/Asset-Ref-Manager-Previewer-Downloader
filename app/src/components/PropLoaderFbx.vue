@@ -41,7 +41,7 @@ import '@/loaders/FBXLoader'
 const OrbitControls = require("three/examples/js/controls/OrbitControls");
 
 
-import vue2Dropzone from 'vue2-dropzone'
+import vue2Dropzone from 'vue2-dropzone' //need to reimplement this library if using this again
 import 'vue2-dropzone/dist/vue2Dropzone.css'
 
 
@@ -237,6 +237,7 @@ export default {
 				var onError = function( xhr ) { console.error( xhr ); };
 
         //fbx loader
+
 				var loader = new THREE.FBXLoader( manager );
         loader.load( result, function( object ) {
           _this.scene.add(object)
@@ -318,6 +319,8 @@ export default {
     overflow: hidden
     cursor: move
     cursor: -webkit-grab
+    &:active
+      cursor: -webkit-grabbing
     .prop-snapshot
       position: absolute
       bottom: 15px
