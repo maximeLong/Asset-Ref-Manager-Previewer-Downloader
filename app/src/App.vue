@@ -1,4 +1,4 @@
-<template>
+asset<template>
   <div id="app">
 
     <!-- side panel -->
@@ -10,17 +10,18 @@
 
       <div id="header-panel">
         <app-header></app-header>
-        <layout-header v-if="layoutIsOpen"></layout-header>
+        <scene-header v-if="sceneIsOpen"></scene-header>
         <options-panel v-if="userPanel.open"></options-panel>
       </div>
 
-      <div id="app-content" :class="{ openLayout : layoutIsOpen }">
+      <div id="app-content" :class="{ openScene : sceneIsOpen }">
         <!-- views -->
         <router-view></router-view>
 
         <!-- full screen modals -->
-        <layout-options v-if="layoutOptions"></layout-options>
-        <prop-import v-if="propImport"></prop-import>
+        <scene-options v-if="sceneOptions"></scene-options>
+        <asset-import v-if="assetImport"></asset-import>
+        <asset-info v-if="assetInfo"></asset-info>
 
       </div>
 
@@ -32,10 +33,11 @@
 <script>
 
 import AppHeader from './components/AppHeader'
-import LayoutHeader from './components/LayoutHeader'
-import LayoutOptions from './components/LayoutOptions'
+import SceneHeader from './components/SceneHeader'
+import SceneOptions from './components/SceneOptions'
 
-import PropImport from './components/PropImport'
+import AssetImport from './components/AssetImport'
+import AssetInfo from './components/AssetInfo'
 
 import OptionsPanel from './components/OptionsPanel'
 import SidePanel from './components/SidePanel'
@@ -47,9 +49,10 @@ export default {
   name: 'app',
   components: {
     AppHeader,
-    LayoutHeader,
-    LayoutOptions,
-    PropImport,
+    SceneHeader,
+    SceneOptions,
+    AssetImport,
+    AssetInfo,
     OptionsPanel,
     SidePanel
   },
@@ -64,8 +67,8 @@ export default {
       this.$store.dispatch('signInLoad')
       .then(success => {
         //check what the entry route is and if user isn't trying to access an endpoint - send to loading route
-        if (this.$store.state.route.name !== 'Layout') {
-          this.$router.push({ name: 'LayoutLoading' })
+        if (this.$store.state.route.name !== 'Scene') {
+          this.$router.push({ name: 'SceneLoading' })
         }
       })
     })
@@ -77,8 +80,8 @@ export default {
   },
   computed: {
 
-    layoutIsOpen: function() {
-      if (this.$store.getters['layouts/current'] == null || this.route.name != 'Layout') { return false } else {
+    sceneIsOpen: function() {
+      if (this.$store.getters['scenes/current'] == null || this.route.name != 'Scene') { return false } else {
         return true
       }
     },
@@ -86,8 +89,9 @@ export default {
       'activePanel',
       'userPanel',
       'route',
-      'layoutOptions',
-      'propImport'
+      'sceneOptions',
+      'assetImport',
+      'assetInfo'
     ])
   }
 }

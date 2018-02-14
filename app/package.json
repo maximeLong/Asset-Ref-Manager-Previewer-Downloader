@@ -15,6 +15,7 @@
     "feathers-hooks": "^2.1.2",
     "feathers-socketio": "^2.0.1",
     "feathers-vuex": "^1.0.4",
+    "fetch": "^1.1.0",
     "gltf-validator": "^2.0.0-dev.1.4",
     "lodash": "^4.17.4",
     "socket.io": "^2.0.3",

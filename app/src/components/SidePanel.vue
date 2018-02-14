@@ -5,27 +5,27 @@
       <div class="icon"></div>
     </div>
 
-    <!-- main layouts bar, add layout -->
+    <!-- main scenes bar, add scene -->
     <div class="sidebar-title">
-      <div>My Layouts</div>
-      <router-link to="/createlayout">+</router-link>
+      <div>My Scenes</div>
+      <router-link to="/createscene">+</router-link>
     </div>
-    <div class="layouts">
-      <div class="layouts-list">
-        <div class="layout-item"
-          v-for="layout in layouts"
-          @click="goToLayout(layout._id)"
-          :class="{ active : checkActive(layout) }">
-          {{layout.name}}</div>
+    <div class="scenes">
+      <div class="scenes-list">
+        <div class="scene-item"
+          v-for="scene in scenes"
+          @click="goToScene(scene._id)"
+          :class="{ active : checkActive(scene) }">
+          {{scene.name}}</div>
       </div>
     </div>
 
-    <!-- team layouts bar, add team -->
-    <!-- <div class="sidebar-title">Team Layouts</div>
+    <!-- team scenes bar, add team -->
+    <!-- <div class="sidebar-title">Team Scenes</div>
     <div class="sidebar-subtitle" v-if="currentTeam">{{currentTeam.name}}</div>
-    <div class="layouts team">
-      <div class="layouts-list">
-        <div class="layout-item" v-for="team in teams">{{team.name}}</div>
+    <div class="scenes team">
+      <div class="scenes-list">
+        <div class="scene-item" v-for="team in teams">{{team.name}}</div>
       </div>
     </div> -->
 
@@ -43,17 +43,17 @@ export default {
   },
   computed: {
     teams: function(){ return this.$store.getters['teams/list']},
-    layouts: function(){ return this.$store.getters['layouts/list'] },
+    scenes: function(){ return this.$store.getters['scenes/list'] },
     currentTeam: function() { return this.$store.state.currentTeam },
-    currentLayout: function() { return this.$store.getters['layouts/current'] }
+    currentScene: function() { return this.$store.getters['scenes/current'] }
   },
   methods: {
-    goToLayout: function(id) {
-      this.$router.push({ name: 'Layout', params: { layout_id: id }})
+    goToScene: function(id) {
+      this.$router.push({ name: 'Scene', params: { scene_id: id }})
     },
-    checkActive: function(layoutIndex) {
-      if (this.currentLayout != null) {
-        if (this.currentLayout.name == layoutIndex.name) { return true } else { return false }
+    checkActive: function(sceneIndex) {
+      if (this.currentScene != null) {
+        if (this.currentScene.name == sceneIndex.name) { return true } else { return false }
       } else { return false }
     }
   }
@@ -93,7 +93,7 @@ export default {
     +systemType(average)
     color: white
 
-  .layouts
+  .scenes
     border-top: 1px solid $border_color_mid
     padding-top: 10px
     margin: 10px 0 50px 0
@@ -102,8 +102,8 @@ export default {
     &.teams
       margin-bottom: 0
 
-    .layouts-list
-      .layout-item
+    .scenes-list
+      .scene-item
         padding: 3px 15px
         +clickable
         &:hover

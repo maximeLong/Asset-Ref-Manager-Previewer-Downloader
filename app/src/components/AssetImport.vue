@@ -1,15 +1,15 @@
 <template>
-<div id="prop-import">
+<div id="asset-import">
 
-  <content-box :title="'Create Prop'">
+  <content-box :title="'Create Asset'">
 
     <!-- import file -->
-    <prop-loader-gltf v-on:loaded="receiveLoaded" v-on:snap="snapTaken = true"></prop-loader-gltf>
+    <asset-loader-gltf v-on:loaded="receiveLoaded" v-on:snapTaken="snapTaken = true"></asset-loader-gltf>
 
     <!-- name and info form -->
     <div class="name form" v-if="loaded">
-      <div class="form-title">Prop Name</div>
-      <input :value="formPropName" @input="updateFormPropName">
+      <div class="form-title">Asset Name</div>
+      <input :value="formAssetName" @input="updateFormAssetName">
     </div>
 
     <div class="info form" v-if="loaded">
@@ -36,7 +36,7 @@
 
     <!-- save buttons -->
     <div class="edit-buttons">
-      <div class="save-button button" :class="{ 'not-active' : !propIsOk }" @click="uploadProp">Upload Prop</div>
+      <div class="save-button button" :class="{ 'not-active' : !assetIsOk }" @click="uploadAsset">Upload Asset</div>
       <div class="cancel-button" @click="handleClickAway">Cancel</div>
       <!-- <div class="error-log" v-if="errors.length">
         <div>There {{errors.length > 1 ? 'are errors' : 'is an error' }} with:</div>
@@ -50,7 +50,7 @@
 </template>
 <script>
 import ContentBox from '../components/ContentBox'
-import propLoaderGltf from '../components/propLoaderGltf'
+import AssetLoaderGltf from '../components/AssetLoaderGltf'
 
 import { mapState } from 'vuex'
 import { mapActions } from 'vuex'
@@ -60,10 +60,10 @@ import _ from 'lodash'
 
 
 export default {
-  name: 'propImport',
+  name: 'assetImport',
   components: {
     ContentBox: ContentBox,
-    propLoaderGltf: propLoaderGltf
+    AssetLoaderGltf: AssetLoaderGltf
   },
   mixins: [ clickaway ],
   data: function() {
@@ -73,14 +73,14 @@ export default {
     }
   },
   destroyed: function() {
-    this.$store.commit('SET_FORM_PROPNAME', '')
+    this.$store.commit('SET_FORM_ASSETNAME', '')
   },
 
   computed: {
     user: function()            { return this.$store.state.auth.user },
-    currentLayout: function()   { return this.$store.getters['layouts/current'] },
-    propIsOk: function()  {
-      if (this.loaded && this.formPropName.length) { return true } else { return false }
+    currentScene: function()   { return this.$store.getters['scenes/current'] },
+    assetIsOk: function()  {
+      if (this.loaded && this.formAssetName.length && this.snapTaken) { return true } else { return false }
     },
     modelVertices: function() {
       return this.modelGeometryInfo.render.vertices
@@ -105,10 +105,11 @@ export default {
       return(n.toFixed(n >= 10 || l < 1 ? 0 : 1) + ' ' + units[l]);
     },
     ...mapState([
-      'formPropName',
+      'formAssetName',
       'modelGeometryInfo',
       'modelFileSize',
       'modelName',
+      'modelFile'
     ])
   },
   methods: {
@@ -117,30 +118,49 @@ export default {
     handleClickAway: function(e) {
       //TODO: better clickaway handler - have to catch button presses on form bcuz bugs
       if (_.includes(e.target.classList, 'button')) { return } else {
-        this.$store.commit('SET_PROP_IMPORT', false);
+        this.$store.commit('SET_ASSET_IMPORT', false);
       }
     },
-    uploadProp: function() {
-      if (this.propIsOk) {
-        this.tryCreateProp()
-      }
-    },
-
-    updateFormPropName: function(e) { this.$store.commit('SET_FORM_PROPNAME', e.target.value); },
-
+    updateFormAssetName: function(e) { this.$store.commit('SET_FORM_ASSETNAME', e.target.value); },
     receiveLoaded: function() {
       this.loaded = true;
     },
 
-    // -- patch layout
+    // -- patch scene
     //
-    tryCreateProp: function() {
+    uploadAsset: function() {
+      if (this.assetIsOk) { this.tryCreateAsset() }
+    },
 
-      this.createAsset({
-        name: this.formPropName,
+    tryCreateAsset: function() {
+      const modelInfo = {
+        name: this.formAssetName,
+        creator: this.user._id,
+        modelSize: this.modelFileSize,
+        performanceInfo: {
+          geometries: this.modelGeometryInfo.memory.geometries,
+          textures:   this.modelGeometryInfo.memory.textures,
+          drawCalls:  this.modelGeometryInfo.render.calls,
+          triangles:  this.modelGeometryInfo.render.faces,
+          vertices:   this.modelGeometryInfo.render.vertices
+        }
+      }
+
+      // Instantiate a FormData() object + add information to it
+      const formData = new FormData();
+      formData.append('file', this.modelFile);
+      formData.append('modelInfo', JSON.stringify(modelInfo));
+      formData.append('currentScene', this.currentScene._id)
+
+      // have to do RESTful thing here so that files can be handled
+      fetch(process.env.SERVER_ADDRESS + '/model', {
+        method: 'POST',
+        body: formData
       })
-      .then(response => {
-        console.log('success');
+      .then(assetResponse => {
+        console.log(assetResponse)
+        this.$store.commit('SET_ASSET_IMPORT', false);
+        //TODO: we need to do a lookup on assets in scene at this point
       })
       .catch(error => { console.log(error) })
 
@@ -156,7 +176,7 @@ export default {
 <style lang="sass">
 @import src/styles/main
 
-#prop-import
+#asset-import
   position: absolute
   top: 0
   bottom: 0

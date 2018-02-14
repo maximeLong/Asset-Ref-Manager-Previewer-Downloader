@@ -1,32 +1,35 @@
 <template>
-<div id="prop-loader-gltf">
+<div id="asset-loader-gltf">
 
-  <!-- propLoader should just emit the model url from a component-->
-  <div id="prop-loader" v-show="!loaded">
+  <!-- assetLoader should just emit the model url from a component-->
+  <div id="asset-loader" v-show="!loaded">
     <div class="placeholder">
       <p>Drag glTF 2.0 file or folder here</p>
     </div>
   </div>
 
-  <prop-viewer v-if="loaded"
+  <asset-viewer v-if="loaded"
     :fromServer="false"
+    :showSnapButton="true"
+    :showWireframeButton="true"
     :droppedFileInfo="modelFileInfo"
     v-on:loadSuccess="emitSuccess"
+    v-on:snapTaken="emitSnap"
     v-on:loadFailure="handleFailure"
-  ></prop-viewer>
+  ></asset-viewer>
 
 </div>
 </template>
 <script>
 
 import DropController from '@/loaders/gltf/drop-controller'
-import PropViewer from '../components/PropViewer'
+import AssetViewer from '../components/AssetViewer'
 
 
 export default {
-  name: 'propLoaderGltf',
+  name: 'assetLoaderGltf',
   components: {
-    PropViewer: PropViewer
+    AssetViewer: AssetViewer
   },
 
   data: function() {
@@ -51,30 +54,24 @@ export default {
       console.error('The File APIs are not fully supported in this browser.');
     }
     //handle file dropping
-    const dropCtrl = new DropController(document.querySelector('#prop-loader'));
+    const dropCtrl = new DropController(document.querySelector('#asset-loader'));
     dropCtrl.on('drop', ({rootFile, rootPath, fileMap}) => this.handleDrop(rootFile, rootPath, fileMap));
   },
 
   computed: {
     user: function()            { return this.$store.state.auth.user },
-    currentLayout: function()   { return this.$store.getters['layouts/current'] },
+    currentScene: function()   { return this.$store.getters['scenes/current'] },
   },
   methods: {
 
     handleDrop: function(rootFile, rootPath, fileMap) {
-      let files;
-      let rootName;
-      const fileURL = typeof rootFile === 'string'
-      ? rootFile
-      : URL.createObjectURL(rootFile);
-      const cleanup = () => {
-        if (typeof rootFile === 'object') {
-          URL.revokeObjectURL(fileURL);
-        }
-      };
+      const fileURL = typeof rootFile === 'string' ? rootFile : URL.createObjectURL(rootFile);
 
       //TODO: run client side validation
+      //TODO: convert gltf to glb somewhere around here after validation
+
       //validationCtrl.validate(fileURL, rootPath, fileMap);
+      //convert gltf to glb at this point
       this.modelFileInfo = {
         fileURL: fileURL,
         rootPath: rootPath,
@@ -84,21 +81,28 @@ export default {
 
       //set file size
       var totalSize = 0;
-      fileMap.forEach((file)=> {
+      fileMap.forEach((file, path)=> {
+
         totalSize += file.size
         this.$store.commit('SET_MODEL_FILE_SIZE', totalSize);
+        this.$store.commit('SET_MODEL_FILE', file);
+
+        //TODO: only works on glb right now --> need to make sure glb happens by converting to gltf above
+        // var reader = new FileReader();
+        // reader.addEventListener("loadend", ()=> {
+        //   this.$store.commit('SET_MODEL_FILE_BUFFER', reader.result);
+        // });
+        // reader.readAsArrayBuffer(file);
+
       });
 
-
-      // TODO: what does this do?
-      //
-      if (fileMap.size) {
-        files = fileMap;
-        rootName = rootFile.name.match(/([^\/]+)\.(gltf|glb)$/)[1];
-      }
     },
 
+    // -- emit events up to whatever component is using the loader
+    // -- TODO: this is kind of silly and could handled by a mutation watcher (like toasts) on whatever cares to listen
+    //
     emitSuccess: function() {this.$emit('loaded')},
+    emitSnap:    function() {this.$emit('snapTaken')},
     handleFailure: function() {console.log('failure loaded')}
 
   }
@@ -109,9 +113,9 @@ export default {
 <style lang="sass">
 @import src/styles/main
 
-#prop-loader-gltf
+#asset-loader-gltf
 
-  #prop-loader
+  #asset-loader
     +flexbox
     +align-items(center)
     height: 250px

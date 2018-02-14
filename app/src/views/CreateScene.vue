@@ -1,12 +1,12 @@
 <template>
-  <div id="create-layout">
+  <div id="create-scene">
 
-    <content-box :title="'Create Layout'">
+    <content-box :title="'Create Scene'">
         <div class="name form">
           <div class="form-title">Name</div>
-          <input :value="formLayoutName"
-            @input="updateFormLayoutName"
-            placeholder="layout name">
+          <input :value="formSceneName"
+            @input="updateFormSceneName"
+            placeholder="scene name">
         </div>
         <div class="invite form">
           <div class="form-title">Collaborators</div>
@@ -25,7 +25,7 @@
         </div>
 
     </content-box>
-    <button @click="tryCreateLayout">Create Layout</button>
+    <button @click="tryCreateScene">Create Scene</button>
 
   </div>
 </template>
@@ -36,7 +36,7 @@ import { mapState } from 'vuex'
 import { mapActions } from 'vuex'
 
 export default {
-  name: 'createLayout',
+  name: 'createScene',
   data: function(){
     return {
       localInvites: [],
@@ -50,28 +50,28 @@ export default {
     user: function()            { return this.$store.state.auth.user },
     userIsLoggedIn: function()  { return this.user ? true : false },
     ...mapState([
-      'formLayoutName',
+      'formSceneName',
       'formInviteEmail'
     ])
   },
   methods: {
-    tryCreateLayout: function() {
-      this.createLayout({
+    tryCreateScene: function() {
+      this.createScene({
         creator: this.user._id,
-        name: this.formLayoutName,
+        name: this.formSceneName,
         users: [this.user._id],
         admins: [this.user._id],
         invites: this.localInvites
       })
       .then(response => {
-        this.$router.push({ name: 'Layout', params: { layout_id: response._id }})
+        this.$router.push({ name: 'Scene', params: { scene_id: response._id }})
       })
       .catch(error => {
         console.log(error)
       })
     },
 
-    updateFormLayoutName: function(e) { this.$store.commit('SET_FORM_LAYOUTNAME', e.target.value) },
+    updateFormSceneName: function(e) { this.$store.commit('SET_FORM_SCENENAME', e.target.value) },
     updateFormInviteEmail: function(e) { this.$store.commit('SET_FORM_INVITEEMAIL', e.target.value) },
     addToInvites: function(){
       this.localInvites.push(this.formInviteEmail)
@@ -81,8 +81,8 @@ export default {
       this.localInvites.splice(inviteIndex, 1)
     },
 
-    ...mapActions('layouts', {
-      createLayout: 'create'
+    ...mapActions('scenes', {
+      createScene: 'create'
     })
   }
 
@@ -92,7 +92,7 @@ export default {
 <style scoped lang="sass">
 @import src/styles/main
 
-#create-layout
+#create-scene
   height: 100%
   +flexbox
   +justify-content(center)

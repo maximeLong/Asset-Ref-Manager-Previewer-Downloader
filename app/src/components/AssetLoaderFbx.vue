@@ -1,7 +1,7 @@
 <template>
-<div id="prop-loader-fbx">
+<div id="asset-loader-fbx">
 
-  <div id="prop-loader" v-show="!loaded">
+  <div id="asset-loader" v-show="!loaded">
 
     <vue-dropzone ref="myVueDropzone"
       id="dropzone-model" class="button import"
@@ -19,10 +19,10 @@
 
   </div>
 
-  <div id="prop-viewer" v-show="loaded">
+  <div id="asset-viewer" v-show="loaded">
     <transition name="fadeup" mode="out-in">
       <div class="button" @click="takeSnapShot" v-if="activeModel && !snapshotIsTaken" key="take">Snapshot</div>
-      <div class="prop-snapshot" v-else key="snap">
+      <div class="asset-snapshot" v-else key="snap">
         <img :src="snapshot">
       </div>
     </transition>
@@ -46,7 +46,7 @@ import 'vue2-dropzone/dist/vue2Dropzone.css'
 
 
 export default {
-  name: 'propLoaderFbx',
+  name: 'assetLoaderFbx',
   components: {
     vueDropzone: vue2Dropzone
   },
@@ -114,7 +114,7 @@ export default {
 
   computed: {
     user: function()            { return this.$store.state.auth.user },
-    currentLayout: function()   { return this.$store.getters['layouts/current'] },
+    currentScene: function()   { return this.$store.getters['scenes/current'] },
   },
   methods: {
 
@@ -123,7 +123,7 @@ export default {
       var ext = file.name.split('.').pop().toLowerCase();
       //handle fbx
       if (ext == 'fbx') {
-        if (!_.isEmpty(this.activeModel)) { done("there is already a .fbx file in prop"); }
+        if (!_.isEmpty(this.activeModel)) { done("there is already a .fbx file in asset"); }
         else {
           this.activeModel = file;
           this.readFile(file, ext);
@@ -171,16 +171,16 @@ export default {
         var binaryData = [];
         binaryData.push(e.target.result);
         var url = window.URL.createObjectURL(new Blob(binaryData, {type: "fbx"}))
-        //start scene, and load prop
+        //start scene, and load asset
         if (_.isEmpty(_this.renderer)) { _this.startScene() }
-        _this.loadProp(url)
+        _this.loadAsset(url)
       };
       reader.readAsArrayBuffer(file);
     },
 
     //three js scene and model loader
     startScene: function() {
-      var container = document.getElementById( 'prop-viewer' );
+      var container = document.getElementById( 'asset-viewer' );
       var containerHeight = getComputedStyle(container).height.slice(0, -2);
       var containerWidth = getComputedStyle(container).width.slice(0, -2);
 
@@ -222,7 +222,7 @@ export default {
       //run loop + watch for resize
       this.animate();
     },
-    loadProp: function(result) {
+    loadAsset: function(result) {
         var _this = this;
 
         //manager callbacks
@@ -277,7 +277,7 @@ export default {
     },
     onWindowResize: function(container) {
 
-      var container = document.getElementById( 'prop-viewer' );
+      var container = document.getElementById( 'asset-viewer' );
       var containerHeight = getComputedStyle(container).height.slice(0, -2);
       var containerWidth = getComputedStyle(container).width.slice(0, -2);
       if (!_.isEmpty(this.renderer)) {
@@ -295,8 +295,8 @@ export default {
 <style lang="sass">
 @import src/styles/main
 
-#prop-loader-fbx
-  #prop-loader
+#asset-loader-fbx
+  #asset-loader
     +flexbox
     +align-items(center)
     #dropzone-model
@@ -311,7 +311,7 @@ export default {
     #dropzone-texture
       +flex(1)
 
-  #prop-viewer
+  #asset-viewer
     width: 100%
     height: 250px
     background: radial-gradient(#f1e4d1 0%, #737373 100%)
@@ -321,7 +321,7 @@ export default {
     cursor: -webkit-grab
     &:active
       cursor: -webkit-grabbing
-    .prop-snapshot
+    .asset-snapshot
       position: absolute
       bottom: 15px
       left: 15px
@@ -350,7 +350,7 @@ export default {
     overflow-y: hidden
     overflow-x: scroll
     padding: 20px
-    .import-prop
+    .import-asset
       color: $action_color
 
 

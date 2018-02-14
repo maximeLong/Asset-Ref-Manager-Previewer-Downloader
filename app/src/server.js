@@ -12,10 +12,9 @@ const server = feathers()
   .configure(auth({ storage: window.localStorage }))
 
 server.service('/users')
-server.service('/teams')
-
-server.service('/layouts')
-server.service('/variants')
+server.service('/scenes')
 server.service('/assets')
+
+server.service('/teams')
 
 export default server

@@ -1,14 +1,14 @@
 <template>
-<div id="layout-options">
+<div id="scene-options">
 
-  <content-box :title="'Layout Options'" v-on-clickaway="handleClickAway">
+  <content-box :title="'Scene Options'" v-on-clickaway="handleClickAway">
 
     <!-- change name form -->
     <div class="name form">
       <div class="form-title">Name</div>
-      <div class="current-name" v-if="!changeNameFormIsOpen">{{currentLayout.name}}</div>
+      <div class="current-name" v-if="!changeNameFormIsOpen">{{currentScene.name}}</div>
       <div class="edit button" v-if="!changeNameFormIsOpen" @click="editTitle">Edit</div>
-      <input :value="formLayoutName" v-if="changeNameFormIsOpen" @input="updateFormLayoutName">
+      <input :value="formSceneName" v-if="changeNameFormIsOpen" @input="updateFormSceneName">
     </div>
 
     <!-- members form -->
@@ -25,11 +25,11 @@
         @click="removeInvite(index)">{{invite[0]}}<div class="tooltip">{{invite}}</div>
       </div>
 
-      <div class="invites existing button" v-for="invite in currentLayout.invites"
+      <div class="invites existing button" v-for="invite in currentScene.invites"
         >{{invite[0]}}<div class="tooltip">{{invite}}</div>
       </div>
 
-      <div class="members" v-for="user in currentLayout.users"
+      <div class="members" v-for="user in currentScene.users"
          :style="{ 'background-image' : 'url(' + user.profileImage.big + ')'}">
          <div class="tooltip">{{user.email}}</div>
       </div>
@@ -53,7 +53,7 @@ import _ from 'lodash'
 
 
 export default {
-  name: 'layoutOptions',
+  name: 'sceneOptions',
   components: { ContentBox },
   mixins: [ clickaway ],
   data: function() {
@@ -64,23 +64,23 @@ export default {
     }
   },
   mounted: function() {
-    this.$store.commit('SET_FORM_LAYOUTNAME', this.currentLayout.name)
+    this.$store.commit('SET_FORM_SCENENAME', this.currentScene.name)
   },
   destroyed: function() {
-    this.$store.commit('SET_FORM_LAYOUTNAME', '')
+    this.$store.commit('SET_FORM_SCENENAME', '')
   },
 
   computed: {
     user: function()            { return this.$store.state.auth.user },
     userIsLoggedIn: function()  { return this.user ? true : false },
-    currentLayout: function()   { return this.$store.getters['layouts/current'] },
+    currentScene: function()   { return this.$store.getters['scenes/current'] },
     formHasChanged: function()  {
-      if (this.formLayoutName !== this.currentLayout.name || this.localInvites.length) {
+      if (this.formSceneName !== this.currentScene.name || this.localInvites.length) {
         return true
       } else { return false }
     },
     ...mapState([
-      'formLayoutName',
+      'formSceneName',
       'formInviteEmail'
     ])
   },
@@ -90,22 +90,22 @@ export default {
     handleClickAway: function(e) {
       //TODO: better clickaway handler - have to catch button presses on form bcuz bugs
       if (_.includes(e.target.classList, 'button')) { return } else {
-        this.$store.commit('SET_LAYOUT_OPTIONS', false);
+        this.$store.commit('SET_SCENE_OPTIONS', false);
       }
     },
     editTitle: function() {
       this.changeNameFormIsOpen = true;
-      this.$store.commit('SET_FORM_LAYOUTNAME', this.currentLayout.name);
+      this.$store.commit('SET_FORM_SCENENAME', this.currentScene.name);
     },
     saveChanges: function() {
       if (this.formHasChanged) {
-        this.tryPatchLayout()
+        this.tryPatchScene()
       }
     },
 
     //-- update form info
     //
-    updateFormLayoutName: function(e) { this.$store.commit('SET_FORM_LAYOUTNAME', e.target.value) },
+    updateFormSceneName: function(e) { this.$store.commit('SET_FORM_SCENENAME', e.target.value) },
     updateFormInviteEmail: function(e) { this.$store.commit('SET_FORM_INVITEEMAIL', e.target.value) },
     addToInvites: function(){
       this.localInvites.push(this.formInviteEmail)
@@ -115,23 +115,23 @@ export default {
       this.localInvites.splice(inviteIndex, 1)
     },
 
-    // -- patch layout
+    // -- patch scene
     //
-    tryPatchLayout: function() {
-      var mergedInvites = _.concat(this.currentLayout.invites, this.localInvites);
-      this.patchLayout([this.currentLayout._id, {
-        name: this.formLayoutName,
+    tryPatchScene: function() {
+      var mergedInvites = _.concat(this.currentScene.invites, this.localInvites);
+      this.patchScene([this.currentScene._id, {
+        name: this.formSceneName,
         invites: mergedInvites
       }, {} ])
       .then(response => {
         console.log('success');
-        this.$store.commit('SET_LAYOUT_OPTIONS', false);
+        this.$store.commit('SET_SCENE_OPTIONS', false);
       })
       .catch(error => { console.log(error) })
 
     },
-    ...mapActions('layouts', {
-      patchLayout: 'patch'
+    ...mapActions('scenes', {
+      patchScene: 'patch'
     })
   }
 
@@ -141,7 +141,7 @@ export default {
 <style scoped lang="sass">
 @import src/styles/main
 
-#layout-options
+#scene-options
   position: absolute
   top: 0
   bottom: 0

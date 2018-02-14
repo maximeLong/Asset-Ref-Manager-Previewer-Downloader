@@ -1,28 +1,28 @@
 <template>
 
-  <div id="layout-header">
+  <div id="scene-header">
     <div class="header-left">
       <div class="header-left-top">
-        <div class="title">{{currentLayout.name}}</div>
-        <div class="options" @click="openLayoutOptions"><div v-for="n in 3"></div></div>
+        <div class="title">{{currentScene.name}}</div>
+        <div class="options" @click="openSceneOptions"><div v-for="n in 3"></div></div>
       </div>
-      <div class="layout-type">Virtual Set, Tracked Vive, SLAM Technology</div>
+      <div class="scene-type">Virtual Set, Tracked Vive, SLAM Technology</div>
     </div>
 
     <div class="header-right">
       <div class="members">
-        <div class="member" v-for="user in currentLayout.users"
+        <div class="member" v-for="user in currentScene.users"
              :style="{ 'background-image' : 'url(' + user.profileImage.big + ')'}">
              <div class="tooltip">{{user.email}}</div>
         </div>
       </div>
       <div class="invites">
-        <div class="invite" v-for="invite in currentLayout.invites">
+        <div class="invite" v-for="invite in currentScene.invites">
           {{invite[0]}}
           <div class="tooltip">{{invite}}</div>
         </div>
       </div>
-      <div class="add-member" @click="openLayoutOptions">
+      <div class="add-member" @click="openSceneOptions">
         +
       </div>
     </div>
@@ -33,15 +33,15 @@
 <script>
 
 export default {
-  name: 'layoutHeader',
+  name: 'sceneHeader',
   computed: {
     user: function()            { return this.$store.state.auth.user },
     userIsLoggedIn: function()  { return this.user ? true : false },
-    currentLayout: function()   { return this.$store.getters['layouts/current'] },
+    currentScene: function()   { return this.$store.getters['scenes/current'] },
   },
   methods: {
-    openLayoutOptions: function() {
-      this.$store.commit('SET_LAYOUT_OPTIONS', true)
+    openSceneOptions: function() {
+      this.$store.commit('SET_SCENE_OPTIONS', true)
     }
   }
 
@@ -51,7 +51,7 @@ export default {
 <style scoped lang="sass">
 @import src/styles/main
 
-#layout-header
+#scene-header
   background-color: white
   border-bottom: 1px solid $border_color_light
   padding: 0 30px
@@ -77,7 +77,7 @@ export default {
         border-radius: 20px
         &:last-of-type
           margin: 0
-    .layout-type
+    .scene-type
       +systemType(small)
       padding-top: 5px
 

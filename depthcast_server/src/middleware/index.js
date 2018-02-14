@@ -1,5 +1,14 @@
+const model = require('./model')
+
+//handle multipart/form requests
+const multer = require('multer');
+const upload = multer({
+  storage: multer.MemoryStorage
+});
+
 module.exports = function () {
-  // Add your custom middleware here. Remember, that
-  // in Express the order matters
-  const app = this; // eslint-disable-line no-unused-vars
+  const app = this;
+
+  //TODO: authenticate this route using feathers-authentication (jwt)
+  app.post('/model', upload.single('file'), model(app) )
 };

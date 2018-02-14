@@ -4,11 +4,11 @@ import {store} from './store/store'
 
 
 import Landing        from './views/Landing'
-import Layout         from './views/Layout'
-import LayoutLoading  from './views/LayoutLoading'
+import Scene         from './views/Scene'
+import SceneLoading  from './views/SceneLoading'
 
-import NoLayout       from './views/NoLayout'
-import CreateLayout   from './views/CreateLayout'
+import NoScene       from './views/NoScene'
+import CreateScene   from './views/CreateScene'
 import CreateTeam     from './views/CreateTeam'
 
 
@@ -26,29 +26,29 @@ export default new Router({
       }
     },
     {
-      path: '/nolayout',
-      name: 'NoLayout',
-      component: NoLayout,
+      path: '/noscene',
+      name: 'NoScene',
+      component: NoScene,
       beforeEnter: (to, from, next) => {
         next(vm => {}) //need to call next for router to continue to fire
       }
     },
     {
-      path: '/layout/:layout_id',
-      name: 'Layout',
-      component: Layout,
+      path: '/scene/:scene_id',
+      name: 'Scene',
+      component: Scene,
       beforeEnter: (to, from, next) => {
         if (store.state.auth.user) {
 
-          //TODO: currentLayout doesn't update on changes to "currentLayout" getter
-          store.dispatch('layouts/get', [to.params.layout_id])
+          //TODO: currentScene doesn't update on changes to "currentScene" getter
+          store.dispatch('scenes/get', [to.params.scene_id])
           .then(success => {
-            console.log('layout success', success)
+            console.log('scene success', success)
             next(vm => {})
           })
           .catch(error => {
-            console.log('layout error', error)
-            next({ name: 'LayoutLoading' })
+            console.log('scene error', error)
+            next({ name: 'SceneLoading' })
           })
         } else {
           next('/')
@@ -59,18 +59,18 @@ export default new Router({
       }
     },
     {
-      path: '/layout',
-      name: 'LayoutLoading',
-      component: LayoutLoading,
+      path: '/scene',
+      name: 'SceneLoading',
+      component: SceneLoading,
       beforeEnter: (to, from, next) => {
         if (store.state.auth.user) {
-          if (!store.state.layouts.ids.length) {
-            console.log('go to no layout')
-            next({ name: 'NoLayout' })
+          if (!store.state.scenes.ids.length) {
+            console.log('go to no scene')
+            next({ name: 'NoScene' })
           }
           else {
-            console.log('go to layout')
-            next({ name: 'Layout', params: { layout_id: store.state.layouts.keyedById[store.state.layouts.ids[0]]._id }})
+            console.log('go to scene')
+            next({ name: 'Scene', params: { scene_id: store.state.scenes.keyedById[store.state.scenes.ids[0]]._id }})
           }
         } else {
           next('/')
@@ -86,9 +86,9 @@ export default new Router({
       }
     },
     {
-      path: '/createlayout',
-      name: 'CreateLayout',
-      component: CreateLayout,
+      path: '/createscene',
+      name: 'CreateScene',
+      component: CreateScene,
       beforeEnter: (to, from, next) => {
         next(vm => {}) //need to call next for router to continue to fire
       }

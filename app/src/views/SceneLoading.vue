@@ -1,10 +1,7 @@
 <template>
-  <div id="no-layout">
-    <div class="no-layout-helper">
-      <div>You haven't made a layout yet.</div>
-      <router-link to="/createlayout">
-        <div>Make one!</div>
-      </router-link>
+  <div id="scene-loading">
+    <div class="loading-helper">
+      <div>loading</div>
     </div>
   </div>
 </template>
@@ -12,7 +9,7 @@
 <script>
 
 export default {
-  name: 'noLayout',
+  name: 'sceneLoading',
   data: function(){
     return {
 
@@ -32,12 +29,12 @@ export default {
 <style scoped lang="sass">
 @import src/styles/main
 
-#no-layout
+#scene-loading
   height: 100%
   +flexbox
   +justify-content(center)
   +align-items(center)
-  .no-layout-helper
+  .loading-helper
     background-color: $border_color_light
     width: 500px
     height: 250px

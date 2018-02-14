@@ -6,8 +6,6 @@ import router from '../router'
 
 //feathers actions
 const { service, auth } = feathersVuex(server, { idField: '_id' })
-//custom server actions
-import serverActions from '../actions/serverActions'
 
 Vue.use(Vuex);
 export const store = new Vuex.Store({
@@ -15,21 +13,23 @@ export const store = new Vuex.Store({
   state: {
 
       userPanel: { open: false, panelType: 'userInfo' }, //panelType can be : 'signIn', 'createAccount', 'userInfo', 'team'
-      layoutOptions: false,
-      propImport: false,
-      propInfo: false,
 
+      sceneOptions: false, //scene options panel
+      assetImport: false,    //import asset panel
+      assetInfo: false,      //asset info panel
+
+      //various form info holders
       formEmail: '',
       formTeamName: '',
-      formLayoutName: '',
+      formSceneName: '',
       formPassword: '',
       formInviteEmail: '',
+      formAssetName: '',
 
-      formPropName: '',
-
-      //model info
+      //model info on import
       modelGeometryInfo: {},
       modelFileSize: '',
+      modelFile: undefined,
       modelSnapshot: undefined,
 
       //current team
@@ -39,26 +39,25 @@ export const store = new Vuex.Store({
   plugins: [
       auth({userService: '/users'}),
       service('users'),
-      service('layouts'),
-      service('teams'),
-      service('variants'),
-      service('assets')
+      service('scenes'),
+      service('assets'),
+
+      service('teams')
+
   ],
 
   actions: {
 
-    // -- first major db lookup, gets layouts and teams, and current of both
+    // -- first major db lookup, gets scenes and teams, and current of both
     // -- should open websocket connection, for getter lists (store.getters['teams/list'])
     // -- TODO: populate doesn't work when lists update from websocket
     //
     async signInLoad (store) {
-      const res = await store.dispatch('layouts/find', {
+      const res = await store.dispatch('scenes/find', {
         query: { users: store.state.auth.user._id }
       })
-
       console.log(res, 'sign in load stuff is done')
       store.commit('SET_USER_PANEL', {open: false})
-
       return res
     },
 
@@ -76,7 +75,7 @@ export const store = new Vuex.Store({
       .then(success => {
         dispatch('signInLoad')
         .then(success => {
-          router.push({ name: 'LayoutLoading' })
+          router.push({ name: 'SceneLoading' })
         })
       })
       .catch(error => { console.log(error) })
@@ -86,17 +85,17 @@ export const store = new Vuex.Store({
       .then(success => {
         //-- clear the store of user specific stuff
         router.push({ name: 'Landing' })
-        commit('layouts/clearAll');
-        commit('SET_CURRENT_LAYOUT', {});
+        commit('scenes/clearAll');
+        commit('SET_CURRENT_SCENE', {});
       })
       .catch(error => { console.log(error) })
     },
 
     //-- team actions -- move to router when you finish
     //
-    findCurrentTeamLayouts: function(store, team) {
+    findCurrentTeamScenes: function(store, team) {
       store.commit('SET_CURRENT_TEAM', team);
-      store.dispatch('layouts/find', {
+      store.dispatch('scenes/find', {
         query: {
           teams: team._id,
           $populate: ['users', 'creator', 'admins', 'teams']
@@ -104,10 +103,6 @@ export const store = new Vuex.Store({
       }).then(success => { console.log(success)})
         .catch(error => { console.log(error) })
     }
-
-    //-- layout action
-    //-- automatically update CurrentLayout when getter is getter stream is modified from server
-
 
   },
 
@@ -120,23 +115,23 @@ export const store = new Vuex.Store({
         }
       },
 
-      SET_PROP_INFO: function(state, val)       { state.propInfo = val; },
-      SET_PROP_IMPORT: function(state, val)     { state.propImport = val; },
-      SET_LAYOUT_OPTIONS: function(state, val)  { state.layoutOptions = val; },
+      SET_ASSET_INFO: function(state, val)        { state.assetInfo = val; },
+      SET_ASSET_IMPORT: function(state, val)      { state.assetImport = val; },
+      SET_SCENE_OPTIONS: function(state, val)    { state.sceneOptions = val; },
 
-      SET_FORM_PROPNAME: function(state, val)   { state.formPropName = val },
-
+      SET_FORM_ASSETNAME: function(state, val)    { state.formAssetName = val },
       SET_FORM_EMAIL: function(state, val)        { state.formEmail = val; },
       SET_FORM_TEAMNAME: function(state, val)     { state.formTeamName = val; },
-      SET_FORM_LAYOUTNAME: function(state, val)   { state.formLayoutName = val; },
+      SET_FORM_SCENENAME: function(state, val)   { state.formSceneName = val; },
       SET_FORM_PASSWORD: function(state, val)     { state.formPassword = val; },
       SET_FORM_INVITEEMAIL: function(state, val)  { state.formInviteEmail = val },
 
       SET_MODEL_GEOMETRY_INFO: function(state, val)   { state.modelGeometryInfo = val },
-      SET_MODEL_FILE_SIZE: function(state, val)       {state.modelFileSize = val},
-      SET_MODEL_SNAPSHOT: function(state, val)        {state.modelSnapshot = val},
+      SET_MODEL_FILE_SIZE: function(state, val)       { state.modelFileSize = val },
+      SET_MODEL_FILE: function(state, val)            { state.modelFile = val },
+      SET_MODEL_SNAPSHOT: function(state, val)        { state.modelSnapshot = val },
 
-      SET_CURRENT_TEAM: function(state, val) { state.currentTeam = val },
+      SET_CURRENT_TEAM: function(state, val)   { state.currentTeam = val },
   }
 
 });

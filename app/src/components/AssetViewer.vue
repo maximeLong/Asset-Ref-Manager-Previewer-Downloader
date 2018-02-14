@@ -1,10 +1,12 @@
 <template>
-  <div id="prop-viewer">
+  <div id="asset-viewer">
 
-    <div class="wireframe-toggle" @click="toggleWireframe(!wireframe)"><div></div></div>
-    <transition name="fadeup" mode="out-in">
+    <div class="wireframe-toggle" @click="toggleWireframe(!wireframe)" v-if="showWireframeButton">
+      <div></div>
+    </div>
+    <transition name="fadeup" mode="out-in" v-if="showSnapButton">
       <div class="button" @click="takeSnapShot" v-if="!snapshotIsTaken" key="take">Snapshot</div>
-      <div class="prop-snapshot" v-else key="snap">
+      <div class="asset-snapshot" v-else key="snap">
         <img :src="snapshot">
       </div>
     </transition>
@@ -25,12 +27,18 @@ const Detector =       require('three/examples/js/Detector');
 
 
 export default {
-  name: 'propViewer',
+  name: 'assetViewer',
 
   props: {
     fromServer: Boolean,
-    droppedFileInfo: Object,
-    serverUrl: String
+    showSnapButton: Boolean,
+    showWireframeButton: Boolean,
+    droppedFileInfo: Object, //handle local file drop
+    serverUrl: String        //handle remote server url pulldown
+    //
+    // -- reverse props ($emits) api:
+    // 1) loadSuccess, 2) loadFailure, 3) snapTaken
+    //
   },
   data: function(){
     return {
@@ -112,8 +120,8 @@ export default {
           return (path || '') + url;
         });
         const loader = new THREE.GLTFLoader(manager);
-        console.log(loader);
         loader.setCrossOrigin('anonymous');
+
         this.load(url, loader)
         .then(()=> {
           this.$store.commit('SET_MODEL_GEOMETRY_INFO', this.renderer.info);
@@ -183,7 +191,7 @@ export default {
 
     //three js scene and model loader
     startScene: function() {
-      var container = document.getElementById( 'prop-viewer' );
+      var container = document.getElementById( 'asset-viewer' );
       var containerHeight = getComputedStyle(container).height.slice(0, -2);
       var containerWidth = getComputedStyle(container).width.slice(0, -2);
 
@@ -265,7 +273,7 @@ export default {
     },
 
     onWindowResize: function(container) {
-      var container = document.getElementById( 'prop-viewer' );
+      var container = document.getElementById( 'asset-viewer' );
       var containerHeight = getComputedStyle(container).height.slice(0, -2);
       var containerWidth = getComputedStyle(container).width.slice(0, -2);
       if (!_.isEmpty(this.renderer)) {
@@ -289,9 +297,9 @@ export default {
       var dataURL = this.renderer.domElement.toDataURL();
       this.snapshot = dataURL;
       this.snapshotIsTaken = true;
-      this.$store.commit('SET_FBX_MODEL_SNAPSHOT', dataURL)
+      this.$store.commit('SET_MODEL_SNAPSHOT', dataURL)
       setTimeout( ()=> {
-        this.$emit('snap');
+        this.$emit('snapTaken');
         this.snapshotIsTaken = false
       }
       , 2000)
@@ -307,7 +315,7 @@ export default {
 <style lang="sass">
 @import src/styles/main
 
-#prop-viewer
+#asset-viewer
   width: 100%
   height: 250px
   background: radial-gradient(#f1e4d1 0%, #737373 100%)
@@ -317,7 +325,7 @@ export default {
   cursor: -webkit-grab
   &:active
     cursor: -webkit-grabbing
-  .prop-snapshot
+  .asset-snapshot
     position: absolute
     bottom: 15px
     left: 15px

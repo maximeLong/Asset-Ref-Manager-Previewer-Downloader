@@ -1,13 +1,14 @@
-// layouts-model.js - A mongoose model
+// scenes-model.js - A mongoose model
 //
 // See http://mongoosejs.com/docs/models.html
 // for more of what you can do here.
 module.exports = function (app) {
   const mongooseClient = app.get('mongooseClient');
   const { Schema } = mongooseClient;
-  const layouts = new Schema({
-    name:       { type: String, required: [true, 'layouts must have title'], unique: true },
-    creator:    { type: Schema.Types.ObjectId, ref: 'users', required: [true, 'layouts must have creator']},
+  const scenes = new Schema({
+
+    name:       { type: String, required: [true, 'scenes must have title'], unique: true },
+    creator:    { type: Schema.Types.ObjectId, ref: 'users', required: [true, 'scenes must have creator']},
 
     users:      [{ type: Schema.Types.ObjectId, ref: 'users' }],
     admins:     [{ type: Schema.Types.ObjectId, ref: 'users' }],
@@ -25,12 +26,12 @@ module.exports = function (app) {
 
   //-- empty array validators
   //
-  layouts.path('users').validate(function(value) {
+  scenes.path('users').validate(function(value) {
     return value.length;
-  }, "layouts need at least one user");
-  layouts.path('admins').validate(function(value) {
+  }, "scenes need at least one user");
+  scenes.path('admins').validate(function(value) {
     return value.length;
-  }, "layouts need at least one admin, which should be the creator");
+  }, "scenes need at least one admin, which should be the creator");
 
-  return mongooseClient.model('layouts', layouts);
+  return mongooseClient.model('scenes', scenes);
 };

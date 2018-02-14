@@ -1,6 +1,10 @@
 <template>
   <div class="content-box">
-    <h2 class="content-header">{{title}}</h2>
+    <div class="content-header">
+      <h2>{{title}}</h2>
+      <slot name="buttons"></slot>
+    </div>
+
     <div class="content-content">
 
       <slot></slot>
@@ -42,9 +46,24 @@ export default {
   &:last-of-type
     margin-bottom: 0
 
-  h2.content-header
+  .content-header
     padding: 15px 30px
     border-bottom: 1px solid $border_color_light
+    +flexbox
+    +align-items(center)
+    +justify-content(flex-start)
+    .buttons
+      margin-left: 10px
+      +flexbox
+      +align-items(center)
+      +justify-content(flex-start)
+      .button
+        margin-left: 25px
+        +clickable
+        +systemType(small)
+        &.active
+          color: $action_color
+
   .content-content
     padding: 30px
 
