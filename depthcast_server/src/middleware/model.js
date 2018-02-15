@@ -23,6 +23,10 @@ module.exports = function(app) {
     const assetData = JSON.parse(req.body.modelInfo);
     const assetScene = req.body.currentScene;
 
+    //convert model thumbnail DataURL strings to buffers
+    assetData.thumbnailImage.small  = new Buffer(assetData.thumbnailImage.small.split(",")[1], 'base64');
+    assetData.thumbnailImage.big    = new Buffer(assetData.thumbnailImage.big.split(",")[1], 'base64');
+
 
     //get file and start stream to gcs
     const gcsname = req.file.originalname;

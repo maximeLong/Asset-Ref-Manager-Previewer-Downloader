@@ -22,7 +22,7 @@ module.exports = function (app) {
       vertices:   { type: Number }
     },
 
-    //store images directly in model with arrayBuffer > convert back on client using utf8 conversion
+    //store images directly in model with DataURL(data:image/jpg;base64,<string>) --> convert back in Unity using System.Convert.FromBase64String
     thumbnailImage: {
       big:    { type: Buffer },
       small:  { type: Buffer }

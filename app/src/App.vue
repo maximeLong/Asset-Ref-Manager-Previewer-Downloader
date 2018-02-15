@@ -1,4 +1,4 @@
-asset<template>
+<template>
   <div id="app">
 
     <!-- side panel -->

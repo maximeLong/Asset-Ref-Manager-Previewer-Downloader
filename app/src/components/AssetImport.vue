@@ -73,7 +73,12 @@ export default {
     }
   },
   destroyed: function() {
+    //release model information from store
     this.$store.commit('SET_FORM_ASSETNAME', '')
+    this.$store.commit('SET_MODEL_GEOMETRY_INFO', {})
+    this.$store.commit('SET_MODEL_FILE_SIZE', '')
+    this.$store.commit('SET_MODEL_SNAPSHOT', undefined)
+    this.$store.commit('SET_MODEL_FILE', undefined)
   },
 
   computed: {
@@ -109,7 +114,8 @@ export default {
       'modelGeometryInfo',
       'modelFileSize',
       'modelName',
-      'modelFile'
+      'modelFile',
+      'modelSnapshot'
     ])
   },
   methods: {
@@ -137,6 +143,10 @@ export default {
         name: this.formAssetName,
         creator: this.user._id,
         modelSize: this.modelFileSize,
+        thumbnailImage: {
+          big: this.modelSnapshot,
+          small: this.modelSnapshot
+        },
         performanceInfo: {
           geometries: this.modelGeometryInfo.memory.geometries,
           textures:   this.modelGeometryInfo.memory.textures,

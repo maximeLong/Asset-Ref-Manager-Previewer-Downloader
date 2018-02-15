@@ -6,7 +6,7 @@ ASSET<template>
       <div class="asset-container">
         <div class="asset" v-for="asset in assets" @click="openAssetInfo(asset)">
             <div class="asset-image-container">
-              <div class="asset-image" :style="{ 'background-image': 'url(' + asset.image + ')' }"></div>
+              <div class="asset-image" :style="{ 'background-image': 'url(data:image/jpg;base64,' + asset.thumbnailImage.small + ')' }"></div>
             </div>
           <div class="asset-title">{{asset.name}}</div>
         </div>
