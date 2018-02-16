@@ -32,6 +32,9 @@ export const store = new Vuex.Store({
       modelFile: undefined,
       modelSnapshot: undefined,
 
+      //model standin that exists between upload click and server response
+      assetStandin: false,
+
       //current team
       currentTeam: {}
   },
@@ -91,6 +94,26 @@ export const store = new Vuex.Store({
       .catch(error => { console.log(error) })
     },
 
+    //-- create asset
+    //
+    createAsset: function(store, formData) {
+      fetch(process.env.SERVER_ADDRESS + '/model', {
+        method: 'POST',
+        body: formData
+      })
+      .then(assetResponse => {
+        store.commit('SET_ASSET_STANDIN', false);
+        store.dispatch('scenes/get', store.getters['scenes/current']._id)
+          .then(success => { console.log('scene updated', success) })
+          .catch(error =>  { console.log('scene error', error) })
+      })
+      .catch(error => { console.log(error) })
+
+      //close the modal before response is done
+      store.commit('SET_ASSET_IMPORT', false);
+      store.commit('SET_ASSET_STANDIN', true);
+    },
+
     //-- team actions -- move to router when you finish
     //
     findCurrentTeamScenes: function(store, team) {
@@ -117,12 +140,12 @@ export const store = new Vuex.Store({
 
       SET_ASSET_INFO: function(state, val)        { state.assetInfo = val; },
       SET_ASSET_IMPORT: function(state, val)      { state.assetImport = val; },
-      SET_SCENE_OPTIONS: function(state, val)    { state.sceneOptions = val; },
+      SET_SCENE_OPTIONS: function(state, val)     { state.sceneOptions = val; },
 
       SET_FORM_ASSETNAME: function(state, val)    { state.formAssetName = val },
       SET_FORM_EMAIL: function(state, val)        { state.formEmail = val; },
       SET_FORM_TEAMNAME: function(state, val)     { state.formTeamName = val; },
-      SET_FORM_SCENENAME: function(state, val)   { state.formSceneName = val; },
+      SET_FORM_SCENENAME: function(state, val)    { state.formSceneName = val; },
       SET_FORM_PASSWORD: function(state, val)     { state.formPassword = val; },
       SET_FORM_INVITEEMAIL: function(state, val)  { state.formInviteEmail = val },
 
@@ -130,6 +153,8 @@ export const store = new Vuex.Store({
       SET_MODEL_FILE_SIZE: function(state, val)       { state.modelFileSize = val },
       SET_MODEL_FILE: function(state, val)            { state.modelFile = val },
       SET_MODEL_SNAPSHOT: function(state, val)        { state.modelSnapshot = val },
+
+      SET_ASSET_STANDIN: function(state, val) { state.assetStandin = val },
 
       SET_CURRENT_TEAM: function(state, val)   { state.currentTeam = val },
   }

@@ -1,7 +1,13 @@
 <template>
   <div id="asset-viewer">
 
-    <div class="wireframe-toggle" @click="toggleWireframe(!wireframe)" v-if="showWireframeButton">
+    <transition name="fade">
+      <div class="loader" v-if="!loaded">
+        <dot-loader :color="'#4e4e4e'"></dot-loader>
+      </div>
+    </transition>
+
+    <div class="wireframe-toggle" @click="toggleWireframe(!wireframe)" v-if="showWireframeButton && loaded">
       <div></div>
     </div>
     <transition name="fadeup" mode="out-in" v-if="showSnapButton">
@@ -19,6 +25,7 @@
 
 const THREE = window.THREE = require('three');
 import _ from 'lodash'
+import DotLoader from 'vue-spinner/src/DotLoader.vue'
 
 const OrbitControls =  require("three/examples/js/controls/OrbitControls");
 const GLTFLoader =     require('three/examples/js/loaders/GLTFLoader');
@@ -28,6 +35,10 @@ const Detector =       require('three/examples/js/Detector');
 
 export default {
   name: 'assetViewer',
+
+  components: {
+    DotLoader
+  },
 
   props: {
     fromServer: Boolean,
@@ -45,6 +56,7 @@ export default {
       //snapshot
       snapshotIsTaken: false,
       snapshot: undefined,
+      loaded: false,
 
       //three scenes
       camera: {},
@@ -125,6 +137,7 @@ export default {
         this.load(url, loader)
         .then(()=> {
           this.$store.commit('SET_MODEL_GEOMETRY_INFO', this.renderer.info);
+          this.loaded = true;
           this.$emit('loadSuccess');
         })
         .catch((error) => {
@@ -140,6 +153,7 @@ export default {
         const loader = new THREE.GLTFLoader();
         this.load(url, loader)
         .then(()=> {
+          this.loaded = true;
           this.$store.commit('SET_MODEL_GEOMETRY_INFO', this.renderer.info);
           this.$emit('loadSuccess');
         })
@@ -325,6 +339,12 @@ export default {
   cursor: -webkit-grab
   &:active
     cursor: -webkit-grabbing
+  .loader
+    width: 100%
+    height: 100%
+    +flexbox
+    +align-items(center)
+    +justify-content(center)
   .asset-snapshot
     position: absolute
     bottom: 15px

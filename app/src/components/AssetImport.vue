@@ -1,7 +1,7 @@
 <template>
 <div id="asset-import">
 
-  <content-box :title="'Create Asset'">
+  <content-box :title="'Create Asset'" v-on-clickaway="handleClickAway">
 
     <!-- import file -->
     <asset-loader-gltf v-on:loaded="receiveLoaded" v-on:snapTaken="snapTaken = true"></asset-loader-gltf>
@@ -53,8 +53,6 @@ import ContentBox from '../components/ContentBox'
 import AssetLoaderGltf from '../components/AssetLoaderGltf'
 
 import { mapState } from 'vuex'
-import { mapActions } from 'vuex'
-
 import { mixin as clickaway } from 'vue-clickaway'
 import _ from 'lodash'
 
@@ -162,22 +160,10 @@ export default {
       formData.append('modelInfo', JSON.stringify(modelInfo));
       formData.append('currentScene', this.currentScene._id)
 
-      // have to do RESTful thing here so that files can be handled
-      fetch(process.env.SERVER_ADDRESS + '/model', {
-        method: 'POST',
-        body: formData
-      })
-      .then(assetResponse => {
-        console.log(assetResponse)
-        this.$store.commit('SET_ASSET_IMPORT', false);
-        //TODO: we need to do a lookup on assets in scene at this point
-      })
-      .catch(error => { console.log(error) })
+      //do a RESTful thing here so that files can be handled
+      this.$store.dispatch('createAsset', formData);
 
-    },
-    ...mapActions('assets', {
-      createAsset: 'create'
-    })
+    }
   }
 
 }

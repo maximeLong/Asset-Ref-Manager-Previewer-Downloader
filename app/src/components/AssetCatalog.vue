@@ -11,6 +11,14 @@ ASSET<template>
           <div class="asset-title">{{asset.name}}</div>
         </div>
 
+        <transition name="fade">
+          <div class="asset asset-standin" v-if="assetStandin">
+            <div class="asset-image-container">
+              <dot-loader :color="'white'" :size="'10px'"></dot-loader>
+            </div>
+          </div>
+        </transition>
+
       </div>
 
       <div class="upload-container">
@@ -29,11 +37,13 @@ ASSET<template>
 
 <script>
 import ContentBox from './ContentBox'
+import DotLoader from 'vue-spinner/src/DotLoader.vue'
 
 export default {
   name: 'assetCatalog',
   components: {
     ContentBox,
+    DotLoader
   },
   data: function() {
     return {
@@ -42,8 +52,9 @@ export default {
   },
   computed: {
     user: function()            { return this.$store.state.auth.user },
-    currentScene: function()   { return this.$store.getters['scenes/current'] },
-    assets: function()           { return this.currentScene.assets }
+    currentScene: function()    { return this.$store.getters['scenes/current'] },
+    assets: function()          { return this.currentScene.assets },
+    assetStandin: function()    { return this.$store.state.assetStandin }
   },
   methods: {
     openImport: function() { this.$store.commit('SET_ASSET_IMPORT', true) },
@@ -79,14 +90,19 @@ export default {
           width: 150px
           border: 1px solid $border_color_light
           background: radial-gradient(#f1e4d1 0%, #737373 100%)
-          border-radius: 5px
+          border-radius: 3px
           margin-bottom: 5px
           .asset-image
-            background-size: contain
-            background-position: 50% 50%
+            background-size: cover
             background-repeat: no-repeat
             height: 100%
             width: 100%
+            background-position: 50% 50%
+      .asset-standin
+        .asset-image-container
+          +flexbox
+          +align-items(center)
+          +justify-content(center)
 
 
     .upload-container
