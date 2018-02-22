@@ -9,10 +9,10 @@
   </div>
 
   <asset-viewer v-if="loaded"
-    :fromServer="false"
+    :assetIsBinary="true"
+    :binaryUrl="glbUrl"
     :showSnapButton="true"
     :showWireframeButton="true"
-    :droppedFileInfo="modelFileInfo"
     v-on:loadSuccess="emitSuccess"
     v-on:snapTaken="emitSnap"
     v-on:loadFailure="handleFailure"
@@ -23,8 +23,8 @@
 <script>
 
 import DropController from '@/loaders/gltf/drop-controller'
+import converter from '@/loaders/gltf/gltfToGlb'
 import AssetViewer from '../components/AssetViewer'
-
 
 export default {
   name: 'assetLoaderGltf',
@@ -37,66 +37,63 @@ export default {
       loaded: false,
 
       errors: [],
+      glbUrl: '',
 
-      //drop info
-      modelFileInfo: {
-        rootFile: "",
-        rootPath: "",
-        fileMap: ""
-      },
-
-
+      //TODO: remove if not used anymore
+      // modelFileInfo: {
+      //   rootFile: "",
+      //   rootPath: "",
+      //   fileMap: ""
+      // },
     }
   },
   mounted: function() {
-    //check that file is supported and webgl can be turned on
+    // check that file is supported and webgl can be turned on
     if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
       console.error('The File APIs are not fully supported in this browser.');
     }
-    //handle file dropping
-    const dropCtrl = new DropController(document.querySelector('#asset-loader'));
-    dropCtrl.on('drop', ({rootFile, rootPath, fileMap}) => this.handleDrop(rootFile, rootPath, fileMap));
+
+    // TODO: we can remove this and Drop-controller class if we aren't using anymore
+    // const dropCtrl = new DropController(document.querySelector('#asset-loader'));
+    // dropCtrl.on('drop', ({rootFile, rootPath, fileMap}) => this.handleGltfDrop(rootFile, rootPath, fileMap));
+
+    // convert gltf to glb
+    converter(document.querySelector('#asset-loader'))
+    .then((file)=> {
+      this.handleDropConversion(file)
+    });
   },
 
   computed: {
-    user: function()            { return this.$store.state.auth.user },
+    user: function()           { return this.$store.state.auth.user },
     currentScene: function()   { return this.$store.getters['scenes/current'] },
   },
   methods: {
 
-    handleDrop: function(rootFile, rootPath, fileMap) {
-      const fileURL = typeof rootFile === 'string' ? rootFile : URL.createObjectURL(rootFile);
-
-      //TODO: run client side validation
-      //TODO: convert gltf to glb somewhere around here after validation
-
-      //validationCtrl.validate(fileURL, rootPath, fileMap);
-      //convert gltf to glb at this point
-      this.modelFileInfo = {
-        fileURL: fileURL,
-        rootPath: rootPath,
-        fileMap: fileMap
-      };
+    handleDropConversion: function(file) {
+      this.glbUrl = URL.createObjectURL(file);
       this.loaded = true;
-
-      //set file size
-      var totalSize = 0;
-      fileMap.forEach((file, path)=> {
-
-        totalSize += file.size
-        this.$store.commit('SET_MODEL_FILE_SIZE', totalSize);
-        this.$store.commit('SET_MODEL_FILE', file);
-
-        //TODO: only works on glb right now --> need to make sure glb happens by converting to gltf above
-        // var reader = new FileReader();
-        // reader.addEventListener("loadend", ()=> {
-        //   this.$store.commit('SET_MODEL_FILE_BUFFER', reader.result);
-        // });
-        // reader.readAsArrayBuffer(file);
-
-      });
-
+      this.$store.commit('SET_MODEL_FILE_SIZE', file.size);
+      this.$store.commit('SET_MODEL_FILE', file);
     },
+
+    //-- TODO: we aren't using this anymore, we can delete
+    //
+    // handleGltfDrop: function(rootFile, rootPath, fileMap) {
+    //   const fileURL = typeof rootFile === 'string' ? rootFile : URL.createObjectURL(rootFile);
+    //   this.modelFileInfo = {
+    //     fileURL: fileURL,
+    //     rootPath: rootPath,
+    //     fileMap: fileMap
+    //   };
+    //   this.loaded = true;
+    //   var totalSize = 0;
+    //   fileMap.forEach((file, path)=> {
+    //     totalSize += file.size
+    //     this.$store.commit('SET_MODEL_FILE_SIZE', totalSize);
+    //     this.$store.commit('SET_MODEL_FILE', file);
+    //   });
+    // },
 
     // -- emit events up to whatever component is using the loader
     // -- TODO: this is kind of silly and could handled by a mutation watcher (like toasts) on whatever cares to listen

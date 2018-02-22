@@ -14,7 +14,6 @@ module.exports = function (app) {
     admins:     [{ type: Schema.Types.ObjectId, ref: 'users' }],
     teams:      [{ type: Schema.Types.ObjectId, ref: 'teams' }],
 
-    assets:     [{ type: Schema.Types.ObjectId, ref: 'assets'}],
     invites:    [{ type: String }],
 
     createdAt:  { type: Date, 'default': Date.now },

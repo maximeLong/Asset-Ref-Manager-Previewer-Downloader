@@ -6,7 +6,7 @@ ASSET<template>
       <div class="asset-container">
         <div class="asset" v-for="asset in assets" @click="openAssetInfo(asset)">
             <div class="asset-image-container">
-              <div class="asset-image" :style="{ 'background-image': 'url(data:image/jpg;base64,' + asset.thumbnailImage.small + ')' }"></div>
+              <div class="asset-image" :style="{ 'background-image': 'url(data:image/jpg;base64,' + asset.thumbnailImage + ')' }"></div>
             </div>
           <div class="asset-title">{{asset.name}}</div>
         </div>
@@ -14,7 +14,7 @@ ASSET<template>
         <transition name="fade">
           <div class="asset asset-standin" v-if="assetStandin">
             <div class="asset-image-container">
-              <dot-loader :color="'white'" :size="'10px'"></dot-loader>
+              <dot-loader :color="'#4e4e4e'" :size="'30px'"></dot-loader>
             </div>
           </div>
         </transition>
@@ -50,20 +50,36 @@ export default {
       assetSearch: ''
     }
   },
+  mounted: function() {
+    this.findCurrentSceneAssets()
+  },
+
   computed: {
     user: function()            { return this.$store.state.auth.user },
     currentScene: function()    { return this.$store.getters['scenes/current'] },
-    assets: function()          { return this.currentScene.assets },
+    assets: function()          { return this.$store.getters['assets/list'] },
     assetStandin: function()    { return this.$store.state.assetStandin }
   },
   methods: {
     openImport: function() { this.$store.commit('SET_ASSET_IMPORT', true) },
-    openAssetInfo: function(selectedAsset) {
 
+    openAssetInfo: function(selectedAsset) {
+      //TODO: this costs a server request, but also the information is hot (if likes or scene adds happen)
+      //      also, if request failure we can drop back to the info that is already in store
       this.$store.dispatch('assets/get', selectedAsset._id)
       .then( response => {
         this.$store.commit('SET_ASSET_INFO', true);
       });
+    },
+
+    baseAssetFind: function(params) {
+      this.$store.dispatch('assets/find', params)
+        .then(success => { console.log('asset list updated', success) })
+        .catch(error =>  { console.log('scene error', error) })
+    },
+    findCurrentSceneAssets: function() {
+      let params = {query: {"scenes": { "$in" : [this.$store.getters['scenes/current']._id]} }};
+      this.baseAssetFind(params);
     }
   }
 
@@ -89,7 +105,7 @@ export default {
           height: 100px
           width: 150px
           border: 1px solid $border_color_light
-          background: radial-gradient(#f1e4d1 0%, #737373 100%)
+          background: $asset_background
           border-radius: 3px
           margin-bottom: 5px
           .asset-image

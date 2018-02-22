@@ -41,11 +41,11 @@ export default {
   },
 
   props: {
-    fromServer: Boolean,
     showSnapButton: Boolean,
     showWireframeButton: Boolean,
-    droppedFileInfo: Object, //handle local file drop
-    serverUrl: String        //handle remote server url pulldown
+    assetIsBinary: Boolean,
+    gltfFileMap: Object,      // handles gltf viewer
+    binaryUrl: String         //handle glb viewer from remote or local url
     //
     // -- reverse props ($emits) api:
     // 1) loadSuccess, 2) loadFailure, 3) snapTaken
@@ -109,13 +109,13 @@ export default {
 
   methods: {
 
-    // -- handle paths dependent on if opening locally or from server
+    // -- handle paths dependent if gltf or glb
     //
     prepLoad: function() {
-      if (!this.fromServer) {
-        var url = this.droppedFileInfo.fileURL;
-        var rootPath = this.droppedFileInfo.rootPath;
-        var assetMap = this.droppedFileInfo.fileMap;
+      if (!this.assetIsBinary) {
+        var url = this.gltfFileMap.fileURL;
+        var rootPath = this.gltfFileMap.rootPath;
+        var assetMap = this.gltfFileMap.fileMap;
         const manager = new THREE.LoadingManager();
         const baseURL = THREE.LoaderUtils.extractUrlBase(url);
         const blobURLs = [];
@@ -147,9 +147,9 @@ export default {
         });
       }
 
-      //if from server just serve URL endpoint
+      //if glb just serve URL endpoint
       else {
-        var url = this.serverUrl;
+        var url = this.binaryUrl;
         const loader = new THREE.GLTFLoader();
         this.load(url, loader)
         .then(()=> {
@@ -210,15 +210,16 @@ export default {
       var containerWidth = getComputedStyle(container).width.slice(0, -2);
 
       //create scene and camera
+      var color = new THREE.Color( 0xf3f3f3 );
       this.camera = new THREE.PerspectiveCamera( 45, containerWidth / containerHeight, 1, 5000 );
       this.scene = new THREE.Scene();
+      this.scene.background = color;
 
       //render loop -- and add to container
       //TODO: have only one renderer in app, have to mutate renderer
       this.renderer = new THREE.WebGLRenderer({
         preserveDrawingBuffer: true,
         antialias: true,
-        alpha: true
       });
       this.renderer.setPixelRatio( window.devicePixelRatio );
       this.renderer.setSize( containerWidth, containerHeight );
@@ -308,7 +309,7 @@ export default {
       });
     },
     takeSnapShot: function() {
-      var dataURL = this.renderer.domElement.toDataURL();
+      var dataURL = this.renderer.domElement.toDataURL("image/jpeg", 0.75);
       this.snapshot = dataURL;
       this.snapshotIsTaken = true;
       this.$store.commit('SET_MODEL_SNAPSHOT', dataURL)
@@ -332,7 +333,7 @@ export default {
 #asset-viewer
   width: 100%
   height: 250px
-  background: radial-gradient(#f1e4d1 0%, #737373 100%)
+  background: $asset_background
   position: relative
   overflow: hidden
   cursor: move

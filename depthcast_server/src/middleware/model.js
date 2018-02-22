@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 // Import the Google Cloud client library + reference key
 const Storage = require('@google-cloud/storage');
 const projectId = 'depthcast-188705';
@@ -19,18 +21,22 @@ module.exports = function(app) {
 
   return function(req, res, next) {
 
-    if(!req.file) { return next(); }
+    if(!req.file) {
+      return next();
+    }
     const assetData = JSON.parse(req.body.modelInfo);
     const assetScene = req.body.currentScene;
 
     //convert model thumbnail DataURL strings to buffers
-    assetData.thumbnailImage.small  = new Buffer(assetData.thumbnailImage.small.split(",")[1], 'base64');
-    assetData.thumbnailImage.big    = new Buffer(assetData.thumbnailImage.big.split(",")[1], 'base64');
+    assetData.thumbnailImage = new Buffer(assetData.thumbnailImage.split(",")[1], 'base64');
 
+    //set file and start stream to gcs
+    const hash = crypto.randomBytes(8).toString("hex");
+    req.file.originalname = assetData.name + '-' + hash + '.glb';
 
-    //get file and start stream to gcs
     const gcsname = req.file.originalname;
     const file = bucket.file(gcsname);
+
     const stream = file.createWriteStream({
       metadata: {
         contentType: 'model/gltf-binary' //default is: req.file.mimetype -- which defaults to octet/stream
@@ -38,7 +44,7 @@ module.exports = function(app) {
     });
 
     stream.on('error', (err) => {
-      console.log(err);
+      return next(new Error(err))
     });
 
     stream.on('finish', () => {
@@ -48,24 +54,17 @@ module.exports = function(app) {
 
       //make file public readable (until auth is built)
       file.makePublic()
-        .then(() => { console.log(gcsname + ' file made public') })
-        .catch(err => { console.error('ERROR:', err); });
+        .then(() =>   { console.log(gcsname + ' file made public') })
+        .catch(err => { return next(new Error(err)) });
 
       //create asset with modelData and public URL
       assetData.modelURL = getPublicUrl(gcsname);
       app.service('assets').create(assetData)
         .then((asset) =>  {
-
-          //add asset to current scene automatically
-          app.service('scenes').patch(assetScene, {$push: { assets: asset._id }} )
-            .then(()=> { console.log('scene successfully patched') })
-            .catch(err => console.log(err))
-
-          //return asset to client
-          res.json(asset);
+          return res.status(200).json({message: asset, code: 200 });
         })
         .catch(err => {
-          console.log(err);
+          return next(new Error(err));
         })
     });
 

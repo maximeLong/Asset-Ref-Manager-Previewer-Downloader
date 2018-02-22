@@ -138,13 +138,12 @@ export default {
 
     tryCreateAsset: function() {
       const modelInfo = {
-        name: this.formAssetName,
-        creator: this.user._id,
-        modelSize: this.modelFileSize,
-        thumbnailImage: {
-          big: this.modelSnapshot,
-          small: this.modelSnapshot
-        },
+        name:           this.formAssetName,
+        creator:        this.user._id,
+        scenes:         [this.currentScene._id],
+        likes:          [],
+        modelSize:      this.modelFileSize,
+        thumbnailImage: this.modelSnapshot,
         performanceInfo: {
           geometries: this.modelGeometryInfo.memory.geometries,
           textures:   this.modelGeometryInfo.memory.textures,
@@ -156,9 +155,9 @@ export default {
 
       // Instantiate a FormData() object + add information to it
       const formData = new FormData();
-      formData.append('file', this.modelFile);
+      formData.append('file', this.modelFile, this.formAssetName + '.glb');
       formData.append('modelInfo', JSON.stringify(modelInfo));
-      formData.append('currentScene', this.currentScene._id)
+      //formData.append('currentScene', this.currentScene._id)
 
       //do a RESTful thing here so that files can be handled
       this.$store.dispatch('createAsset', formData);

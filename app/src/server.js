@@ -8,7 +8,7 @@ const socket = io(process.env.SERVER_ADDRESS, {transports: ['websocket']})
 
 const server = feathers()
   .configure(hooks())
-  .configure(socketio(socket))
+  .configure(socketio(socket, { timeout: 10000 }))
   .configure(auth({ storage: window.localStorage }))
 
 server.service('/users')

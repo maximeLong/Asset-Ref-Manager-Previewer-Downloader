@@ -97,17 +97,24 @@ export const store = new Vuex.Store({
     //-- create asset
     //
     createAsset: function(store, formData) {
+
       fetch(process.env.SERVER_ADDRESS + '/model', {
         method: 'POST',
         body: formData
       })
-      .then(assetResponse => {
-        store.commit('SET_ASSET_STANDIN', false);
-        store.dispatch('scenes/get', store.getters['scenes/current']._id)
-          .then(success => { console.log('scene updated', success) })
-          .catch(error =>  { console.log('scene error', error) })
+      .then((res) => {
+        if (!res.ok) {
+          res.json().then((data)=> {console.log(data) }); //error
+          store.commit('SET_ASSET_STANDIN', false);
+        } else {
+          res.json().then((data)=> {console.log(data) }); //success
+          store.commit('SET_ASSET_STANDIN', false);
+        }
       })
-      .catch(error => { console.log(error) })
+      .catch((error) => { //catch all other errors?
+        console.log('res failed', error);
+        store.commit('SET_ASSET_STANDIN', false);
+      })
 
       //close the modal before response is done
       store.commit('SET_ASSET_IMPORT', false);

@@ -5,13 +5,13 @@
 
     <div class="asset-preview">
       <div class="asset-image" v-if="!loaded"
-        :style="{ 'background-image': 'url(data:image/jpg;base64,' + activeAsset.thumbnailImage.small + ')' }">
+        :style="{ 'background-image': 'url(data:image/jpg;base64,' + activeAsset.thumbnailImage + ')' }">
       </div>
       <asset-viewer v-else
-        :fromServer="true"
+        :assetIsBinary="true"
+        :binaryUrl="fileURL"
         :showSnapButton="false"
         :showWireframeButton="true"
-        :serverUrl="fileURL"
         v-on:loadSuccess="emitSuccess"
         v-on:loadFailure="handleFailure"
       ></asset-viewer>
@@ -153,7 +153,7 @@ export default {
       position: relative
       height: 250px
       width: 100%
-      background: radial-gradient(#f1e4d1 0%, #737373 100%)
+      //background: $asset_background
       .asset-image
         background-size: cover
         background-repeat: no-repeat

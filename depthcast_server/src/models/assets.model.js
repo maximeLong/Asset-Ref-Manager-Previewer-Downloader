@@ -10,9 +10,15 @@ module.exports = function (app) {
     name:       { type: String, required: [true, 'asset must have title'] },
     creator:    { type: Schema.Types.ObjectId, ref: 'users', required: [true, 'asset must have creator']},
 
-    //url produced by middleware route /model
-    modelURL:       { type: String },
+    //TODO: decided to hold relationship here because assets seem fairly atomic in that they can..
+    //      ..be held in scenes or users (through creator or likes)..
+    //      ..but that means that asset model could hold broken links to users/scenes that do not exist
+    scenes:     [{ type: Schema.Types.ObjectId, ref: 'scenes' }],
+    likes:      [{ type: Schema.Types.ObjectId, ref: 'users'}],
+    views:      { type: Number, 'default': 0 },
 
+    //model information
+    modelURL:       { type: String },
     modelSize:      { type: Number },
     performanceInfo: {
       geometries: { type: Number },
@@ -22,15 +28,12 @@ module.exports = function (app) {
       vertices:   { type: Number }
     },
 
-    //store images directly in model with DataURL(data:image/jpg;base64,<string>) --> convert back in Unity using System.Convert.FromBase64String
-    thumbnailImage: {
-      big:    { type: Buffer },
-      small:  { type: Buffer }
-    },
+    //store images directly in model with DataURL(data:image/jpg;base64,<string>)
+    //--> convert back in Unity using System.Convert.FromBase64String
+    thumbnailImage: { type: Buffer },
 
     createdAt:  { type: Date, 'default': Date.now },
     updatedAt:  { type: Date, 'default': Date.now }
-
   }, {
     timestamps: true
   });
