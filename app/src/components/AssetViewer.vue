@@ -360,7 +360,7 @@ export default {
     position: absolute
     bottom: 15px
     left: 15px
-    +button(false, true, white, 125px)
+    +button(false, true, $action_color, 125px)
     background-color: transparent
 
   .wireframe-toggle
@@ -370,7 +370,7 @@ export default {
     z-index: 1
     border-radius: 50px
     padding: 10px
-    background-color: #f9f9f985
+    background-color: grey
     width: 40px
     height: 40px
     +flexbox

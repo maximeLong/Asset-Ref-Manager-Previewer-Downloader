@@ -53,25 +53,31 @@ export default {
   mounted: function() {
     this.findCurrentSceneAssets()
   },
+  watch: {
+    currentScene: function (newVal, oldVal) {
+      this.findCurrentSceneAssets()
+    }
+  },
 
   computed: {
     user: function()            { return this.$store.state.auth.user },
     currentScene: function()    { return this.$store.getters['scenes/current'] },
     assets: function()          { return this.$store.getters['assets/list'] },
-    assetStandin: function()    { return this.$store.state.assetStandin }
+    assetStandin: function()    { return this.$store.state.assetStandin },
   },
+  
   methods: {
+    //-- modal opens
     openImport: function() { this.$store.commit('SET_ASSET_IMPORT', true) },
-
     openAssetInfo: function(selectedAsset) {
       //TODO: this costs a server request, but also the information is hot (if likes or scene adds happen)
-      //      also, if request failure we can drop back to the info that is already in store
       this.$store.dispatch('assets/get', selectedAsset._id)
       .then( response => {
         this.$store.commit('SET_ASSET_INFO', true);
       });
     },
 
+    //-- generate asset lists
     baseAssetFind: function(params) {
       this.$store.dispatch('assets/find', params)
         .then(success => { console.log('asset list updated', success) })
