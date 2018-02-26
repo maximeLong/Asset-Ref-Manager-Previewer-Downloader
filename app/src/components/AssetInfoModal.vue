@@ -1,7 +1,7 @@
 <template>
-<div id="asset-info">
+<div id="asset-info-modal">
 
-  <content-box :title="activeAsset.name" v-on-clickaway="handleClickAway">
+  <modal :title="activeAsset.name" :onClickaway="handleClickaway">
 
     <div class="asset-preview">
       <div class="asset-image" v-if="!loaded"
@@ -41,30 +41,28 @@
           <div class="count">{{activeAsset.performanceInfo.vertices}} verts</div>
         </div>
       </div>
-
     </div>
-  </content-box>
+
+  </modal>
 
 </div>
 </template>
 
 <script>
-import ContentBox from '../components/ContentBox'
+import Modal from '../components/Modal'
 import AssetViewer from '../components/AssetViewer'
 import { mapState } from 'vuex'
 import { mapActions } from 'vuex'
-import { mixin as clickaway } from 'vue-clickaway'
 import _ from 'lodash'
 import moment from 'moment'
 
 
 export default {
-  name: 'assetInfo',
+  name: 'assetInfoModal',
   components: {
-    ContentBox: ContentBox,
+    Modal: Modal,
     AssetViewer: AssetViewer
   },
-  mixins: [ clickaway ],
   data: function() {
     return {
       loaded: false,
@@ -105,12 +103,8 @@ export default {
   },
   methods: {
     //-- button methods
-    //
-    handleClickAway: function(e) {
-      //TODO: better clickaway handler - have to catch button presses on form bcuz bugs
-      if (_.includes(e.target.classList, 'button')) { return } else {
-        this.$store.commit('SET_ASSET_INFO', false);
-      }
+    handleClickaway: function() {
+      this.$store.commit('SET_ASSET_INFO_MODAL_IS_OPEN', false);
     },
 
     // -- use these if you need them
@@ -126,91 +120,69 @@ export default {
 <style lang="sass">
 @import src/styles/main
 
-#asset-info
-  position: absolute
-  top: 0
-  bottom: 0
-  left: 0
-  right: 0
-  width: 100%
-  height: 100%
-  +flexbox
-  +justify-content(center)
-  +align-items(center)
-  &::before
-    content: ''
-    position: absolute
+#asset-info-modal
+  .asset-preview
+    position: relative
+    height: 250px
     width: 100%
-    height: 100%
-    background-color: $side_panel_color
-    opacity: .8
-
-  .content-box
-    width: 80%
-    max-width: 700px
-
-    .asset-preview
-      position: relative
-      height: 250px
+    //background: $asset_background
+    .asset-image
+      background-size: cover
+      background-repeat: no-repeat
+      height: 100%
       width: 100%
-      //background: $asset_background
-      .asset-image
-        background-size: cover
-        background-repeat: no-repeat
+      background-position: 50% 50%
+    .button
+      +button(false, false, $action_color, fit-content)
+      position: absolute
+      bottom: 20px
+      left: 20px
+      padding: 13px 15px
+  .asset-information
+    padding-top: 20px
+    +flexbox
+    +systemType(small)
+
+    .related-information
+      +flex(1)
+      color: $border_color_mid
+      .title
+        border-bottom: 1px solid $border_color_mid
+        padding-bottom: 7px
+        margin-bottom: 12px
+      .info
+        +flexbox
+        .keys
+          margin-right: 30px
+        .key,.value
+          padding-bottom: 4px
+
+
+    .performance-information
+      position: relative
+      +flex(0 0 175px)
+      height: 175px
+      margin-left: 30px
+      .performance-chart
         height: 100%
         width: 100%
-        background-position: 50% 50%
-      .button
-        +button(false, false, $action_color, fit-content)
         position: absolute
-        bottom: 20px
-        left: 20px
-        padding: 13px 15px
-    .asset-information
-      padding-top: 20px
-      +flexbox
-      +systemType(small)
+        border: 20px solid $border_color_light
+        border-radius: 100%
 
-      .related-information
-        +flex(1)
-        color: $border_color_mid
-        .title
-          border-bottom: 1px solid $border_color_mid
-          padding-bottom: 7px
-          margin-bottom: 12px
-        .info
-          +flexbox
-          .keys
-            margin-right: 30px
-          .key,.value
-            padding-bottom: 4px
-
-
-      .performance-information
-        position: relative
-        +flex(0 0 175px)
-        height: 175px
-        margin-left: 30px
-        .performance-chart
-          height: 100%
-          width: 100%
-          position: absolute
-          border: 20px solid $border_color_light
-          border-radius: 100%
-
-        .performance-number
-          height: 100%
-          width: 100%
-          position: absolute
-          +flexbox
-          +align-items(center)
-          +justify-content(center)
-          +flex-direction(column)
-          .shorthand
-            +systemType(big)
-          .count
-            +systemType(normal)
-            padding-top: 10px
+      .performance-number
+        height: 100%
+        width: 100%
+        position: absolute
+        +flexbox
+        +align-items(center)
+        +justify-content(center)
+        +flex-direction(column)
+        .shorthand
+          +systemType(big)
+        .count
+          +systemType(normal)
+          padding-top: 10px
 
 
 </style>

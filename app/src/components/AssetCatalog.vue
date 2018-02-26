@@ -1,4 +1,4 @@
-ASSET<template>
+<template>
 <div id="asset-catalog">
   <content-box :title="'Asset Catalog'">
 
@@ -22,7 +22,6 @@ ASSET<template>
       </div>
 
       <div class="upload-container">
-        <input v-model="assetSearch" placeholder="search public assets, WIP">
         <div class="devider"></div>
         <div class="open-import" @click="openImport">Import from file</div>
       </div>
@@ -46,9 +45,7 @@ export default {
     DotLoader
   },
   data: function() {
-    return {
-      assetSearch: ''
-    }
+    return {}
   },
   mounted: function() {
     this.findCurrentSceneAssets()
@@ -65,15 +62,15 @@ export default {
     assets: function()          { return this.$store.getters['assets/list'] },
     assetStandin: function()    { return this.$store.state.assetStandin },
   },
-  
+
   methods: {
     //-- modal opens
-    openImport: function() { this.$store.commit('SET_ASSET_IMPORT', true) },
+    openImport: function() { this.$store.commit('SET_ASSET_IMPORT_MODAL_IS_OPEN', true) },
     openAssetInfo: function(selectedAsset) {
       //TODO: this costs a server request, but also the information is hot (if likes or scene adds happen)
       this.$store.dispatch('assets/get', selectedAsset._id)
       .then( response => {
-        this.$store.commit('SET_ASSET_INFO', true);
+        this.$store.commit('SET_ASSET_INFO_MODAL_IS_OPEN', true);
       });
     },
 

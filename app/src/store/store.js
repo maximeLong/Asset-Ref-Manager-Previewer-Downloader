@@ -14,9 +14,9 @@ export const store = new Vuex.Store({
 
       userPanel: { open: false, panelType: 'userInfo' }, //panelType can be : 'signIn', 'createAccount', 'userInfo', 'team'
 
-      sceneOptions: false, //scene options panel
-      assetImport: false,    //import asset panel
-      assetInfo: false,      //asset info panel
+      sceneOptionsModalIsOpen: false, //scene options panel
+      assetImportModalIsOpen: false,    //import asset panel
+      assetInfoModalIsOpen: false,      //asset info panel
 
       //various form info holders
       formEmail: '',
@@ -145,9 +145,9 @@ export const store = new Vuex.Store({
         }
       },
 
-      SET_ASSET_INFO: function(state, val)        { state.assetInfo = val; },
-      SET_ASSET_IMPORT: function(state, val)      { state.assetImport = val; },
-      SET_SCENE_OPTIONS: function(state, val)     { state.sceneOptions = val; },
+      SET_ASSET_INFO_MODAL_IS_OPEN: function(state, val)        { state.assetInfoModalIsOpen = val; },
+      SET_ASSET_IMPORT_MODAL_IS_OPEN: function(state, val)      { state.assetImportModalIsOpen = val; },
+      SET_SCENE_OPTIONS_MODAL_IS_OPEN: function(state, val)     { state.sceneOptionsModalIsOpen = val; },
 
       SET_FORM_ASSETNAME: function(state, val)    { state.formAssetName = val },
       SET_FORM_EMAIL: function(state, val)        { state.formEmail = val; },

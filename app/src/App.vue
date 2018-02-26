@@ -19,9 +19,9 @@
         <router-view></router-view>
 
         <!-- full screen modals -->
-        <scene-options v-if="sceneOptions"></scene-options>
-        <asset-import v-if="assetImport"></asset-import>
-        <asset-info v-if="assetInfo"></asset-info>
+        <scene-options-modal v-if="sceneOptionsModalIsOpen"></scene-options-modal>
+        <asset-import-modal v-if="assetImportModalIsOpen"></asset-import-modal>
+        <asset-info-modal v-if="assetInfoModalIsOpen"></asset-info-modal>
 
       </div>
 
@@ -34,10 +34,10 @@
 
 import AppHeader from './components/AppHeader'
 import SceneHeader from './components/SceneHeader'
-import SceneOptions from './components/SceneOptions'
 
-import AssetImport from './components/AssetImport'
-import AssetInfo from './components/AssetInfo'
+import SceneOptionsModal from './components/SceneOptionsModal'
+import AssetImportModal from './components/AssetImportModal'
+import AssetInfoModal from './components/AssetInfoModal'
 
 import OptionsPanel from './components/OptionsPanel'
 import SidePanel from './components/SidePanel'
@@ -50,9 +50,9 @@ export default {
   components: {
     AppHeader,
     SceneHeader,
-    SceneOptions,
-    AssetImport,
-    AssetInfo,
+    SceneOptionsModal,
+    AssetImportModal,
+    AssetInfoModal,
     OptionsPanel,
     SidePanel
   },
@@ -89,9 +89,9 @@ export default {
       'activePanel',
       'userPanel',
       'route',
-      'sceneOptions',
-      'assetImport',
-      'assetInfo'
+      'sceneOptionsModalIsOpen',
+      'assetImportModalIsOpen',
+      'assetInfoModalIsOpen'
     ])
   }
 }

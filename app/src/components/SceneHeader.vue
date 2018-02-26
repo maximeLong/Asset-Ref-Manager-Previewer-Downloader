@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     openSceneOptions: function() {
-      this.$store.commit('SET_SCENE_OPTIONS', true)
+      this.$store.commit('SET_SCENE_OPTIONS_MODAL_IS_OPEN', true)
     }
   }
 
