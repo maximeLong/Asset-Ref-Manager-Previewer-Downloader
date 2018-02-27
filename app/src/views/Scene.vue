@@ -42,7 +42,6 @@ export default {
   },
   computed: {
     user: function()            { return this.$store.state.auth.user },
-    userIsLoggedIn: function()  { return this.user ? true : false },
     currentScene: function()    { return this.$store.state.currentScene },
   },
   methods: {

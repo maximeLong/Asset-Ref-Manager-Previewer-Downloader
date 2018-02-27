@@ -22,7 +22,6 @@
 </template>
 <script>
 
-import DropController from '@/loaders/gltf/drop-controller'
 import converter from '@/loaders/gltf/gltfToGlb'
 import AssetViewer from '../components/AssetViewer'
 
@@ -35,16 +34,7 @@ export default {
   data: function() {
     return {
       loaded: false,
-
-      errors: [],
       glbUrl: '',
-
-      //TODO: remove if not used anymore
-      // modelFileInfo: {
-      //   rootFile: "",
-      //   rootPath: "",
-      //   fileMap: ""
-      // },
     }
   },
   mounted: function() {
@@ -52,10 +42,6 @@ export default {
     if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
       console.error('The File APIs are not fully supported in this browser.');
     }
-
-    // TODO: we can remove this and Drop-controller class if we aren't using anymore
-    // const dropCtrl = new DropController(document.querySelector('#asset-loader'));
-    // dropCtrl.on('drop', ({rootFile, rootPath, fileMap}) => this.handleGltfDrop(rootFile, rootPath, fileMap));
 
     // convert gltf to glb
     converter(document.querySelector('#asset-loader'))
@@ -76,24 +62,6 @@ export default {
       this.$store.commit('SET_MODEL_FILE_SIZE', file.size);
       this.$store.commit('SET_MODEL_FILE', file);
     },
-
-    //-- TODO: we aren't using this anymore, we can delete
-    //
-    // handleGltfDrop: function(rootFile, rootPath, fileMap) {
-    //   const fileURL = typeof rootFile === 'string' ? rootFile : URL.createObjectURL(rootFile);
-    //   this.modelFileInfo = {
-    //     fileURL: fileURL,
-    //     rootPath: rootPath,
-    //     fileMap: fileMap
-    //   };
-    //   this.loaded = true;
-    //   var totalSize = 0;
-    //   fileMap.forEach((file, path)=> {
-    //     totalSize += file.size
-    //     this.$store.commit('SET_MODEL_FILE_SIZE', totalSize);
-    //     this.$store.commit('SET_MODEL_FILE', file);
-    //   });
-    // },
 
     // -- emit events up to whatever component is using the loader
     // -- TODO: this is kind of silly and could handled by a mutation watcher (like toasts) on whatever cares to listen

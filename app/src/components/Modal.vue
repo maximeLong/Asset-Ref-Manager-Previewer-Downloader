@@ -1,9 +1,11 @@
 <template>
   <div class="modal">
 
-    <content-box :title="title" v-on-clickaway="clickawayWrapper">
-      <slot></slot>
-    </content-box>
+    <transition name="fadeup" appear>
+      <content-box :title="title" v-on-clickaway="clickawayWrapper">
+        <slot></slot>
+      </content-box>
+    </transition>
 
   </div>
 </template>

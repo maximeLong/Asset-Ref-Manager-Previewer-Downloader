@@ -30,7 +30,6 @@ import DotLoader from 'vue-spinner/src/DotLoader.vue'
 const OrbitControls =  require("three/examples/js/controls/OrbitControls");
 const GLTFLoader =     require('three/examples/js/loaders/GLTFLoader');
 const Detector =       require('three/examples/js/Detector');
-// const ValidationController =  require('.@/loaders/gltf/validation-controller');
 
 
 export default {
@@ -102,52 +101,16 @@ export default {
   },
 
   computed: {
-    userIsLoggedIn: function()  { return this.user ? true : false },
     user: function()            { return this.$store.state.auth.user },
     device: function()          { return this.$store.state.device },
   },
 
   methods: {
 
-    // -- handle paths dependent if gltf or glb
-    //
     prepLoad: function() {
       if (!this.assetIsBinary) {
-        var url = this.gltfFileMap.fileURL;
-        var rootPath = this.gltfFileMap.rootPath;
-        var assetMap = this.gltfFileMap.fileMap;
-        const manager = new THREE.LoadingManager();
-        const baseURL = THREE.LoaderUtils.extractUrlBase(url);
-        const blobURLs = [];
-        manager.setURLModifier((url, path) => {
-          const normalizedURL = rootPath + url
-            .replace(baseURL, '')
-            .replace(/^(\.?\/)/, '');
-          if (assetMap.has(normalizedURL)) {
-            const blob = assetMap.get(normalizedURL);
-            const blobURL = URL.createObjectURL(blob);
-            blobURLs.push(blobURL);
-            return blobURL;
-          }
-          return (path || '') + url;
-        });
-        const loader = new THREE.GLTFLoader(manager);
-        loader.setCrossOrigin('anonymous');
-
-        this.load(url, loader)
-        .then(()=> {
-          this.$store.commit('SET_MODEL_GEOMETRY_INFO', this.renderer.info);
-          this.loaded = true;
-          this.$emit('loadSuccess');
-        })
-        .catch((error) => {
-          console.log(error);
-          this.$emit('loadFailure');
-          window.alert((error||{}).message || error);
-        });
+        return //non binary should be handled externally now
       }
-
-      //if glb just serve URL endpoint
       else {
         var url = this.binaryUrl;
         const loader = new THREE.GLTFLoader();

@@ -52,7 +52,6 @@ export const store = new Vuex.Store({
   actions: {
 
     // -- first major db lookup, gets scenes and teams, and current of both
-    // -- should open websocket connection, for getter lists (store.getters['teams/list'])
     // -- TODO: populate doesn't work when lists update from websocket
     //
     async signInLoad (store) {
@@ -97,7 +96,6 @@ export const store = new Vuex.Store({
     //-- create asset
     //
     createAsset: function(store, formData) {
-
       fetch(process.env.SERVER_ADDRESS + '/model', {
         method: 'POST',
         body: formData
@@ -115,23 +113,9 @@ export const store = new Vuex.Store({
         console.log('res failed', error);
         store.commit('SET_ASSET_STANDIN', false);
       })
-
       //close the modal before response is done
       store.commit('SET_ASSET_IMPORT', false);
       store.commit('SET_ASSET_STANDIN', true);
-    },
-
-    //-- team actions -- move to router when you finish
-    //
-    findCurrentTeamScenes: function(store, team) {
-      store.commit('SET_CURRENT_TEAM', team);
-      store.dispatch('scenes/find', {
-        query: {
-          teams: team._id,
-          $populate: ['users', 'creator', 'admins', 'teams']
-        }
-      }).then(success => { console.log(success)})
-        .catch(error => { console.log(error) })
     }
 
   },

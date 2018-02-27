@@ -209,14 +209,6 @@ export default function(el) {
       var file = new Blob([finalBuffer],{type: 'model/json-binary'})
       file.lastModifiedDate = new Date();
       file.name = glbfilename+".glb";
-
-      // var a = document.createElement("a");
-      // document.body.appendChild(a);
-      // a.style = "display: none";
-      // a.href = URL.createObjectURL(file);
-      // a.download = glbfilename+".glb";
-      // a.click();
-
       resolve(file);
 
   }
