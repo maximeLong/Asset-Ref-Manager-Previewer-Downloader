@@ -119,7 +119,7 @@ export default {
       }, {} ])
       .then(response => {
         console.log('success');
-        this.$store.commit('SET_SCENE_OPTIONS', false);
+        this.handleClickaway()
       })
       .catch(error => { console.log(error) })
 
