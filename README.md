@@ -1,6 +1,6 @@
-DMX512
+Depthcast Manager
 ===========================
-Node server and clientside DMX dummy
+Node server and clientside manager for Depthcast
 
 to start this thing:
 `cd app && npm start`

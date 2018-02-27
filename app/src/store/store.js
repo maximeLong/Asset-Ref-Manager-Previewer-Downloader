@@ -6,134 +6,60 @@ import router from '../router'
 
 //feathers actions
 const { service, auth } = feathersVuex(server, { idField: '_id' })
-//custom server actions
-import serverActions from '../actions/serverActions'
 
 Vue.use(Vuex);
 export const store = new Vuex.Store({
 
   state: {
-      userPanel: { open: false, panelType: 'userInfo' }, //panelType can be : 'signIn', 'createAccount', 'userInfo', 'team'
-      layoutOptions: false,
 
+      userPanel: { open: false, panelType: 'userInfo' }, //panelType can be : 'signIn', 'createAccount', 'userInfo', 'team'
+
+      sceneOptionsModalIsOpen: false, //scene options panel
+      assetImportModalIsOpen: false,    //import asset panel
+      assetInfoModalIsOpen: false,      //asset info panel
+
+      //various form info holders
       formEmail: '',
       formTeamName: '',
-      formLayoutName: '',
+      formSceneName: '',
       formPassword: '',
       formInviteEmail: '',
+      formAssetName: '',
+
+      //model info on import
+      modelGeometryInfo: {},
+      modelFileSize: '',
+      modelFile: undefined,
+      modelSnapshot: undefined,
+
+      //model standin that exists between upload click and server response
+      assetStandin: false,
 
       //current team
-      currentTeam: {},
-
-      //dmx board
-      // lock: false,
-      // channels: [0,0,0,0,0],
-      //channel mixer sliders
-      // channel_mixer: {
-      //   red: {
-      //     red:    0,
-      //     green:  0,
-      //     blue:   0
-      //   },
-      //   green: {
-      //     red:    0,
-      //     green:  0,
-      //     blue:   0
-      //   },
-      //   blue: {
-      //     red:    0,
-      //     green:  0,
-      //     blue:   0
-      //   }
-      // },
-      // tonemapping: {
-      //   temperature:  0,
-      //   tint:         0,
-      //   saturation:   0
-      // },
-      // contrast: {
-      //   contrast:   0,
-      //   brightness: 0,
-      //   tone:       0
-      // },
-      // two_d_sliders: {
-      //   lift:   [0,0],
-      //   gamma:  [0,0],
-      //   gain:   [0,0]
-      // },
-      //team layouts dummy
-      // layouts: [
-      //   {
-      //     name: 'Sheraton 2018 Gala',
-      //     assets: [
-      //       {
-      //         name: 'someAsset',
-      //       }
-      //     ],
-      //     varients: 2,
-      //     authors: [
-      //       {
-      //         name: 'maximeLong'
-      //       }
-      //     ]
-      //   }
-      // ],
-      // activeScene: {
-      //   name: 'Sheraton 2018 Gala',
-      //   assets: [
-      //     {
-      //       name: 'someAsset',
-      //     }
-      //   ],
-      //   variants: [
-      //     {
-      //       name: 'Sheraton 2018 Varient - No podium',
-      //       assets: [
-      //         {
-      //             name: 'someAsset'
-      //         }
-      //       ]
-      //     },
-      //     {
-      //       name: 'Sheraton 2018 Varient - Extra chairs',
-      //       assets: [
-      //         {
-      //             name: 'someAsset'
-      //         }
-      //       ]
-      //     }
-      //   ],
-      //   authors: [
-      //     {
-      //       name: 'maximeLong'
-      //     }
-      //   ]
-      // }
+      currentTeam: {}
   },
 
   plugins: [
       auth({userService: '/users'}),
       service('users'),
-      service('layouts'),
-      service('teams'),
-      service('variants'),
-      service('assets')
+      service('scenes'),
+      service('assets'),
+
+      service('teams')
+
   ],
 
   actions: {
 
-    // -- first major db lookup, gets layouts and teams, and current of both
-    // -- should open websocket connection, for getter lists (store.getters['teams/list'])
+    // -- first major db lookup, gets scenes and teams, and current of both
     // -- TODO: populate doesn't work when lists update from websocket
     //
     async signInLoad (store) {
-      const res = await store.dispatch('layouts/find', {
+      const res = await store.dispatch('scenes/find', {
         query: { users: store.state.auth.user._id }
       })
-
       console.log(res, 'sign in load stuff is done')
       store.commit('SET_USER_PANEL', {open: false})
-
       return res
     },
 
@@ -151,7 +77,7 @@ export const store = new Vuex.Store({
       .then(success => {
         dispatch('signInLoad')
         .then(success => {
-          router.push({ name: 'LayoutLoading' })
+          router.push({ name: 'SceneLoading' })
         })
       })
       .catch(error => { console.log(error) })
@@ -161,28 +87,36 @@ export const store = new Vuex.Store({
       .then(success => {
         //-- clear the store of user specific stuff
         router.push({ name: 'Landing' })
-        commit('layouts/clearAll');
-        commit('SET_CURRENT_LAYOUT', {});
+        commit('scenes/clearAll');
+        commit('SET_CURRENT_SCENE', {});
       })
       .catch(error => { console.log(error) })
     },
 
-    //-- team actions -- move to router when you finish
+    //-- create asset
     //
-    findCurrentTeamLayouts: function(store, team) {
-      store.commit('SET_CURRENT_TEAM', team);
-      store.dispatch('layouts/find', {
-        query: {
-          teams: team._id,
-          $populate: ['users', 'creator', 'admins', 'teams']
+    createAsset: function(store, formData) {
+      fetch(process.env.SERVER_ADDRESS + '/model', {
+        method: 'POST',
+        body: formData
+      })
+      .then((res) => {
+        if (!res.ok) {
+          res.json().then((data)=> {console.log(data) }); //error
+          store.commit('SET_ASSET_STANDIN', false);
+        } else {
+          res.json().then((data)=> {console.log(data) }); //success
+          store.commit('SET_ASSET_STANDIN', false);
         }
-      }).then(success => { console.log(success)})
-        .catch(error => { console.log(error) })
+      })
+      .catch((error) => { //catch all other errors?
+        console.log('res failed', error);
+        store.commit('SET_ASSET_STANDIN', false);
+      })
+      //close the modal before response is done
+      store.commit('SET_ASSET_IMPORT', false);
+      store.commit('SET_ASSET_STANDIN', true);
     }
-
-    //-- layout action
-    //-- automatically update CurrentLayout when getter is getter stream is modified from server
-
 
   },
 
@@ -194,43 +128,26 @@ export const store = new Vuex.Store({
           state.userPanel.panelType = panelType;
         }
       },
-      SET_LAYOUT_OPTIONS: function(state, val) {
-        state.layoutOptions = val;
-      },
 
-      SET_FORM_EMAIL: function(state, val) { state.formEmail = val; },
-      SET_FORM_TEAMNAME: function(state, val) { state.formTeamName = val; },
-      SET_FORM_LAYOUTNAME: function(state, val) { state.formLayoutName = val; },
-      SET_FORM_PASSWORD: function(state, val) { state.formPassword = val; },
-      SET_FORM_INVITEEMAIL: function(state, val) { state.formInviteEmail = val },
+      SET_ASSET_INFO_MODAL_IS_OPEN: function(state, val)        { state.assetInfoModalIsOpen = val; },
+      SET_ASSET_IMPORT_MODAL_IS_OPEN: function(state, val)      { state.assetImportModalIsOpen = val; },
+      SET_SCENE_OPTIONS_MODAL_IS_OPEN: function(state, val)     { state.sceneOptionsModalIsOpen = val; },
 
-      SET_CURRENT_TEAM: function(state, val) { state.currentTeam = val },
+      SET_FORM_ASSETNAME: function(state, val)    { state.formAssetName = val },
+      SET_FORM_EMAIL: function(state, val)        { state.formEmail = val; },
+      SET_FORM_TEAMNAME: function(state, val)     { state.formTeamName = val; },
+      SET_FORM_SCENENAME: function(state, val)    { state.formSceneName = val; },
+      SET_FORM_PASSWORD: function(state, val)     { state.formPassword = val; },
+      SET_FORM_INVITEEMAIL: function(state, val)  { state.formInviteEmail = val },
 
-      //DMX board
-      SET_CHANNELS_COLLECTION: function(state, {channel, value}) {
-        //hard coding channels 1 - 5 (pos 0 -4)
-        state.channels.splice(channel, 1, value);
-        //pos 5 - 520
-        for (var i = 5; i < 512; i++) {
-          state.channels[i] = 0;
-        }
-      },
-      UPDATE_LOCK: function(state, val) {
-        state.lock = val;
-      },
-      //FX Board
-      UPDATE_CHANNEL_MIXER: function(state, val) {
-        state.channel_mixer[val.channel][val.name] = val.value;
-      },
-      UPDATE_TONEMAPPING: function(state, val) {
-        state.tonemapping[val.name] = val.value;
-      },
-      UPDATE_CONTRAST: function(state, val) {
-        state.contrast[val.name] = val.value;
-      },
-      UPDATE_2D_SLIDER: function(state, slider, xVal, yVal){
-        state.two_d_sliders[slider] = [xVal,yVal];
-      }
+      SET_MODEL_GEOMETRY_INFO: function(state, val)   { state.modelGeometryInfo = val },
+      SET_MODEL_FILE_SIZE: function(state, val)       { state.modelFileSize = val },
+      SET_MODEL_FILE: function(state, val)            { state.modelFile = val },
+      SET_MODEL_SNAPSHOT: function(state, val)        { state.modelSnapshot = val },
+
+      SET_ASSET_STANDIN: function(state, val) { state.assetStandin = val },
+
+      SET_CURRENT_TEAM: function(state, val)   { state.currentTeam = val },
   }
 
 });

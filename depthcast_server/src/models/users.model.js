@@ -16,10 +16,6 @@ module.exports = function (app) {
       small: { type: String }
     },
 
-    //-- could store these in localStorage as well to save db writes
-    currentLayout: { type: Schema.Types.ObjectId, ref: 'layout' },
-    currentTeam: { type: Schema.Types.ObjectId, ref: 'teams' },
-
     createdAt:  { type: Date, 'default': Date.now },
     updatedAt:  { type: Date, 'default': Date.now }
 

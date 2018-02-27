@@ -1,23 +1,25 @@
 const { authenticate } = require('feathers-authentication').hooks;
+const { fastJoin, populate } = require('feathers-hooks-common');
+
 
 module.exports = {
   before: {
-    all: [ authenticate('jwt') ],
-    find: [],
-    get: [],
+    all:    [ authenticate('jwt') ],
+    find:   [],
+    get:    [],
     create: [],
     update: [],
-    patch: [],
+    patch:  [],
     remove: []
   },
 
   after: {
-    all: [],
-    find: [],
-    get: [],
+    all:    [],
+    find:   [],
+    get:    [],
     create: [],
     update: [],
-    patch: [],
+    patch:  [],
     remove: []
   },
 
