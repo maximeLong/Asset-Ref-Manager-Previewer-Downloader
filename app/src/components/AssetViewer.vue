@@ -343,8 +343,8 @@ export default {
     div
       height: 25px
       width: 25px
-      // background: url('../assets/wireframe.svg')
-      // background-repeat: no-repeat
-      // background-position: 50% 50%
+      background: url('../assets/wireframe.svg')
+      background-repeat: no-repeat
+      background-position: 50% 50%
 
 </style>
