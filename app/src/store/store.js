@@ -7,6 +7,13 @@ import router from '../router'
 //feathers actions
 const { service, auth } = feathersVuex(server, { idField: '_id' })
 
+
+
+//firestore module
+import {firebaseStore} from './firebase'
+import {initFirebase} from './initFirebase'
+
+
 Vue.use(Vuex);
 export const store = new Vuex.Store({
 
@@ -44,17 +51,20 @@ export const store = new Vuex.Store({
       service('users'),
       service('scenes'),
       service('assets'),
-
-      service('teams')
-
+      service('teams'),
+      initFirebase
   ],
+
+  modules: {
+    firebaseStore
+  },
 
   actions: {
 
     // -- first major db lookup, gets scenes and teams, and current of both
     // -- TODO: populate doesn't work when lists update from websocket
     //
-    async signInLoad (store) {
+    signInLoad: async function(store) {
       const res = await store.dispatch('scenes/find', {
         query: { users: store.state.auth.user._id }
       })

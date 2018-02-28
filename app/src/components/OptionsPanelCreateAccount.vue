@@ -36,7 +36,8 @@ export default {
     updateFormPassword: function(e) { this.$store.commit('SET_FORM_PASSWORD', e.target.value) },
 
     tryCreateAccount: function(email, password) {
-      this.$store.dispatch('createUser', {email: email, password: password})
+      this.$store.dispatch('firebaseStore/createUser', {email: email, password: password})
+      //this.$store.dispatch('createUser', {email: email, password: password})
     }
   }
 

@@ -1,19 +1,16 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import {store} from './store/store'
-
+import Vue      from 'vue'
+import Router   from 'vue-router'
+import {store}  from './store/store'
 
 import Landing        from './views/Landing'
-import Scene         from './views/Scene'
-import SceneLoading  from './views/SceneLoading'
-
-import NoScene       from './views/NoScene'
-import CreateScene   from './views/CreateScene'
+import Scene          from './views/Scene'
+import SceneLoading   from './views/SceneLoading'
+import NoScene        from './views/NoScene'
+import CreateScene    from './views/CreateScene'
 import CreateTeam     from './views/CreateTeam'
 
 
 Vue.use(Router)
-
 export default new Router({
 
   routes: [
@@ -59,18 +56,21 @@ export default new Router({
       }
     },
     {
+      //TODO: im pretty sure this functionality can just exist on App.mounted() -- and this Route doesn't have to exist
+      //      we're basically halfway there already
       path: '/scene',
       name: 'SceneLoading',
       component: SceneLoading,
       beforeEnter: (to, from, next) => {
-        if (store.state.auth.user) {
-          if (!store.state.scenes.ids.length) {
-            console.log('go to no scene')
+        console.log()
+        if (store.state.firebaseStore.user) {
+          if (!store.state.firebaseStore.rawScenes.length) {
+            console.log('no scene created')
             next({ name: 'NoScene' })
           }
           else {
             console.log('go to scene')
-            next({ name: 'Scene', params: { scene_id: store.state.scenes.keyedById[store.state.scenes.ids[0]]._id }})
+            next({ name: 'Scene', params: { scene_id: store.state.firebaseStore.rawScenes[0]._id }})
           }
         } else {
           next('/')

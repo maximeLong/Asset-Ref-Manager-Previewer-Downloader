@@ -14,7 +14,6 @@ const server = feathers()
 server.service('/users')
 server.service('/scenes')
 server.service('/assets')
-
 server.service('/teams')
 
 export default server
