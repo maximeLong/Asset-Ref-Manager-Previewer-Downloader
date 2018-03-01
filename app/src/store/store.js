@@ -7,12 +7,10 @@ import router from '../router'
 //feathers actions
 const { service, auth } = feathersVuex(server, { idField: '_id' })
 
-
-
 //firestore module
 import {firebaseStore} from './firebase'
-import {initFirebase} from './initFirebase'
-
+//initialize application
+import {initApp} from './initApp'
 
 Vue.use(Vuex);
 export const store = new Vuex.Store({
@@ -52,7 +50,7 @@ export const store = new Vuex.Store({
       service('scenes'),
       service('assets'),
       service('teams'),
-      initFirebase
+      initApp
   ],
 
   modules: {

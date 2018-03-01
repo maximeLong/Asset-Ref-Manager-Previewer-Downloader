@@ -13,22 +13,16 @@ import { mapActions } from 'vuex'
 
 export default {
   data: function(){
-    return {
-
-    }
+    return {}
   },
 
   computed: {
-    userIsLoggedIn: function()  { return this.user ? true : false },
-    user: function()            { return this.$store.state.auth.user },
-    ...mapState([
-      'userPanel',
-    ])
+
   },
 
   methods: {
     tryLogOut: function() {
-      this.$store.dispatch('logOutUser')
+      this.$store.dispatch('firebaseStore/signOut')
     },
   }
 

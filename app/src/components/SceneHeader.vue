@@ -11,10 +11,19 @@
 
     <div class="header-right">
       <div class="members">
-        <div class="member" v-for="user in currentScene.users"
-             :style="{ 'background-image' : 'url(' + user.profileImage.big + ')'}">
-             <div class="tooltip">{{user.email}}</div>
+
+        <!-- if you are a member show your thumb, if not then show first letter -->
+        <div class="member"
+          v-if="currentUserIsInScene"
+          :style="{ 'background-image' : 'url(' + user.thumbnail_big + ')'}">
+          <div class="tooltip">{{user.email}}</div>
         </div>
+
+        <!-- <div class="member" v-for="user in currentSceneUsers">
+          {{user.email[0]}}
+          <div class="tooltip">{{user.email}}</div>
+        </div> -->
+
       </div>
       <div class="invites">
         <div class="invite" v-for="invite in currentScene.invites">
@@ -35,8 +44,11 @@
 export default {
   name: 'sceneHeader',
   computed: {
-    user: function()            { return this.$store.state.auth.user },
-    currentScene: function()   { return this.$store.getters['scenes/current'] },
+    user: function()            { return this.$store.state.firebaseStore.user },
+    currentScene: function()    { return this.$store.getters['firebaseStore/currentScene'] },
+    currentUserIsInScene: function() {
+      return true //TODO: this needs to check the currentSceneUsers array to see if user._id is included
+    }
   },
   methods: {
     openSceneOptions: function() {

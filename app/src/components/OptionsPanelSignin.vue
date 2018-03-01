@@ -22,8 +22,6 @@ export default {
   },
 
   computed: {
-    userIsLoggedIn: function()  { return this.user ? true : false },
-    user: function()            { return this.$store.state.auth.user },
     ...mapState([
       'userPanel',
       'formEmail',
@@ -36,7 +34,7 @@ export default {
     updateFormPassword: function(e) { this.$store.commit('SET_FORM_PASSWORD', e.target.value) },
 
     trySignIn: function(email, password) {
-      this.$store.dispatch('signInUser', {email: email, password: password})
+      this.$store.dispatch('firebaseStore/signIn', {email: email, password: password})
     }
 
   }

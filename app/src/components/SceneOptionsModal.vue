@@ -29,6 +29,7 @@
         >{{invite[0]}}<div class="tooltip">{{invite}}</div>
       </div>
 
+      <!-- make this a component because im going to use it in other places -->
       <div class="members" v-for="user in currentScene.users"
          :style="{ 'background-image' : 'url(' + user.profileImage.big + ')'}">
          <div class="tooltip">{{user.email}}</div>
@@ -69,9 +70,8 @@ export default {
   },
 
   computed: {
-    user: function()            { return this.$store.state.auth.user },
-    userIsLoggedIn: function()  { return this.user ? true : false },
-    currentScene: function()   { return this.$store.getters['scenes/current'] },
+    user: function()            { return this.$store.state.firebaseStore.user },
+    currentScene: function()   { return this.$store.getters['firebaseStore/currentScene'] },
     formHasChanged: function()  {
       if (this.formSceneName !== this.currentScene.name || this.localInvites.length) {
         return true
@@ -110,9 +110,11 @@ export default {
     },
 
     // -- patch scene
-    //
+    // -- patch firebase action
     tryPatchScene: function() {
       var mergedInvites = _.concat(this.currentScene.invites, this.localInvites);
+
+
       this.patchScene([this.currentScene._id, {
         name: this.formSceneName,
         invites: mergedInvites

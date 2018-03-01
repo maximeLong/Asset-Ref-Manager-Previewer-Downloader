@@ -38,14 +38,14 @@
 export default {
   name: 'sidePanel',
   data: function(){
-    return {
-    }
+    return {}
   },
   computed: {
+    scenes: function(){ return this.$store.state.firebaseStore.populatedScenes },
+    currentScene: function() { return this.$store.getters['firebaseStore/currentScene'] },
+
     teams: function(){ return this.$store.getters['teams/list']},
-    scenes: function(){ return this.$store.getters['scenes/list'] },
     currentTeam: function() { return this.$store.state.currentTeam },
-    currentScene: function() { return this.$store.getters['scenes/current'] }
   },
   methods: {
     goToScene: function(id) {

@@ -19,7 +19,7 @@
     <div class="right-section">
       <div class="user-account" v-if="userIsLoggedIn" @click="openUserInfoPanel">
         <div class="account-name">{{user.email}}</div>
-        <div class="account-image" :style="{ 'background-image' : 'url(' + user.profileImage.big + ')'}"></div>
+        <div class="account-image" :style="{ 'background-image' : 'url(' + user.thumbnail_big + ')'}"></div>
       </div>
       <div class="sign-in" v-if="!userIsLoggedIn" @click="openSignInPanel">
         <div class="sign-in-text">Sign In</div>
@@ -39,7 +39,7 @@ export default {
     }
   },
   computed: {
-    user: function()            { return this.$store.state.auth.user },
+    user: function()            { return this.$store.state.firebaseStore.user },
     userIsLoggedIn: function()  { return this.user ? true : false },
     userPanel: function()       { return this.$store.state.userPanel }
   },
