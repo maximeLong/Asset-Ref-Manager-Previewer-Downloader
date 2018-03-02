@@ -13,7 +13,7 @@
 
     <!-- members form -->
     <div class="invite form">
-      <div class="form-title">Members</div>
+      <div class="form-title">Invites</div>
 
       <div class="openInviteForm button" @click="inviteFormIsOpen = true" v-if="!inviteFormIsOpen">+</div>
       <input :value="formInviteEmail" v-if="inviteFormIsOpen"
@@ -27,12 +27,6 @@
 
       <div class="invites existing button" v-for="invite in currentScene.invites"
         >{{invite[0]}}<div class="tooltip">{{invite}}</div>
-      </div>
-
-      <!-- make this a component because im going to use it in other places -->
-      <div class="members" v-for="user in currentScene.users"
-         :style="{ 'background-image' : 'url(' + user.profileImage.big + ')'}">
-         <div class="tooltip">{{user.email}}</div>
       </div>
 
     </div>

@@ -12,17 +12,16 @@
     <div class="header-right">
       <div class="members">
 
-        <!-- if you are a member show your thumb, if not then show first letter -->
-        <div class="member"
-          v-if="currentUserIsInScene"
+        <!-- if you are a member... -->
+        <div class="member" v-if="userIsInScene"
           :style="{ 'background-image' : 'url(' + user.thumbnail_big + ')'}">
           <div class="tooltip">{{user.email}}</div>
         </div>
-
-        <!-- <div class="member" v-for="user in currentSceneUsers">
-          {{user.email[0]}}
-          <div class="tooltip">{{user.email}}</div>
-        </div> -->
+        <!-- else... -->
+        <div class="member" v-for="user in userList">
+          {{user.userEmail[0]}}
+          <div class="tooltip">{{user.userEmail}}</div>
+        </div>
 
       </div>
       <div class="invites">
@@ -31,9 +30,7 @@
           <div class="tooltip">{{invite}}</div>
         </div>
       </div>
-      <div class="add-member" @click="openSceneOptions">
-        +
-      </div>
+      <div class="add-member" @click="openSceneOptions">+</div>
     </div>
   </div>
 
@@ -46,9 +43,18 @@ export default {
   computed: {
     user: function()            { return this.$store.state.firebaseStore.user },
     currentScene: function()    { return this.$store.getters['firebaseStore/currentScene'] },
-    currentUserIsInScene: function() {
-      return true //TODO: this needs to check the currentSceneUsers array to see if user._id is included
+    usersInCurrentScene: function() { return this.$store.state.firebaseStore.usersInCurrentScene },
+    usersMinusUser: function() {
+      return this.usersInCurrentScene.filter((user)=> { return user.userId !== this.user.uid })
+    },
+
+    userIsInScene: function() {
+      return _.some(this.usersInCurrentScene, {'userId': this.user.uid}) ? true : false
+    },
+    userList: function() {
+      return this.userIsInScene ? this.usersMinusUser : this.usersInCurrentScene
     }
+
   },
   methods: {
     openSceneOptions: function() {
