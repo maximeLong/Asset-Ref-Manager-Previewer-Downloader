@@ -15,6 +15,15 @@ export const initApp = (store)=> {
   });
   firebase.firestore();  //can reference current firestore through import
 
+
+  //set up collection + auth refs
+  this.firestore = firebase.firestore();
+  this.auth = firebase.auth();
+  this.usersCollection = firebase.firestore().collection('users');
+  this.scenesCollection = firebase.firestore().collection('scenes');
+  this.scenesLinkUsersCollection = firebase.firestore().collection('scenes_link_users');
+
+
   //initialize auth watcher > kicks off appLoad on auth
   store.dispatch('firebaseStore/watchAuthChange');
 

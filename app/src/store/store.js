@@ -1,58 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import feathersVuex from 'feathers-vuex'
-import server from '../server'
 import router from '../router'
 
-//feathers actions
-const { service, auth } = feathersVuex(server, { idField: '_id' })
-
-//firestore module
-import {firebaseStore} from './firebase'
-//initialize application
-import {initApp} from './initApp'
+import {firebaseStore} from './firebase'  //firestore module
+import {initApp} from './initApp'         //initialize application
 
 Vue.use(Vuex);
 export const store = new Vuex.Store({
 
-  state: {
-
-      userPanel: { open: false, panelType: 'userInfo' }, //panelType can be : 'signIn', 'createAccount', 'userInfo', 'team'
-
-      sceneOptionsModalIsOpen: false, //scene options panel
-      assetImportModalIsOpen: false,    //import asset panel
-      assetInfoModalIsOpen: false,      //asset info panel
-
-      //various form info holders
-      formEmail: '',
-      formTeamName: '',
-      formSceneName: '',
-      formPassword: '',
-      formInviteEmail: '',
-      formAssetName: '',
-
-      //model info on import
-      modelGeometryInfo: {},
-      modelFileSize: '',
-      modelFile: undefined,
-      modelSnapshot: undefined,
-
-      //model standin that exists between upload click and server response
-      assetStandin: false,
-
-      //current team
-      currentTeam: {}
-  },
-
   plugins: [
-      auth({userService: '/users'}),
-      service('users'),
-      service('scenes'),
-      service('assets'),
-      service('teams'),
-      initApp
+    initApp
   ],
-
   modules: {
     firebaseStore
   },
@@ -61,7 +19,6 @@ export const store = new Vuex.Store({
 
     // -- first major db lookup, gets scenes and teams, and current of both
     // -- TODO: populate doesn't work when lists update from websocket
-    //
     signInLoad: async function(store) {
       const res = await store.dispatch('scenes/find', {
         query: { users: store.state.auth.user._id }
@@ -72,7 +29,6 @@ export const store = new Vuex.Store({
     },
 
     // -- other user actions
-    //
     createUser: function({dispatch, commit}, props) {
       dispatch('users/create', props)
       .then(success => {
@@ -102,7 +58,6 @@ export const store = new Vuex.Store({
     },
 
     //-- create asset
-    //
     createAsset: function(store, formData) {
       fetch(process.env.SERVER_ADDRESS + '/model', {
         method: 'POST',
@@ -128,34 +83,55 @@ export const store = new Vuex.Store({
 
   },
 
+  state: {
+    userPanel: { open: false, panelType: 'userInfo' }, //panelType can be : 'signIn', 'createAccount', 'userInfo', 'team'
+    sceneOptionsModalIsOpen: false, //scene options panel
+    assetImportModalIsOpen: false,    //import asset panel
+    assetInfoModalIsOpen: false,      //asset info panel
+
+    //various form info holders
+    formEmail: '',
+    formTeamName: '',
+    formSceneName: '',
+    formPassword: '',
+    formInviteEmail: '',
+    formAssetName: '',
+
+    //model info on import
+    modelGeometryInfo: {},
+    modelFileSize: '',
+    modelFile: undefined,
+    modelSnapshot: undefined,
+
+    //model standin that exists between upload click and server response
+    assetStandin: false,
+  },
+
   mutations: {
+    SET_USER_PANEL: function(state, {open, panelType}) {
+      state.userPanel.open = open;
+      if (panelType != undefined) {
+        state.userPanel.panelType = panelType;
+      }
+    },
 
-      SET_USER_PANEL: function(state, {open, panelType}) {
-        state.userPanel.open = open;
-        if (panelType != undefined) {
-          state.userPanel.panelType = panelType;
-        }
-      },
+    SET_ASSET_INFO_MODAL_IS_OPEN: function(state, val)        { state.assetInfoModalIsOpen = val; },
+    SET_ASSET_IMPORT_MODAL_IS_OPEN: function(state, val)      { state.assetImportModalIsOpen = val; },
+    SET_SCENE_OPTIONS_MODAL_IS_OPEN: function(state, val)     { state.sceneOptionsModalIsOpen = val; },
 
-      SET_ASSET_INFO_MODAL_IS_OPEN: function(state, val)        { state.assetInfoModalIsOpen = val; },
-      SET_ASSET_IMPORT_MODAL_IS_OPEN: function(state, val)      { state.assetImportModalIsOpen = val; },
-      SET_SCENE_OPTIONS_MODAL_IS_OPEN: function(state, val)     { state.sceneOptionsModalIsOpen = val; },
+    SET_FORM_ASSETNAME: function(state, val)    { state.formAssetName = val },
+    SET_FORM_EMAIL: function(state, val)        { state.formEmail = val; },
+    SET_FORM_TEAMNAME: function(state, val)     { state.formTeamName = val; },
+    SET_FORM_SCENENAME: function(state, val)    { state.formSceneName = val; },
+    SET_FORM_PASSWORD: function(state, val)     { state.formPassword = val; },
+    SET_FORM_INVITEEMAIL: function(state, val)  { state.formInviteEmail = val },
 
-      SET_FORM_ASSETNAME: function(state, val)    { state.formAssetName = val },
-      SET_FORM_EMAIL: function(state, val)        { state.formEmail = val; },
-      SET_FORM_TEAMNAME: function(state, val)     { state.formTeamName = val; },
-      SET_FORM_SCENENAME: function(state, val)    { state.formSceneName = val; },
-      SET_FORM_PASSWORD: function(state, val)     { state.formPassword = val; },
-      SET_FORM_INVITEEMAIL: function(state, val)  { state.formInviteEmail = val },
+    SET_MODEL_GEOMETRY_INFO: function(state, val)   { state.modelGeometryInfo = val },
+    SET_MODEL_FILE_SIZE: function(state, val)       { state.modelFileSize = val },
+    SET_MODEL_FILE: function(state, val)            { state.modelFile = val },
+    SET_MODEL_SNAPSHOT: function(state, val)        { state.modelSnapshot = val },
 
-      SET_MODEL_GEOMETRY_INFO: function(state, val)   { state.modelGeometryInfo = val },
-      SET_MODEL_FILE_SIZE: function(state, val)       { state.modelFileSize = val },
-      SET_MODEL_FILE: function(state, val)            { state.modelFile = val },
-      SET_MODEL_SNAPSHOT: function(state, val)        { state.modelSnapshot = val },
-
-      SET_ASSET_STANDIN: function(state, val) { state.assetStandin = val },
-
-      SET_CURRENT_TEAM: function(state, val)   { state.currentTeam = val },
+    SET_ASSET_STANDIN: function(state, val) { state.assetStandin = val },
   }
 
 });

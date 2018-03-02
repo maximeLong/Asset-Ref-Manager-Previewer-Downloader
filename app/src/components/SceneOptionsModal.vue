@@ -48,7 +48,6 @@
 <script>
 import Modal from '../components/Modal'
 import { mapState } from 'vuex'
-import { mapActions } from 'vuex'
 import _ from 'lodash'
 
 
@@ -110,25 +109,18 @@ export default {
     },
 
     // -- patch scene
-    // -- patch firebase action
     tryPatchScene: function() {
       var mergedInvites = _.concat(this.currentScene.invites, this.localInvites);
-
-
-      this.patchScene([this.currentScene._id, {
+      var patchedData = {
         name: this.formSceneName,
         invites: mergedInvites
-      }, {} ])
-      .then(response => {
-        console.log('success');
-        this.handleClickaway()
-      })
-      .catch(error => { console.log(error) })
-
-    },
-    ...mapActions('scenes', {
-      patchScene: 'patch'
-    })
+      }
+      this.$store.dispatch('firebaseStore/patchSceneInfo', {sceneId: this.currentScene._id, patchedData: patchedData})
+        .then(response => {
+          this.handleClickaway()
+        })
+        .catch(error => { console.log(error) })
+    }
   }
 
 }

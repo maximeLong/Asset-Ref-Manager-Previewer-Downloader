@@ -33,7 +33,6 @@
 <script>
 import ContentBox from '../components/ContentBox'
 import { mapState } from 'vuex'
-import { mapActions } from 'vuex'
 
 export default {
   name: 'createScene',
@@ -47,7 +46,8 @@ export default {
     ContentBox
   },
   computed: {
-    user: function()            { return this.$store.state.auth.user },
+    user: function()    { return this.$store.state.firebaseStore.user },
+    scenes: function()  { return this.$store.state.firebaseStore.populatedScenes },
     ...mapState([
       'formSceneName',
       'formInviteEmail'
@@ -55,19 +55,18 @@ export default {
   },
   methods: {
     tryCreateScene: function() {
-      this.createScene({
-        creator: this.user._id,
+      var sceneData = {
+        creator: this.user.uid,
         name: this.formSceneName,
-        users: [this.user._id],
-        admins: [this.user._id],
         invites: this.localInvites
-      })
-      .then(response => {
-        this.$router.push({ name: 'Scene', params: { scene_id: response._id }})
-      })
-      .catch(error => {
-        console.log(error)
-      })
+      }
+      this.$store.dispatch('firebaseStore/createScene', sceneData)
+        .then(response => {
+          this.$router.push({ name: 'Scene', params: { scene_id: this.scenes[this.scenes.length-1]._id }})
+        })
+        .catch(error => {
+          console.log(error)
+        })
     },
 
     updateFormSceneName: function(e) { this.$store.commit('SET_FORM_SCENENAME', e.target.value) },
@@ -78,11 +77,7 @@ export default {
     },
     removeInvite: function(inviteIndex){
       this.localInvites.splice(inviteIndex, 1)
-    },
-
-    ...mapActions('scenes', {
-      createScene: 'create'
-    })
+    }
   }
 
 }

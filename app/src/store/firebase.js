@@ -1,17 +1,19 @@
 //firebase store
 import firebase from '@firebase/app';
+import {firestore, auth, usersCollection, scenesCollection, scenesLinkUsersCollection} from './initApp'
+
 import router from '../router'
 import _ from 'lodash'
 import md5 from 'md5'
+
 
 export const firebaseStore = {
   namespaced: true, //access actions with 'firebase/whatever'
 
   actions: {
 
-    //TODO: have to mimic the waterfall on automatic auth
     signIn: function(store, {email, password}) {
-      firebase.auth().signInWithEmailAndPassword(email, password)
+      auth.signInWithEmailAndPassword(email, password)
         .then((success)=> {
           console.log('signed in... watchAuth should fire..')
           store.commit('SET_USER_PANEL', {open: false}, {root : true})
@@ -20,7 +22,7 @@ export const firebaseStore = {
     },
 
     signOut: function(store) {
-      firebase.auth().signOut()
+      auth.signOut()
         .then((success)=> {
           console.log('signed out')
           //TODO: this should unsubscribe all snapShots in memory
@@ -32,10 +34,9 @@ export const firebaseStore = {
     },
 
     createUser: function(store, {email, password}) {
-      firebase.auth().createUserWithEmailAndPassword(email, password)
+      auth.createUserWithEmailAndPassword(email, password)
         .then((user)=> {
-          //create user doc in firestore using user.uid as doc uuid
-          firebase.firestore().collection('users').doc(user.uid).set({
+          usersCollection.doc(user.uid).set({
             email: email,
             thumbnail_big: 'http://www.gravatar.com/avatar/' + md5(email) + '.jpg?s=' + 150 + '&d=retro',
             thumbnail_small: 'http://www.gravatar.com/avatar/' + md5(email) + '.jpg?s=' + 50 + '&d=retro',
@@ -47,7 +48,8 @@ export const firebaseStore = {
     },
 
     watchAuthChange: function(store) {
-      firebase.auth().onAuthStateChanged((user)=> {
+
+      auth.onAuthStateChanged((user)=> {
         if (user) {
           var userData = {
             email: user.email,
@@ -57,8 +59,8 @@ export const firebaseStore = {
             metaData: user.metadata
           };
 
-          //get userInfo stored in firestore
-          firebase.firestore().collection("users").doc(user.uid)
+          // > then get info in firestore
+          usersCollection.doc(user.uid)
             .get()
             .then((doc)=> {
               if (doc.exists) {
@@ -84,8 +86,6 @@ export const firebaseStore = {
     beginLoadApp: function(store, uid) {
       store.dispatch('getScenesByUser', uid)
 
-        //basically wants to wait for populated scenes to end before pushing to route
-        //but resolve has to fire even if no onSnapshot happens (log out + back in)
         .then((sucess)=> {
           if (store.state.populatedScenes.length) {
             router.push({ name: 'Scene', params: { scene_id: store.state.populatedScenes[store.state.currentSceneIndex]._id }})
@@ -104,8 +104,7 @@ export const firebaseStore = {
     getScenesByUser: function(store, uid) {
       return new Promise((resolve, reject) => {
 
-        firebase.firestore().collection("scenes_link_users")
-        .where("userId", "==", uid)
+        scenesLinkUsersCollection.where("userId", "==", uid)
         .onSnapshot((snapshot) => {
           var scenesByUser = [];
           snapshot.forEach((doc) => {
@@ -132,9 +131,7 @@ export const firebaseStore = {
         rawScenes.forEach((rawScene)=> {
           if ( !_.some(state.populatedScenes, {'_id': rawScene.sceneId}) ) {
 
-            console.log('populate scene: ' + rawScene.sceneId)
-
-            firebase.firestore().collection("scenes").doc(rawScene.sceneId)
+            scenesCollection.doc(rawScene.sceneId)
             .onSnapshot((doc) => {
               var populatedScene = _.merge({_id: doc.id}, doc.data());
               var popSceneIndex = _.findIndex(state.populatedScenes, function(o) { return o._id == doc.id; });
@@ -143,8 +140,6 @@ export const firebaseStore = {
               } else {
                 commit('ADD_POPULATED_SCENE_DATA', populatedScene)
               }
-
-              //BUG: this wont resolve on logout/login, bcuz snapshot is cached and doesn't fire again
               resolve()
             })
           }
@@ -153,8 +148,8 @@ export const firebaseStore = {
         //check (-) -- if popScenes has object that isnt in rawScenes
         //TODO: this needs to unsub as well -- look at vueFire for inspiration
         state.populatedScenes.forEach((popScene)=> {
-          if ( !_.some(rawScenes, {'sceneId': popScene._id}) ) {
 
+          if ( !_.some(rawScenes, {'sceneId': popScene._id}) ) {
             var popSceneIndex = _.findIndex(state.populatedScenes, popScene );
             commit('REMOVE_POPULATED_SCENE_DATA', popSceneIndex)
           }
@@ -163,12 +158,11 @@ export const firebaseStore = {
       })
     },
 
-    getUsersByScene: async function(store, sceneId) {
+    getUsersByScene: function(store, sceneId) {
       //NOTE: duplicating data model to include email --> will save a populate but can't change email
       //TODO: unsubscribe on scene change
-      //BUG: signOut() fires onSnapshot and returns error (bcuz no auth)
-      firebase.firestore().collection("scenes_link_users")
-      .where("sceneId", "==", sceneId)
+      //BUG:  signOut() fires onSnapshot and returns error (bcuz no auth, bcuz ???)
+      scenesLinkUsersCollection.where("sceneId", "==", sceneId)
       .onSnapshot((snapshot) => {
         var usersInScene = [];
         snapshot.forEach((doc) => {
@@ -178,10 +172,34 @@ export const firebaseStore = {
       }, (error)=> {
         //console.log(error)
       });
+    },
+
+    createScene: function(store, sceneData) {
+      return new Promise((resolve, reject) => {
+        //create the sceneId + batch request
+        var sceneRef = scenesCollection.doc();
+        var batch = firestore.batch()
+
+        batch.set(sceneRef, sceneData);
+        batch.set(scenesLinkUsersCollection.doc(sceneRef.id + '_' + store.state.user.uid), {
+          sceneId: sceneRef.id,
+          userId: store.state.user.uid,
+          userEmail: store.state.user.email, //NOTE: duplicate in data model
+          admin: true
+        })
+        batch.commit().then((success)=> { resolve() })
+      })
+    },
+
+    patchSceneInfo: function(store, {sceneId, patchedData}) {
+      return new Promise((resolve, reject) => {
+        scenesCollection.doc(sceneId).update(patchedData)
+          .then((success)=> resolve() )
+          .catch((error)=> reject(error) )
+      })
     }
 
   },
-
 
   getters: {
     //scene change just changes the index of populatedScenes[]
@@ -189,7 +207,6 @@ export const firebaseStore = {
       return state.populatedScenes[state.currentSceneIndex];
     }
   },
-
 
   //-- STATE AND MUTATORS
   //
@@ -206,9 +223,8 @@ export const firebaseStore = {
     // currentSceneAssets: [],
     // currentUserAssets: [],
     // currentAsset: {},
-
-
   },
+
   mutations: {
     SET_USER_DATA: function(state, val)   { state.user = val; },
 
