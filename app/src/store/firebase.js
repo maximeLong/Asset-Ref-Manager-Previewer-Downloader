@@ -27,7 +27,6 @@ export const firebaseStore = {
           console.log('signed out')
           //TODO: this should unsubscribe all snapShots in memory
           store.commit('SET_USER_PANEL', {open: false}, {root : true})
-          store.commit('SET_RAW_SCENES_DATA', [])
           store.commit('SET_POPULATED_SCENES_DATA', [])
         })
         .catch((error)=>  { console.log(error) });
@@ -85,7 +84,6 @@ export const firebaseStore = {
     //takes the userId and begins the scene load process
     beginLoadApp: function(store, uid) {
       store.dispatch('getScenesByUser', uid)
-
         .then((sucess)=> {
           if (store.state.populatedScenes.length) {
             router.push({ name: 'Scene', params: { scene_id: store.state.populatedScenes[store.state.currentSceneIndex]._id }})
@@ -99,22 +97,33 @@ export const firebaseStore = {
         })
     },
 
-    //subscribe to scene_user docs, and subscribe (so that we can see additions, removals, changes to admin status)
-    //TODO: hold subscriber and unsub on complete teardown event (like logout)
+    //subscribe to scene_user docs
     getScenesByUser: function(store, uid) {
       return new Promise((resolve, reject) => {
+        var initialPromiseCall = true; // toggle for entry code (resolve()) and continous code on snapshot updates
 
         scenesLinkUsersCollection.where("userId", "==", uid)
         .onSnapshot((snapshot) => {
-          var scenesByUser = [];
-          snapshot.forEach((doc) => {
-            scenesByUser.push(_.merge({_id: doc.id}, doc.data()) )
-          });
-          store.commit('SET_RAW_SCENES_DATA', scenesByUser)
-          store.dispatch('populateScenes', scenesByUser)
-            .then((success)=> {
-              resolve()
+
+          //resolve immediately if initial promise and no scenes
+          if (!snapshot.docs.length && initialPromiseCall) {
+            resolve()
+            initialPromiseCall = false;
+          } else {
+
+            //populate based on added change type
+            snapshot.docChanges.forEach((change)=> {
+              if (change.type == 'added') {
+                var sceneData = _.merge({_id: change.doc.id}, change.doc.data())
+                store.dispatch('populateScene', sceneData)
+                .then((success)=> {
+                  resolve()
+                  initialPromiseCall = false;
+                })
+              }
             })
+
+          }
 
         }, (error)=> {
           reject(error)
@@ -123,35 +132,29 @@ export const firebaseStore = {
     },
 
 
-    populateScenes: function({state, commit, rootState}, rawScenes) {
+    populateScene: function({state, commit}, scene) {
       return new Promise((resolve, reject) => {
 
-        //check (+) -- if rawScenes has object that isnt in popScene
-        //TODO: hold subscriber to unsub
-        rawScenes.forEach((rawScene)=> {
-          if ( !_.some(state.populatedScenes, {'_id': rawScene.sceneId}) ) {
+        //populate scene on added -- scene will update/remove itself through its created snapshot subscriber
+        scenesCollection.doc(scene.sceneId)
+        .onSnapshot((doc) => {
+          if (doc.exists) {
+            var populatedScene = _.merge({_id: doc.id, admin: scene.admin}, doc.data());
 
-            scenesCollection.doc(rawScene.sceneId)
-            .onSnapshot((doc) => {
-              var populatedScene = _.merge({_id: doc.id}, doc.data());
-              var popSceneIndex = _.findIndex(state.populatedScenes, function(o) { return o._id == doc.id; });
-              if ( popSceneIndex !== -1 ) {
-                commit('UPDATE_POPULATED_SCENE_DATA', {splicePosition: popSceneIndex, newVal: populatedScene})
-              } else {
-                commit('ADD_POPULATED_SCENE_DATA', populatedScene)
-              }
-              resolve()
-            })
-          }
-        })
+            //once added popSceneIndex will exist > fire update, else > add to populated scene
+            var popSceneIndex = _.findIndex(state.populatedScenes, function(o) { return o._id == doc.id; });
+            if ( popSceneIndex !== -1 ) {
+              commit('UPDATE_POPULATED_SCENE_DATA', {splicePosition: popSceneIndex, newVal: populatedScene})
+            } else {
+              commit('ADD_POPULATED_SCENE_DATA', populatedScene)
+            }
+            //resolve on initial added
+            resolve()
 
-        //check (-) -- if popScenes has object that isnt in rawScenes
-        //TODO: this needs to unsub as well -- look at vueFire for inspiration
-        state.populatedScenes.forEach((popScene)=> {
-
-          if ( !_.some(rawScenes, {'sceneId': popScene._id}) ) {
-            var popSceneIndex = _.findIndex(state.populatedScenes, popScene );
-            commit('REMOVE_POPULATED_SCENE_DATA', popSceneIndex)
+          } else {
+            //remove populated scene if deleted
+            var removedSceneIndex = _.findIndex(state.populatedScenes, function(o) { return o._id == doc.id });
+            commit('REMOVE_POPULATED_SCENE_DATA', removedSceneIndex)
           }
         })
 
@@ -197,6 +200,25 @@ export const firebaseStore = {
           .then((success)=> resolve() )
           .catch((error)=> reject(error) )
       })
+    },
+
+    deleteScene: function(store, sceneId) {
+      return new Promise((resolve, reject) => {
+        var batch = firestore.batch()
+
+        scenesLinkUsersCollection.where('sceneId', '==', sceneId).get()
+          .then((querySnapshot)=> {
+            //delete all scenes_link_users docs with sceneId
+            //NOTE: this will involve checking the users admin privilege again the sceneId on security rules..
+            querySnapshot.forEach((doc)=> { batch.delete(doc.ref) })
+            //delete current scene
+            batch.delete(scenesCollection.doc(sceneId))
+
+            batch.commit()
+              .then((success)=> resolve() )
+              .catch((error)=> reject(error) )
+          })
+      })
     }
 
   },
@@ -213,7 +235,6 @@ export const firebaseStore = {
   state: {
     user: null,
 
-    rawScenes: [],
     populatedScenes: [],
 
     currentSceneIndex: 0,
@@ -227,8 +248,6 @@ export const firebaseStore = {
 
   mutations: {
     SET_USER_DATA: function(state, val)   { state.user = val; },
-
-    SET_RAW_SCENES_DATA: function(state, val)      { state.rawScenes = val; },
 
     SET_POPULATED_SCENES_DATA: function(state, val) { state.populatedScenes = val },
     ADD_POPULATED_SCENE_DATA: function(state, val) {

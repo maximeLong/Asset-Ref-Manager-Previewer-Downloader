@@ -14,22 +14,25 @@
     <!-- members form -->
     <div class="invite form">
       <div class="form-title">Invites</div>
-
       <div class="openInviteForm button" @click="inviteFormIsOpen = true" v-if="!inviteFormIsOpen">+</div>
       <input :value="formInviteEmail" v-if="inviteFormIsOpen"
         @input="updateFormInviteEmail"
         @keyup.enter="addToInvites" placeholder="email address">
-
       <div class="invites button"
         v-for="(invite, index) in localInvites"
         @click="removeInvite(index)">{{invite[0]}}<div class="tooltip">{{invite}}</div>
       </div>
-
       <div class="invites existing button" v-for="invite in currentScene.invites"
         >{{invite[0]}}<div class="tooltip">{{invite}}</div>
       </div>
-
     </div>
+
+    <!-- Danger Zone -->
+    <div class="delete form">
+      <div class="form-title">Danger Zone</div>
+      <div class="delete button" @click="tryDeleteScene">Delete Scene</div>
+    </div>
+
     <div class="edit-buttons">
       <div class="save-button button" :class="{ 'not-active' : !formHasChanged }" @click="saveChanges">Save Changes</div>
       <div class="cancel-button" @click="handleClickaway">Cancel</div>
@@ -63,8 +66,9 @@ export default {
   },
 
   computed: {
-    user: function()            { return this.$store.state.firebaseStore.user },
-    currentScene: function()   { return this.$store.getters['firebaseStore/currentScene'] },
+    user: function()          { return this.$store.state.firebaseStore.user },
+    currentScene: function()  { return this.$store.getters['firebaseStore/currentScene'] },
+    scenes: function()        { return this.$store.state.firebaseStore.populatedScenes },
     formHasChanged: function()  {
       if (this.formSceneName !== this.currentScene.name || this.localInvites.length) {
         return true
@@ -114,6 +118,22 @@ export default {
           this.handleClickaway()
         })
         .catch(error => { console.log(error) })
+    },
+
+    tryDeleteScene: function() {
+      this.$store.dispatch('firebaseStore/deleteScene', this.currentScene._id)
+        .then(response => {
+
+          //BUG: this throws errors because modal is listening to deleted info
+          this.handleClickaway()
+          if (this.scenes.length) {
+            this.$router.push({ name: 'Scene', params: { scene_id: this.scenes[0]._id }})
+          } else {
+            this.$router.push({ name: 'NoScene' })
+          }
+
+        })
+        .catch(error => { console.log(error) })
     }
   }
 
@@ -151,6 +171,10 @@ export default {
       +clickable
       color: $action_color
       padding-left: 10px
+
+    .delete
+      +button(false, false, #e64747, inherit)
+      padding: 13px 30px
 
     //invite members
     .openInviteForm,.invites,.members
