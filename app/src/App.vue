@@ -10,11 +10,10 @@
 
       <div id="header-panel">
         <app-header></app-header>
-        <scene-header v-if="sceneIsOpen"></scene-header>
         <options-panel v-if="userPanel.open"></options-panel>
       </div>
 
-      <div id="app-content" :class="{ openScene : sceneIsOpen }">
+      <div id="app-content">
         <!-- views -->
         <router-view></router-view>
 
@@ -33,7 +32,6 @@
 <script>
 
 import AppHeader from './components/AppHeader'
-import SceneHeader from './components/SceneHeader'
 import SceneOptionsModal from './components/SceneOptionsModal'
 import AssetImportModal from './components/AssetImportModal'
 import AssetInfoModal from './components/AssetInfoModal'
@@ -47,7 +45,6 @@ export default {
   name: 'app',
   components: {
     AppHeader,
-    SceneHeader,
     SceneOptionsModal,
     AssetImportModal,
     AssetInfoModal,
@@ -59,11 +56,6 @@ export default {
   },
   methods: {},
   computed: {
-    sceneIsOpen: function() {
-      if (this.$store.getters['firebaseStore/currentScene'] == null || this.route.name != 'Scene') {
-        return false
-      } else { return true }
-    },
     ...mapState([
       'activePanel',
       'userPanel',

@@ -135,8 +135,9 @@ export const firebaseStore = {
     populateScene: function({state, commit}, scene) {
       return new Promise((resolve, reject) => {
 
+
         //populate scene on added -- scene will update/remove itself through its created snapshot subscriber
-        scenesCollection.doc(scene.sceneId)
+        var unsubscribe = scenesCollection.doc(scene.sceneId)
         .onSnapshot((doc) => {
           if (doc.exists) {
             var populatedScene = _.merge({_id: doc.id, admin: scene.admin}, doc.data());
@@ -155,6 +156,7 @@ export const firebaseStore = {
             //remove populated scene if deleted
             var removedSceneIndex = _.findIndex(state.populatedScenes, function(o) { return o._id == doc.id });
             commit('REMOVE_POPULATED_SCENE_DATA', removedSceneIndex)
+            unsubscribe() //unsubs from listener
           }
         })
 

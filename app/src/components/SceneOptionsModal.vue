@@ -173,7 +173,7 @@ export default {
       padding-left: 10px
 
     .delete
-      +button(false, false, #e64747, inherit)
+      +button(false, false, #f76363, inherit)
       padding: 13px 30px
 
     //invite members

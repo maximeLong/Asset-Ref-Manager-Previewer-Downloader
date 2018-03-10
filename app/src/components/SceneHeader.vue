@@ -6,7 +6,7 @@
         <div class="title">{{currentScene.name}}</div>
         <div class="options" @click="openSceneOptions"><div v-for="n in 3"></div></div>
       </div>
-      <div class="scene-type">Virtual Set, Tracked Vive, SLAM Technology</div>
+      <div class="scene-type">Virtual Set, Vive Tracker</div>
     </div>
 
     <div class="header-right">
@@ -71,9 +71,8 @@ export default {
 #scene-header
   background-color: white
   border-bottom: 1px solid $border_color_light
-  padding: 0 30px
-  padding: 0 30px
-  height: 90px
+  padding: 30px 30px 60px 30px
+  height: 130px
   +flexbox
   +align-items(center)
   +justify-content(space-between)
@@ -106,7 +105,7 @@ export default {
       +align-items(center)
     .invite,.member,.add-member
       border-radius: 100px
-      border: 2px solid $border_color_light
+      border: 3px solid $border_color_light
       width: 40px
       height: 40px
       position: relative
@@ -134,6 +133,7 @@ export default {
       background-position: 50% 50%
       background-repeat: no-repeat
     .add-member
+      font-size: 20px
       color: $action-color
 
 </style>

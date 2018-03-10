@@ -7,7 +7,7 @@
 
     <!-- main scenes bar, add scene -->
     <div class="sidebar-title">
-      <div>My Scenes</div>
+      <div>Scenes</div>
       <router-link to="/createscene">+</router-link>
     </div>
     <div class="scenes">
@@ -71,10 +71,10 @@ export default {
     +flexbox
     +align-items(center)
     +justify-content(center)
-    width: 60px
+    width: 100%
     height: $header_panel_height
     margin-bottom: 20px
-    background-color: white
+    background-color: #424242
     +clickable
     .icon
       height: 30px
@@ -83,7 +83,7 @@ export default {
       border-radius: 100px
 
   .sidebar-title, .sidebar-subtitle
-    +systemType(big)
+    +systemType(average)
     color: white
     padding: 0 15px
     +flexbox
@@ -97,20 +97,20 @@ export default {
     border-top: 1px solid $border_color_mid
     padding-top: 10px
     margin: 10px 0 50px 0
-    +userType(average)
+    +userType(small)
     color: white
     &.teams
       margin-bottom: 0
 
     .scenes-list
       .scene-item
-        padding: 3px 15px
+        padding: 7px 15px
         +clickable
         &:hover
           background-color: $side_panel_hover
           +transition(.25s ease-in-out all)
         &.active
-          color: $action_color
+          color: $active_color
 
 
 

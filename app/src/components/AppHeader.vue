@@ -2,7 +2,7 @@
   <div id="header-content">
 
     <div class="left-section">
-      <div class="asset-marketplace">asset marketplace</div>
+      <div class="asset-marketplace">asset marketplace (beta)</div>
     </div>
 
     <div class="middle-section">
@@ -99,10 +99,10 @@ $margin_amount: 30px
     +align-items(center)
     +justify-content(flex-end)
     height: 100%
-    +flex(0 0 210px)
+    +flex(0 0 250px)
     margin-left: 30px
     .asset-marketplace
-      +button(false,false)
+      +button(false,false, $side_panel_color)
       padding: 10px
 
   .middle-section
@@ -147,7 +147,7 @@ $margin_amount: 30px
       .account-image
         width: 45px
         height: 45px
-        border: 1px solid $border_color
+        border: 3px solid $border_color
         border-radius: 100%
         margin-left: 15px
         background-size: contain

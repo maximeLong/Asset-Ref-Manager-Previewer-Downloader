@@ -1,37 +1,35 @@
 <template>
 <div id="asset-catalog">
-  <content-box :title="'Asset Catalog'">
 
-    <div class="catalog-container">
-      <div class="asset-container">
-        <div class="asset" v-for="asset in assets" @click="openAssetInfo(asset)">
-            <div class="asset-image-container">
-              <div class="asset-image" :style="{ 'background-image': 'url(data:image/jpg;base64,' + asset.thumbnailImage + ')' }"></div>
-            </div>
-          <div class="asset-title">{{asset.name}}</div>
-        </div>
-
-        <transition name="fade">
-          <div class="asset asset-standin" v-if="assetStandin">
-            <div class="asset-image-container">
-              <dot-loader :color="'#4e4e4e'" :size="'30px'"></dot-loader>
-            </div>
-          </div>
-        </transition>
-
-      </div>
-
-      <div class="upload-container">
-        <div class="devider"></div>
-        <div class="open-import" @click="openImport">Import from file</div>
-      </div>
-
+  <div class="catalog-options">
+    <div class="option">Scene Assets</div>
+    <div class="option">My Assets</div>
+    <div class="option locked">
+      <div class="open-import" @click="openImport">Import from file</div>
     </div>
+  </div>
 
 
-  </content-box>
+  <div class="catalog-assets">
+    <div class="assets-wrap-container">
+      <div class="asset" v-for="asset in assets" @click="openAssetInfo(asset)">
+          <div class="asset-image-container">
+            <div class="asset-image" :style="{ 'background-image': 'url(data:image/jpg;base64,' + asset.thumbnailImage + ')' }"></div>
+          </div>
+        <div class="asset-title">{{asset.name}}</div>
+      </div>
+
+      <transition name="fade">
+        <div class="asset asset-standin" v-if="assetStandin">
+          <div class="asset-image-container">
+            <dot-loader :color="'#4e4e4e'" :size="'30px'"></dot-loader>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </div>
+
 </div>
-
 </template>
 
 <script>
@@ -93,11 +91,37 @@ export default {
 @import src/styles/main
 
 #asset-catalog
-  margin-top: 40px
-  .catalog-container
-    +flexbox
-    .asset-container
-      +flex(2)
+  height: 100%
+  width: 100%
+  +flexbox
+  +flex-direction(row)
+  .catalog-options
+    +flex(0 0 200px)
+    height: 100%
+    border-right: 1px solid $border_color_light
+    position: relative
+    .option
+      +clickable
+      +systemType(small)
+      padding: 15px 30px
+      border-bottom: 1px solid $border_color_light
+      &.locked
+        padding: 0
+        width: 100%
+        position: absolute
+        bottom: 0
+      .open-import
+        +button(false,false, $action_color)
+        border-radius: 0
+
+
+  .catalog-assets
+    padding: 30px
+    height: 100%
+    +flex(1)
+    overflow-y: scroll
+
+    .assets-wrap-container
       +flexbox
       -webkit-flex-wrap: wrap
       flex-wrap: wrap
@@ -122,18 +146,5 @@ export default {
           +flexbox
           +align-items(center)
           +justify-content(center)
-
-
-    .upload-container
-      +flex(.5)
-      input
-        border-radius: 100px
-        padding: 12px 15px
-      .devider
-        margin: 20px 0
-        height: 2px
-        background-color: $border_color_light
-      .open-import
-        +button(false,true)
 
 </style>
