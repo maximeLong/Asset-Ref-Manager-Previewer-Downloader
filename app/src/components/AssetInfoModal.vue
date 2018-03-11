@@ -5,7 +5,7 @@
 
     <div class="asset-preview">
       <div class="asset-image" v-if="!loaded"
-        :style="{ 'background-image': 'url(data:image/jpg;base64,' + activeAsset.thumbnailImage + ')' }">
+        :style="{ 'background-image': 'url(' + activeAsset.thumbnailImage + ')' }">
       </div>
       <asset-viewer v-else
         :assetIsBinary="true"
@@ -24,14 +24,14 @@
     <div class="asset-information">
       <div class="related-information">
         <div class="title">Model Information</div>
-        <div class="info">
+        <!-- <div class="info">
           <div class="keys">
             <div class="key" v-for="(value, key) in relatedInfo">{{key}}</div>
           </div>
           <div class="values">
             <div class="key" v-for="(value, key) in relatedInfo">{{value}}</div>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <div class="performance-information">
@@ -70,17 +70,16 @@ export default {
     }
   },
   created: function() {
-    this.relatedInfo = {
-      "file size": this.modelSizeFormatted,
-      "draw calls": this.activeAsset.performanceInfo.drawCalls,
-      "last updated": moment(this.activeAsset.updatedAt).fromNow()
-    }
+    // this.relatedInfo = {
+    //   "file size": this.modelSizeFormatted,
+    //   "draw calls": this.activeAsset.performanceInfo.drawCalls,
+    //   "last updated": moment(this.activeAsset.updatedAt).fromNow()
+    // }
   },
 
   computed: {
-    user: function()            { return this.$store.state.auth.user },
-    activeAsset: function()      { return this.$store.getters['assets/current'] },
-    fileURL: function()         { return this.activeAsset.modelURL },
+    activeAsset: function()      { return this.$store.state.firebaseStore.currentAsset },
+    fileURL: function()         { return this.activeAsset.assetUrl },
     modelSizeFormatted: function() {
       const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
       let l = 0, n = parseInt(this.activeAsset.modelSize, 10) || 0;

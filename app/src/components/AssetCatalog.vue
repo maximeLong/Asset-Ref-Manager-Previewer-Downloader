@@ -14,9 +14,9 @@
     <div class="assets-wrap-container">
       <div class="asset" v-for="asset in assets" @click="openAssetInfo(asset)">
           <div class="asset-image-container">
-            <div class="asset-image" :style="{ 'background-image': 'url(data:image/jpg;base64,' + asset.thumbnailImage + ')' }"></div>
+            <div class="asset-image" :style="{ 'background-image': 'url(' + asset.assetThumbnailImage + ')' }"></div>
           </div>
-        <div class="asset-title">{{asset.name}}</div>
+        <div class="asset-title">{{asset.assetName}}</div>
       </div>
 
       <transition name="fade">
@@ -55,32 +55,25 @@ export default {
   },
 
   computed: {
-    user: function()            { return this.$store.state.auth.user },
-    currentScene: function()    { return this.$store.getters['scenes/current'] },
-    assets: function()          { return this.$store.getters['assets/list'] },
+    currentScene: function()    { return this.$store.getters['firebaseStore/currentScene'] },
+    assets: function()          { return this.$store.state.firebaseStore.assetsInCurrentScene },
     assetStandin: function()    { return this.$store.state.assetStandin },
   },
 
   methods: {
     //-- modal opens
     openImport: function() { this.$store.commit('SET_ASSET_IMPORT_MODAL_IS_OPEN', true) },
+
     openAssetInfo: function(selectedAsset) {
-      //TODO: this costs a server request, but also the information is hot (if likes or scene adds happen)
-      this.$store.dispatch('assets/get', selectedAsset._id)
+      console.log(selectedAsset._id)
+      this.$store.dispatch('firebaseStore/getAsset', selectedAsset.assetId)
       .then( response => {
         this.$store.commit('SET_ASSET_INFO_MODAL_IS_OPEN', true);
       });
     },
 
-    //-- generate asset lists
-    baseAssetFind: function(params) {
-      this.$store.dispatch('assets/find', params)
-        .then(success => { console.log('asset list updated', success) })
-        .catch(error =>  { console.log('scene error', error) })
-    },
     findCurrentSceneAssets: function() {
-      let params = {query: {"scenes": { "$in" : [this.$store.getters['scenes/current']._id]} }};
-      this.baseAssetFind(params);
+      this.$store.dispatch('firebaseStore/getAssetsByScene', this.currentScene._id)
     }
   }
 

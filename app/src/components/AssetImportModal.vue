@@ -73,8 +73,8 @@ export default {
   },
 
   computed: {
-    user: function()            { return this.$store.state.auth.user },
-    currentScene: function()   { return this.$store.getters['scenes/current'] },
+    user: function()            { return this.$store.state.firebaseStore.user },
+    currentScene: function()    { return this.$store.getters['firebaseStore/currentScene'] },
     assetIsOk: function()  {
       if (this.loaded && this.formAssetName.length && this.snapTaken) { return true } else { return false }
     },
@@ -128,9 +128,8 @@ export default {
     tryCreateAsset: function() {
       const modelInfo = {
         name:           this.formAssetName,
-        creator:        this.user._id,
-        scenes:         [this.currentScene._id],
-        likes:          [],
+        creator:        this.user.uid,
+        creatorEmail:   this.user.email,
         modelSize:      this.modelFileSize,
         thumbnailImage: this.modelSnapshot,
         performanceInfo: {
@@ -143,13 +142,13 @@ export default {
       }
 
       // Instantiate a FormData() object + add information to it
-      const formData = new FormData();
-      formData.append('file', this.modelFile, this.formAssetName + '.glb');
-      formData.append('modelInfo', JSON.stringify(modelInfo));
+      // const formData = new FormData();
+      // formData.append('file', this.modelFile, this.formAssetName + '.glb');
+      // formData.append('modelInfo', JSON.stringify(modelInfo));
       //formData.append('currentScene', this.currentScene._id)
 
       //do a RESTful thing here so that files can be handled
-      this.$store.dispatch('createAsset', formData);
+      this.$store.dispatch('firebaseStore/createAsset', {assetData: modelInfo, assetFile: this.modelFile});
 
     }
   }

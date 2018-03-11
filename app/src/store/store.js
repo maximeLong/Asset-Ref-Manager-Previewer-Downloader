@@ -59,7 +59,7 @@ export const store = new Vuex.Store({
 
     //-- create asset
     createAsset: function(store, formData) {
-      fetch(process.env.SERVER_ADDRESS + '/model', {
+      fetch('https://us-central1-depthcast-188705.cloudfunctions.net/assetUpload/', {
         method: 'POST',
         body: formData
       })

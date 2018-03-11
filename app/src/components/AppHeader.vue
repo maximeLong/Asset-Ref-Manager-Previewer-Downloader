@@ -6,11 +6,6 @@
     </div>
 
     <div class="middle-section">
-      <!--
-      <div class="team-account" v-if="userIsLoggedIn" @click="openTeamPanel">
-        <div class="team-name">Your Teams</div>
-      </div>
-      -->
       <div class="create-account" v-if="!userIsLoggedIn" @click="openCreatePanel">
         <div class="create-account-text">Create Account</div>
       </div>
@@ -147,7 +142,7 @@ $margin_amount: 30px
       .account-image
         width: 45px
         height: 45px
-        border: 3px solid $border_color
+        border: 3px solid $border_color_light
         border-radius: 100%
         margin-left: 15px
         background-size: contain

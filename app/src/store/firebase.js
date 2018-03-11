@@ -1,6 +1,6 @@
 //firebase store
 import firebase from '@firebase/app';
-import {firestore, auth, usersCollection, scenesCollection, scenesLinkUsersCollection} from './initApp'
+import { firestore, auth, storage, usersCollection, scenesCollection, assetsCollection, scenesLinkAssetsCollection, scenesLinkUsersCollection} from './initApp'
 
 import router from '../router'
 import _ from 'lodash'
@@ -221,6 +221,78 @@ export const firebaseStore = {
               .catch((error)=> reject(error) )
           })
       })
+    },
+
+    createAsset: function(store, {assetData, assetFile}) {
+      //send file to cloud storage
+      var storageRef = storage.ref();
+      var uploadTask = storageRef.child('gltf/' + assetData.name + '.glb').put(assetFile);
+
+      uploadTask.on('state_changed', function(snapshot){
+        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress + '% done');
+        switch (snapshot.state) {
+          case firebase.storage.TaskState.PAUSED: // or 'paused'
+            console.log('Upload is paused');
+            break;
+          case firebase.storage.TaskState.RUNNING: // or 'running'
+            console.log('Upload is running');
+            break;
+          }
+      }, function(error) {  //error
+        console.log(error)
+      }, function() {       //success
+
+        //get the downloadURL and add it to assetData
+        var downloadURL = uploadTask.snapshot.downloadURL;
+        assetData.assetUrl = downloadURL;
+
+        // then batch request the asset model & scenesLinkAssets model
+        var assetRef = assetsCollection.doc();
+        var batch = firestore.batch();
+        batch.set(assetRef, assetData);
+        batch.set(scenesLinkAssetsCollection.doc(store.getters['currentScene']._id + '_' + assetRef.id), {
+          sceneId: store.getters['currentScene']._id,
+          assetId: assetRef.id,
+          assetThumbnailImage: assetData.thumbnailImage, //NOTE: duplicate in data model
+          assetName: assetData.name //NOTE: duplicate in data model
+        })
+        batch.commit().then((success)=> {
+          store.commit('SET_ASSET_STANDIN', false, {root: true});
+          console.log('asset completed')
+        })
+      });
+
+      //close the modal before response is done
+      store.commit('SET_ASSET_IMPORT_MODAL_IS_OPEN', false, {root: true});
+      store.commit('SET_ASSET_STANDIN', true, {root: true});
+    },
+
+    getAssetsByScene: function(store, sceneId) {
+      //NOTE: duplicating data model to include name/image --> will save a populate but can't change values
+      //TODO: unsubscribe on scene change
+      //BUG:  signOut() fires onSnapshot and returns error (bcuz no auth, bcuz ???)
+      scenesLinkAssetsCollection.where("sceneId", "==", sceneId)
+      .onSnapshot((snapshot) => {
+        var assetsInScene = [];
+        snapshot.forEach((doc) => {
+          assetsInScene.push(_.merge({_id: doc.id}, doc.data()) )
+        });
+        store.commit('SET_ASSETS_IN_CURRENT_SCENE_DATA', assetsInScene)
+      }, (error)=> {
+        //console.log(error)
+      });
+    },
+
+    getAsset: function(store, assetId) {
+      assetsCollection.doc(assetId).get()
+        .then((doc)=> {
+          if (doc.exists) {
+            console.log(doc.data())
+            store.commit('SET_CURRENT_ASSET', doc.data());
+
+          } else { console.log({message: 'no asset info -- this is bad'}) }
+        }).catch((error)=> { console.log(error) })
     }
 
   },
@@ -241,6 +313,9 @@ export const firebaseStore = {
 
     currentSceneIndex: 0,
     usersInCurrentScene: [],
+
+    assetsInCurrentScene: [],
+    currentAsset: {}
 
     //TODO: need manage large sets of asset data (thumbs need to be released + watchers unsubbed)
     // currentSceneAssets: [],
@@ -263,7 +338,10 @@ export const firebaseStore = {
     },
 
     SET_CURRENT_SCENE_INDEX: function(state, val) { state.currentSceneIndex = val },
-    SET_USERS_IN_CURRENT_SCENE_DATA: function(state, val) { state.usersInCurrentScene = val }
+    SET_USERS_IN_CURRENT_SCENE_DATA: function(state, val) { state.usersInCurrentScene = val },
+
+    SET_ASSETS_IN_CURRENT_SCENE_DATA: function(state, val) { state.assetsInCurrentScene = val },
+    SET_CURRENT_ASSET: function(state, val) { state.currentAsset = val }
 
   }
 
