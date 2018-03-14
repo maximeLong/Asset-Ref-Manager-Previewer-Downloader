@@ -109,7 +109,7 @@ export default {
             content: ''
             position: absolute
             height: 8px
-            background-color: $active_color
+            background-color: $active_color_light
             top: 43px
             width: 100%
 

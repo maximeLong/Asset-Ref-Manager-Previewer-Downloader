@@ -143,6 +143,7 @@ $margin_amount: 30px
         width: 45px
         height: 45px
         border: 3px solid $border_color_light
+        box-shadow: inset 0px 0px 0px 3px white
         border-radius: 100%
         margin-left: 15px
         background-size: contain

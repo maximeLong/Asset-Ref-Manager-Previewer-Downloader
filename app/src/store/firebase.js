@@ -211,7 +211,7 @@ export const firebaseStore = {
         scenesLinkUsersCollection.where('sceneId', '==', sceneId).get()
           .then((querySnapshot)=> {
             //delete all scenes_link_users docs with sceneId
-            //NOTE: this will involve checking the users admin privilege again the sceneId on security rules..
+            //NOTE: permissions need to thought out
             querySnapshot.forEach((doc)=> { batch.delete(doc.ref) })
             //delete current scene
             batch.delete(scenesCollection.doc(sceneId))
@@ -285,14 +285,37 @@ export const firebaseStore = {
     },
 
     getAsset: function(store, assetId) {
-      assetsCollection.doc(assetId).get()
-        .then((doc)=> {
-          if (doc.exists) {
-            console.log(doc.data())
-            store.commit('SET_CURRENT_ASSET', doc.data());
+      return new Promise((resolve, reject) => {
+        assetsCollection.doc(assetId).get()
+          .then((doc)=> {
+            if (doc.exists) {
+              store.commit('SET_CURRENT_ASSET', doc.data());
+              resolve()
+            } else {
+              console.log({message: 'no asset info -- this is bad'})
+              reject()
+            }
+          }).catch((error)=> { console.log(error) })
+      })
+    },
 
-          } else { console.log({message: 'no asset info -- this is bad'}) }
-        }).catch((error)=> { console.log(error) })
+    deleteAsset: function(store, {sceneId, assetId}) {
+      return new Promise((resolve, reject) => {
+        var batch = firestore.batch()
+
+        scenesLinkAssetsCollection.where('sceneId', '==', sceneId).get()
+          .then((querySnapshot)=> {
+            //delete all scenes_link_assets docs with sceneId
+            //NOTE: permissions need to thought out
+            querySnapshot.forEach((doc)=> { batch.delete(doc.ref) })
+            //delete current assets
+            batch.delete(assetsCollection.doc(assetId))
+
+            batch.commit()
+              .then((success)=> resolve() )
+              .catch((error)=> reject(error) )
+          })
+      })
     }
 
   },

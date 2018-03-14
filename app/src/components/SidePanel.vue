@@ -2,7 +2,7 @@
   <div id="side-panel-content">
 
     <div id="logo">
-      <div class="icon"></div>
+      <div class="icon">Depthcast</div>
     </div>
 
     <!-- main scenes bar, add scene -->
@@ -68,19 +68,24 @@ export default {
   width: 100%
 
   #logo
-    +flexbox
-    +align-items(center)
-    +justify-content(center)
     width: 100%
     height: $header_panel_height
     margin-bottom: 20px
     background-color: #424242
+    padding: 12px 15px
     +clickable
     .icon
-      height: 30px
-      width: 30px
-      border: 2px solid $action_color
-      border-radius: 100px
+      +systemType(small)
+      letter-spacing: 4px
+      font-weight: normal
+      font-size: 13px
+      +flexbox
+      +align-items(center)
+      +justify-content(center)
+      color: white
+      width: 100%
+      height: 100%
+      border: 1px solid white
 
   .sidebar-title, .sidebar-subtitle
     +systemType(average)
@@ -110,7 +115,7 @@ export default {
           background-color: $side_panel_hover
           +transition(.25s ease-in-out all)
         &.active
-          color: $active_color
+          color: $active_color_light
 
 
 

@@ -3,7 +3,7 @@
 
     <transition name="fade">
       <div class="loader" v-if="!loaded">
-        <dot-loader :color="'#4e4e4e'"></dot-loader>
+        <dot-loader :color="'#e4bb86'"></dot-loader>
       </div>
     </transition>
 
@@ -332,8 +332,8 @@ export default {
     left: 15px
     z-index: 1
     border-radius: 50px
-    padding: 10px
-    background-color: grey
+    background-color: $action_color
+    opacity: .8
     width: 40px
     height: 40px
     +flexbox
@@ -341,10 +341,11 @@ export default {
     +justify-content(center)
     +clickable
     div
-      height: 25px
-      width: 25px
+      height: 100%
+      width: 100%
       background: url('../assets/wireframe.svg')
       background-repeat: no-repeat
       background-position: 50% 50%
+      background-size: 67%
 
 </style>

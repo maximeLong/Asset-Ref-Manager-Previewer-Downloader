@@ -24,21 +24,21 @@
     <div class="asset-information">
       <div class="related-information">
         <div class="title">Model Information</div>
-        <!-- <div class="info">
+        <div class="info">
           <div class="keys">
             <div class="key" v-for="(value, key) in relatedInfo">{{key}}</div>
           </div>
           <div class="values">
             <div class="key" v-for="(value, key) in relatedInfo">{{value}}</div>
           </div>
-        </div> -->
+        </div>
       </div>
 
       <div class="performance-information">
         <div class="performance-chart"></div>
         <div class="performance-number">
           <div class="shorthand">{{performanceShorthand}}</div>
-          <div class="count">{{activeAsset.performanceInfo.vertices}} verts</div>
+          <div class="count">{{(performance.vertices/1000).toFixed(2)}}k verts</div>
         </div>
       </div>
     </div>
@@ -55,6 +55,7 @@ import { mapState } from 'vuex'
 import { mapActions } from 'vuex'
 import _ from 'lodash'
 import moment from 'moment'
+const ProgressBar = require('progressbar.js')
 
 
 export default {
@@ -65,52 +66,60 @@ export default {
   },
   data: function() {
     return {
-      loaded: false,
-      relatedInfo: {}
+      loaded: false
     }
   },
-  created: function() {
-    // this.relatedInfo = {
-    //   "file size": this.modelSizeFormatted,
-    //   "draw calls": this.activeAsset.performanceInfo.drawCalls,
-    //   "last updated": moment(this.activeAsset.updatedAt).fromNow()
-    // }
+  mounted: function() {
+    var bar = new ProgressBar.Circle('.performance-chart', {
+      strokeWidth: 12,
+      easing: 'easeInOut',
+      duration: 1400,
+      color: '#e4bb86',
+      trailColor: '#e6e7e8',
+      trailWidth: 3,
+      svgStyle: null
+    });
+    bar.animate(this.performanceBar);
   },
-
   computed: {
-    activeAsset: function()      { return this.$store.state.firebaseStore.currentAsset },
-    fileURL: function()         { return this.activeAsset.assetUrl },
+    activeAsset: function() { return this.$store.state.firebaseStore.currentAsset },
+    performance: function() { return this.$store.state.firebaseStore.currentAsset.performanceInfo },
+    fileURL: function()     { return this.activeAsset.assetUrl },
     modelSizeFormatted: function() {
       const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
       let l = 0, n = parseInt(this.activeAsset.modelSize, 10) || 0;
       while(n >= 1024){
-          n = n/1024;
-          l++;
+        n = n/1024;
+        l++;
       }
       return(n.toFixed(n >= 10 || l < 1 ? 0 : 1) + ' ' + units[l]);
     },
     performanceShorthand: function() {
-      if (this.activeAsset.performanceInfo.vertices <= 20000) {
-        return 'small'
+      if (this.performance.vertices <= 20000) { return 'light'}
+      if (this.performance.vertices >= 20001 && this.performance.vertices <= 100000) { return 'average' }
+      else { return 'heavy' }
+    },
+    performanceBar: function() {
+      if ( (this.performance.vertices / 100000) <= .1 ) { return .1 }
+      if ( (this.performance.vertices / 100000) >= .95 ) { return .95 }
+      else return ( (this.performance.vertices / 100000) )
+    },
+    relatedInfo: function() {
+      return {
+        "file size":  this.modelSizeFormatted,
+        "materials": this.performance.drawCalls,
+        "created at": moment(this.activeAsset.createdAt).fromNow()
       }
-      if (this.activeAsset.performanceInfo.vertices >= 20001 && this.activeAsset.performanceInfo.vertices <= 100000) {
-        return 'average'
-      } else {
-        return 'big'
-      }
-    }
+    },
   },
   methods: {
     //-- button methods
     handleClickaway: function() {
       this.$store.commit('SET_ASSET_INFO_MODAL_IS_OPEN', false);
     },
-
     // -- use these if you need them
-    //
     emitSuccess: function()   { console.log('success loading model') },
     handleFailure: function() { console.log('failure loaded' )}
-
   }
 
 }
@@ -120,6 +129,14 @@ export default {
 @import src/styles/main
 
 #asset-info-modal
+
+  .content-box
+    .content-header
+      h2
+        +userType(big)
+        font-weight: normal
+        text-transform: none
+
   .asset-preview
     position: relative
     height: 250px
@@ -144,17 +161,16 @@ export default {
 
     .related-information
       +flex(1)
-      color: $border_color_mid
       .title
-        border-bottom: 1px solid $border_color_mid
-        padding-bottom: 7px
-        margin-bottom: 12px
+        border-bottom: 3px solid $border_color_light
+        padding-bottom: 10px
+        margin-bottom: 15px
       .info
         +flexbox
         .keys
           margin-right: 30px
         .key,.value
-          padding-bottom: 4px
+          padding-bottom: 7px
 
 
     .performance-information
@@ -166,8 +182,6 @@ export default {
         height: 100%
         width: 100%
         position: absolute
-        border: 20px solid $border_color_light
-        border-radius: 100%
 
       .performance-number
         height: 100%
