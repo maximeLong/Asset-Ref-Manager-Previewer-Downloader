@@ -13,7 +13,7 @@
 
     <!-- catalog -->
     <div id="scene-active-module">
-      <asset-catalog v-if="activeModule == 'Asset Catalog'"></asset-catalog>
+      <asset-catalog-module v-if="activeModule == 'Asset Catalog'"></asset-catalog-module>
     </div>
   </div>
 
@@ -22,7 +22,7 @@
 
 <script>
 import ContentBox from '../components/ContentBox'
-import AssetCatalog from '../components/AssetCatalog'
+import AssetCatalogModule from '../components/AssetCatalogModule'
 import SceneHeader from '../components/SceneHeader'
 
 
@@ -30,7 +30,7 @@ export default {
   name: 'scene',
   components: {
     ContentBox,
-    AssetCatalog,
+    AssetCatalogModule,
     SceneHeader
   },
   data: function() {

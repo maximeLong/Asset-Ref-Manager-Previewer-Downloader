@@ -224,6 +224,7 @@ export const firebaseStore = {
     },
 
     createAsset: function(store, {assetData, assetFile}) {
+      //NOTE: duplicating data model to include name/image --> will save a populate but can't change values
       //send file to cloud storage
       var storageRef = storage.ref();
       var uploadTask = storageRef.child('gltf/' + assetData.name + '.glb').put(assetFile);
@@ -268,10 +269,9 @@ export const firebaseStore = {
       store.commit('SET_ASSET_STANDIN', true, {root: true});
     },
 
+
     getAssetsByScene: function(store, sceneId) {
-      //NOTE: duplicating data model to include name/image --> will save a populate but can't change values
       //TODO: unsubscribe on scene change
-      //BUG:  signOut() fires onSnapshot and returns error (bcuz no auth, bcuz ???)
       scenesLinkAssetsCollection.where("sceneId", "==", sceneId)
       .onSnapshot((snapshot) => {
         var assetsInScene = [];
@@ -280,8 +280,35 @@ export const firebaseStore = {
         });
         store.commit('SET_ASSETS_IN_CURRENT_SCENE_DATA', assetsInScene)
       }, (error)=> {
-        //console.log(error)
+        console.log(error)
       });
+    },
+
+    getAssetsByUser: function(store, uid) {
+      //TODO: unsubscribe on logout
+      assetsCollection.where("creator", "==", uid)
+      .onSnapshot((snapshot) => {
+        var assetsByUser = [];
+        snapshot.forEach((doc) => {
+          assetsByUser.push(_.merge({_id: doc.id}, doc.data()) )
+        });
+        store.commit('SET_ASSETS_BY_CURRENT_USER_DATA', assetsByUser)
+      }, (error)=> {
+        console.log(error)
+      });
+    },
+
+    removeAssetsByScene: function(store, assetList) {
+      return new Promise((resolve, reject) => {
+        var batch = firestore.batch()
+
+        assetList.forEach((asset)=> {
+          batch.delete(scenesLinkAssetsCollection.doc(asset))
+        })
+        batch.commit()
+          .then((success)=> resolve() )
+          .catch((error)=> reject(error) )
+      })
     },
 
     getAsset: function(store, assetId) {
@@ -338,12 +365,9 @@ export const firebaseStore = {
     usersInCurrentScene: [],
 
     assetsInCurrentScene: [],
+    assetsByCurrentUser: [],
     currentAsset: {}
 
-    //TODO: need manage large sets of asset data (thumbs need to be released + watchers unsubbed)
-    // currentSceneAssets: [],
-    // currentUserAssets: [],
-    // currentAsset: {},
   },
 
   mutations: {
@@ -364,6 +388,8 @@ export const firebaseStore = {
     SET_USERS_IN_CURRENT_SCENE_DATA: function(state, val) { state.usersInCurrentScene = val },
 
     SET_ASSETS_IN_CURRENT_SCENE_DATA: function(state, val) { state.assetsInCurrentScene = val },
+    SET_ASSETS_BY_CURRENT_USER_DATA: function(state, val) { state.assetsByCurrentUser = val },
+
     SET_CURRENT_ASSET: function(state, val) { state.currentAsset = val }
 
   }

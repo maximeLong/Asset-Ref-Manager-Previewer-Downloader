@@ -160,7 +160,7 @@ export default {
 
 
     .form-title
-      +flex(0 0 100px)
+      +flex(0 0 120px)
       +systemType(small)
     input
       font-weight: bold

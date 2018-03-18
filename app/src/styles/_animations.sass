@@ -18,3 +18,12 @@
   transition: all .5s ease
   +translate3d(0, -30px, 0)
   opacity: 0
+
+
+.faderight-enter-active, .faderight-leave-active
+  transition: all .35s ease
+  +translate3d(0, 0, 0)
+.faderight-enter, .faderight-leave-active
+  transition: all .35s ease
+  +translate3d(-30px, 0, 0)
+  opacity: 0
