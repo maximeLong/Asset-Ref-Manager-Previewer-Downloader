@@ -6,7 +6,7 @@
     <div class="group">
       <div class="option" @click="assetList = 'scene'" :class="{active : assetList == 'scene'}">Scene Assets</div>
       <div class="option" @click="getUserAssets" :class="{active : assetList == 'user'}">My Assets</div>
-      <div class="option">Sketchfab</div>
+      <div class="option" @click="getSketchfabAssets" :class="{active : assetList == 'sketchfab'}">Sketchfab</div>
       <div class="option">Depthcast Curated</div>
     </div>
     <div class="group">
@@ -38,6 +38,19 @@
         click: addAssetsToScene
       }"
       :normalClick="openDepthcastAsset"
+    ></asset-catalog-schema>
+
+    <asset-catalog-schema v-if="assetList == 'sketchfab'" key="sketchfab"
+      :schemaAssets="sketchfabAssets"
+      :multiSelectEnabled="false"
+      :searchEnabled="true"
+      :customButtonEnabled="true"
+      :customButtonData="{
+        icon: 'stars',
+        click: getSketchfabAssets
+      }"
+      :searchClick="searchSketchfab"
+      :normalClick="openSketchfabAsset"
     ></asset-catalog-schema>
   </transition>
 
@@ -72,7 +85,6 @@ export default {
     user: function()           { return this.$store.state.firebaseStore.user },
     currentScene: function()   { return this.$store.getters['firebaseStore/currentScene'] },
     assetStandin: function()   { return this.$store.state.assetStandin },
-
     isSceneAdmin: function() { return this.currentScene.admin ? true : false },
 
     sceneAssets: function() {
@@ -97,6 +109,18 @@ export default {
         }
       })
     },
+    sketchfabAssets: function() {
+      return this.$store.state.firebaseStore.sketchfabAssets.map((asset)=> {
+        return {
+          name: asset.name,
+          thumb: asset.thumbnails.images[2].url,
+          assetId: undefined,
+          uid: asset.uid, //uid is sketchfab uid
+          original: asset
+        }
+      })
+    }
+
   },
 
   methods: {
@@ -132,7 +156,22 @@ export default {
         this.assetList = 'scene'
         console.log('successfully added')
       });
-    }
+    },
+
+    //sketchfab
+    getSketchfabAssets: function(manualOverride) {
+      if (!this.sketchfabAssets.length || manualOverride == true) {
+        this.$store.dispatch('firebaseStore/getSketchfabAssets', null)
+        .then( (success)=> { this.assetList = 'sketchfab' })
+      } else { this.assetList = 'sketchfab' }
+    },
+    searchSketchfab: function(search) {
+      this.$store.dispatch('firebaseStore/getSketchfabAssets', search)
+      .then( (success)=> { console.log('search success') })
+    },
+    openSketchfabAsset: function(asset) {
+      console.log(asset)
+    },
 
   }
 

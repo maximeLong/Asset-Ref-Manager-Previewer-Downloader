@@ -360,6 +360,24 @@ export const firebaseStore = {
               .catch((error)=> reject(error) )
           })
       })
+    },
+
+    getSketchfabAssets: function(store, search) {
+      return new Promise((resolve, reject) => {
+        var defaultUrl = 'https://api.sketchfab.com/v3/search?type=models&downloadable=true&staffpicked=true&sort_by=-publishedAt';
+        var searchUrl = 'https://api.sketchfab.com/v3/search?type=models&downloadable=true&q=' + search;
+        var fetchUrl = search ? searchUrl : defaultUrl;
+
+        fetch(fetchUrl)
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(jsonResponse) {
+            resolve()
+            console.log('sketchfab gotten')
+            store.commit('SET_SKETCHFAB_ASSETS', jsonResponse.results)
+          });
+      })
     }
 
   },
@@ -383,7 +401,9 @@ export const firebaseStore = {
 
     assetsInCurrentScene: [],
     assetsByCurrentUser: [],
-    currentAsset: {}
+    currentAsset: {},
+
+    sketchfabAssets: [],
 
   },
 
@@ -407,7 +427,9 @@ export const firebaseStore = {
     SET_ASSETS_IN_CURRENT_SCENE_DATA: function(state, val) { state.assetsInCurrentScene = val },
     SET_ASSETS_BY_CURRENT_USER_DATA: function(state, val) { state.assetsByCurrentUser = val },
 
-    SET_CURRENT_ASSET: function(state, val) { state.currentAsset = val }
+    SET_CURRENT_ASSET: function(state, val) { state.currentAsset = val },
+
+    SET_SKETCHFAB_ASSETS: function(state, val) { state.sketchfabAssets = val },
 
   }
 

@@ -15,11 +15,22 @@
       </transition>
     </div>
 
-    <!-- search TODO: goes here -->
-    <!-- <div class="search"></div> -->
+    <!-- search-->
+    <div class="search" :class="{ active : searchIsActive }" v-if="searchEnabled">
+      <i class="material-icons" @click="toggleSearch">search</i>
+      <transition name="faderight">
+        <input v-if="searchIsActive" v-model="searchInput" ref="search">
+      </transition><transition name="faderight">
+        <div v-if="searchIsActive" @click="handleSearchClick" class="action-button">Search</div>
+      </transition><transition name="faderight">
+        <div v-if="searchIsActive" @click="toggleSearch" class="cancel-button">cancel</div>
+      </transition>
+    </div>
 
     <!-- custom options -->
-    <slot name="options"></slot>
+    <div class="custom-button" v-if="customButtonEnabled">
+      <i class="material-icons" @click="handleCustomClick">{{customButtonData.icon}}</i>
+    </div>
   </div>
 
 
@@ -61,15 +72,21 @@ export default {
   props: {
     schemaAssets: Array,
     assetIsUploading: Boolean,
+    normalClick: Function,
+    //optional settings
     multiSelectEnabled: Boolean,
     multiSelectData: Object, //includes icon, text, click()
-    normalClick: Function
+    customButtonEnabled: Boolean,
+    customButtonData: Object, //includes icon, click()
+    searchEnabled: Boolean,
+    searchClick: Function,
   },
   data: function() {
     return {
       multiSelectModeIsOn: false,
       multiSelectedAssets: [],
-      random: Math.random()
+      searchInput: '',
+      searchIsActive: false
     }
   },
 
@@ -89,16 +106,37 @@ export default {
       }
     },
 
+    handleCustomClick: function() {
+      //turn off everything before click handles
+      this.searchInput = '';
+      this.searchIsActive = false;
+      this.multiSelectModeIsOn = false;
+      this.multiSelectedAssets = [];
+      this.customButtonData.click(true)
+    },
+
     handleMultiSelectClick: function() {
       this.multiSelectData.click(this.multiSelectedAssets)
     },
-
     toggleMultiSelectMode: function() {
       if (this.multiSelectModeIsOn) {
         this.multiSelectModeIsOn = false;
         this.multiSelectedAssets = [];
       } else {
         this.multiSelectModeIsOn = true;
+      }
+    },
+
+    handleSearchClick: function() {
+      this.searchClick(this.searchInput)
+    },
+    toggleSearch: function() {
+      if (this.searchIsActive) {
+        this.searchInput = '';
+        this.searchIsActive = false;
+      } else {
+        this.searchIsActive = true;
+        this.$nextTick(() => this.$refs.search.focus())
       }
     }
 
@@ -124,8 +162,8 @@ export default {
     +align-items(center)
     +flex-direction(row)
 
-    .multiselect
-      margin-right: 20px
+    .multiselect,.search
+      margin-right: 15px
       padding-right: 12px
       border-right: 2px solid $border_color_light
 
@@ -156,8 +194,29 @@ export default {
         border: 2px solid $action_color
         color: $action_color
         margin-left: 10px
-
-
+    .search
+      input
+        border: none
+        padding: 5px
+        border-radius: 0
+        font-size: 15px
+        line-height: 15px
+        outline: 0
+        outline: none
+        margin-left: 5px
+        border-bottom: 2px solid $border_color_mid
+        +transition(.35s ease all)
+        &:focus
+          +transition(.35s ease all)
+          border: none
+          border-bottom: 2px solid $action_color
+    .custom-button
+      i
+        +clickable
+        +transition(.35s ease all)
+        &:hover
+          color: $action_color
+          +transition(.35s ease all)
 
   .assets-wrap-container
     padding: 30px
