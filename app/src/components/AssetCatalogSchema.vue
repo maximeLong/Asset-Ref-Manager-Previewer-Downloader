@@ -5,12 +5,14 @@
   <div class="assets-options">
 
     <!-- multi select -->
-    <div class="multiselect" :class="{ active : multiSelectModeIsOn }">
-      <i class="material-icons" @click="toggleMultiSelectMode">{{multiSelectIcon}}</i>
-      <transition-group name="faderight">
-        <div key="a" v-if="multiSelectModeIsOn" @click="handleMultiSelectClick" class="action-button">Handle {{multiSelectedAssets.length}} Assets</div>
-        <div key="c" v-if="multiSelectModeIsOn" @click="toggleMultiSelectMode" class="cancel-button">cancel</div>
-      </transition-group>
+    <div class="multiselect" :class="{ active : multiSelectModeIsOn }" v-if="multiSelectEnabled">
+      <div class="title">Scene tools:</div>
+      <i class="material-icons" @click="toggleMultiSelectMode">{{multiSelectData.icon}}</i>
+      <transition name="faderight">
+        <div v-if="multiSelectModeIsOn" @click="handleMultiSelectClick" class="action-button">{{multiSelectData.text}} ({{multiSelectedAssets.length}})</div>
+      </transition><transition name="faderight">
+        <div v-if="multiSelectModeIsOn" @click="toggleMultiSelectMode" class="cancel-button">cancel</div>
+      </transition>
     </div>
 
     <!-- search TODO: goes here -->
@@ -36,7 +38,7 @@
     <!-- list proper -->
     <div class="asset" v-for="asset in schemaAssets"
       @click="handleAssetClick(asset)"
-      :class="{ active : multiSelectedAssets.includes(asset.Id) }">
+      :class="{ active : multiSelectedAssets.includes(asset) }">
         <div class="asset-image-container">
           <div class="asset-image" :style="{ 'background-image': 'url(' + asset.thumb + ')' }"></div>
         </div>
@@ -52,34 +54,34 @@
 import DotLoader from 'vue-spinner/src/DotLoader.vue'
 
 export default {
-  name: 'assetCatalog',
+  name: 'assetCatalogSchema',
   components: {
     DotLoader
   },
   props: {
     schemaAssets: Array,
     assetIsUploading: Boolean,
-    multiSelectIcon: String,
-    multiSelectClick: Function,
+    multiSelectEnabled: Boolean,
+    multiSelectData: Object, //includes icon, text, click()
     normalClick: Function
   },
   data: function() {
     return {
       multiSelectModeIsOn: false,
-      multiSelectedAssets: []
+      multiSelectedAssets: [],
+      random: Math.random()
     }
   },
 
   computed: {},
-
   methods: {
 
     handleAssetClick: function(asset) {
-      if (this.multiSelectMode) { //handle multiSelected mode
-        if (this.multiSelectedAssets.includes(asset.Id)) {
-          this.multiSelectedAssets.splice(this.multiSelectedAssets.indexOf(asset.Id), 1)
+      if (this.multiSelectModeIsOn) { //handle multiSelected mode
+        if (this.multiSelectedAssets.includes(asset)) {
+          this.multiSelectedAssets.splice(this.multiSelectedAssets.indexOf(asset), 1)
         } else {
-          this.multiSelectedAssets.push(asset.Id)
+          this.multiSelectedAssets.push(asset)
         }
       }
       else { //handle normal mode
@@ -88,7 +90,7 @@ export default {
     },
 
     handleMultiSelectClick: function() {
-      this.multiSelectClick(this.multiSelectedAssets)
+      this.multiSelectData.click(this.multiSelectedAssets)
     },
 
     toggleMultiSelectMode: function() {
@@ -117,29 +119,39 @@ export default {
     width: 100%
     padding: 0 30px
     border-bottom: 1px solid $border_color_light
+    +systemType(small)
     +flexbox
     +align-items(center)
     +flex-direction(row)
 
     .multiselect
-      +systemType(small)
       margin-right: 20px
-      +clickable
+      padding-right: 12px
+      border-right: 2px solid $border_color_light
+
       +flexbox
       +align-items(center)
-      +transition(.35s ease all)
-      &:hover
-        color: $action_color
+      +flex-direction(row)
+      +align-items(center)
+      .title
+        margin-right: 8px
+      i
+        +clickable
         +transition(.35s ease all)
+        &:hover
+          color: $action_color
+          +transition(.35s ease all)
       &.active
-        color: $action_color
-        +transition(.35s ease all)
+        i
+          color: $action_color
       .action-button
+        +clickable
         background-color: $action_color
         color: white
         margin-left: 10px
         padding: 7px 15px
       .cancel-button
+        +clickable
         padding: 5px 15px
         border: 2px solid $action_color
         color: $action_color

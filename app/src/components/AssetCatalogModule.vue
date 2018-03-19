@@ -14,78 +14,33 @@
     </div>
   </div>
 
-  <!-- catalog views -->
-  <asset-catalog-schema v-if="assetList == 'scene'"
-    :schemaAssets="sceneAssets"
-    :assetIsUploading="assetStandin"
-    :multiSelectIcon="'delete'"
-    :multiSelectClick="removeAssetsFromScene"
-    :normalClick="openSceneAsset"
-  ></asset-catalog-schema>
+  <!-- catalog views, provide key to force component to non-reuse -->
+  <transition name="fade" mode="out-in">
+    <asset-catalog-schema v-if="assetList == 'scene'" key="scene"
+      :schemaAssets="sceneAssets"
+      :assetIsUploading="assetStandin"
+      :multiSelectEnabled="isSceneAdmin"
+      :multiSelectData="{
+        icon: 'delete',
+        text: 'Remove Assets from Scene',
+        click: removeAssetsFromScene
+      }"
+      :normalClick="openDepthcastAsset"
+    ></asset-catalog-schema>
 
-  <asset-catalog-schema v-if="assetList == 'user'"
-    :schemaAssets="userAssets"
-    :assetIsUploading="assetStandin"
-    :multiSelectIcon="'add_box'"
-    :multiSelectClick="addAssetsToScene"
-    :normalClick="openUserAsset"
-  ></asset-catalog-schema>
+    <asset-catalog-schema v-if="assetList == 'user'" key="user"
+      :schemaAssets="userAssets"
+      :assetIsUploading="assetStandin"
+      :multiSelectEnabled="isSceneAdmin"
+      :multiSelectData="{
+        icon: 'add_box',
+        text: 'Add Your Assets to Scene',
+        click: addAssetsToScene
+      }"
+      :normalClick="openDepthcastAsset"
+    ></asset-catalog-schema>
+  </transition>
 
-
-    <!-- <div class="assets-options" v-if="assetList == 'scene'">
-      <div class="option" :class="{ active : removing }">
-        <i class="material-icons" @click="handleRemovalToggle">delete</i>
-        <transition name="faderight">
-          <div v-if="removing" @click="removeAssets" class="action-button">Remove {{removalCollection.length}} selected Assets</div>
-        </transition>
-        <transition name="faderight">
-          <div v-if="removing" @click="handleRemovalToggle" class="cancel-button">cancel</div>
-        </transition>
-      </div>
-    </div>
-    <div class="assets-options" v-if="assetList == 'user'">
-      <div class="option" :class="{ active : adding }">
-        <i class="material-icons" @click="handleAddingToggle">add_box</i>
-        <transition name="faderight">
-          <div v-if="adding" @click="addAssets" class="action-button">Add {{addingCollection.length}} Assets to scene</div>
-        </transition>
-        <transition name="faderight">
-          <div v-if="adding" @click="handleAddingToggle" class="cancel-button">cancel</div>
-        </transition>
-      </div>
-    </div>
-
-
-    <div class="assets-wrap-container">
-      <transition name="fade">
-        <div class="asset asset-standin" v-if="assetStandin">
-          <div class="asset-image-container">
-            <dot-loader :color="'#4e4e4e'" :size="'30px'"></dot-loader>
-          </div>
-        </div>
-      </transition>
-
-      <div class="asset" v-for="asset in sceneAssets"
-        v-if="assetList == 'scene'"
-        @click="handleAssetClick(asset, asset.assetId)"
-        :class="{ active : removalCollection.includes(asset._id) }">
-          <div class="asset-image-container">
-            <div class="asset-image" :style="{ 'background-image': 'url(' + asset.assetThumbnailImage + ')' }"></div>
-          </div>
-        <div class="asset-title">{{asset.assetName}}</div>
-      </div>
-
-      <div class="asset" v-for="asset in userAssets"
-        v-if="assetList == 'user'"
-        @click="handleAssetClick(asset, asset._id)"
-        :class="{ active : addingCollection.includes(asset._id) }">
-          <div class="asset-image-container">
-            <div class="asset-image" :style="{ 'background-image': 'url(' + asset.thumbnailImage + ')' }"></div>
-          </div>
-        <div class="asset-title">{{asset.name}}</div>
-      </div>
-    </div>
-  </div>  -->
 
 </div>
 </template>
@@ -106,18 +61,41 @@ export default {
 
   //get sceneAssets on module mount, and on scene change (since module will stay active)
   mounted: function() {this.getSceneAssets()},
-  watch: { currentScene: function() {this.getSceneAssets()} },
+  watch: {
+    currentScene: function() {
+      this.assetList = 'scene'
+      this.getSceneAssets()
+    }
+  },
 
   computed: {
     user: function()           { return this.$store.state.firebaseStore.user },
     currentScene: function()   { return this.$store.getters['firebaseStore/currentScene'] },
     assetStandin: function()   { return this.$store.state.assetStandin },
 
+    isSceneAdmin: function() { return this.currentScene.admin ? true : false },
+
     sceneAssets: function() {
-      return this.$store.state.firebaseStore.assetsInCurrentScene
+      return this.$store.state.firebaseStore.assetsInCurrentScene.map((link)=> {
+        return {
+          name: link.assetName,
+          thumb: link.assetThumbnailImage,
+          assetId: link.assetId,
+          uid: link._id, //uid is link id
+          original: link
+        }
+      })
     },
     userAssets: function() {
-      return this.$store.state.firebaseStore.assetsByCurrentUser
+      return this.$store.state.firebaseStore.assetsByCurrentUser.map((asset)=> {
+        return {
+          name: asset.name,
+          thumb: asset.thumbnailImage,
+          assetId: asset._id,
+          uid: asset._id, //uid is asset id
+          original: asset
+        }
+      })
     },
   },
 
@@ -136,14 +114,8 @@ export default {
     },
 
     //handle asset open actions
-    openSceneAsset: function(asset) {
-      this.$store.dispatch('firebaseStore/getAsset', asset.Id)
-      .then( response => {
-        this.$store.commit('SET_ASSET_INFO_MODAL_IS_OPEN', true);
-      });
-    },
-    openUserAsset: function(asset) {
-      this.$store.dispatch('firebaseStore/getAsset', asset.Id)
+    openDepthcastAsset: function(asset) {
+      this.$store.dispatch('firebaseStore/getAsset', asset.assetId)
       .then( response => {
         this.$store.commit('SET_ASSET_INFO_MODAL_IS_OPEN', true);
       });
@@ -151,11 +123,15 @@ export default {
 
     //handle the multiselect actions
     removeAssetsFromScene: function(multiSelectedAssets) {
-      this.$store.dispatch('firebaseStore/removeAssetsByScene', this.multiSelectedAssets)
+      this.$store.dispatch('firebaseStore/removeAssetsByScene', multiSelectedAssets)
       .then( response => { console.log('successfully removed') });
     },
     addAssetsToScene: function(multiSelectedAssets) {
-      return
+      this.$store.dispatch('firebaseStore/addAssetsToScene', multiSelectedAssets)
+      .then( response => {
+        this.assetList = 'scene'
+        console.log('successfully added')
+      });
     }
 
   }

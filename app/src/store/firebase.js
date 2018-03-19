@@ -298,12 +298,29 @@ export const firebaseStore = {
       });
     },
 
-    removeAssetsByScene: function(store, assetList) {
+    removeAssetsByScene: function(store, multiSelectList) {
       return new Promise((resolve, reject) => {
         var batch = firestore.batch()
 
-        assetList.forEach((asset)=> {
-          batch.delete(scenesLinkAssetsCollection.doc(asset))
+        multiSelectList.forEach((link)=> {
+          batch.delete(scenesLinkAssetsCollection.doc(link.original._id))
+        })
+        batch.commit()
+          .then((success)=> resolve() )
+          .catch((error)=> reject(error) )
+      })
+    },
+    addAssetsToScene: function(store, multiSelectList) {
+      return new Promise((resolve, reject) => {
+        var batch = firestore.batch()
+
+        multiSelectList.forEach((asset)=> {
+          batch.set(scenesLinkAssetsCollection.doc(store.getters['currentScene']._id + '_' + asset.original._id), {
+            sceneId: store.getters['currentScene']._id,
+            assetId: asset.original._id,
+            assetThumbnailImage: asset.original.thumbnailImage, //NOTE: duplicate in data model
+            assetName: asset.original.name //NOTE: duplicate in data model
+          })
         })
         batch.commit()
           .then((success)=> resolve() )
