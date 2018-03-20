@@ -7,7 +7,6 @@
       <div class="option" @click="assetList = 'scene'" :class="{active : assetList == 'scene'}">Scene Assets</div>
       <div class="option" @click="getUserAssets" :class="{active : assetList == 'user'}">My Assets</div>
       <div class="option" @click="getSketchfabAssets" :class="{active : assetList == 'sketchfab'}">Sketchfab</div>
-      <div class="option">Depthcast Curated</div>
     </div>
     <div class="group">
       <div class="option import" @click="openAssetImportModal">Import from file</div>
@@ -60,6 +59,7 @@
 
 <script>
 import AssetCatalogSchema from './AssetCatalogSchema'
+import _ from 'lodash'
 
 export default {
   name: 'assetCatalogModule',
@@ -113,7 +113,7 @@ export default {
       return this.$store.state.firebaseStore.sketchfabAssets.map((asset)=> {
         return {
           name: asset.name,
-          thumb: asset.thumbnails.images[2].url,
+          thumb: this.parseSketchfabThumb(asset), //avoids undefined error
           assetId: undefined,
           uid: asset.uid, //uid is sketchfab uid
           original: asset
@@ -124,7 +124,9 @@ export default {
   },
 
   methods: {
-    openAssetImportModal: function() { this.$store.commit('SET_ASSET_IMPORT_MODAL_IS_OPEN', true) },
+    openAssetImportModal: function() {
+      this.$store.commit('SET_ASSET_IMPORT_MODAL', {isOpen: true, panelType: 'file'})
+    },
 
     //get asset collections
     getSceneAssets: function() {
@@ -170,8 +172,12 @@ export default {
       .then( (success)=> { console.log('search success') })
     },
     openSketchfabAsset: function(asset) {
-      console.log(asset)
+      this.$store.commit('SET_ASSET_IMPORT_MODAL', {isOpen: true, panelType: 'sketchfab', relatedAsset: asset})
     },
+    parseSketchfabThumb: function(asset) {
+      try { return asset.thumbnails.images[2].url }
+      catch(e) { return asset.thumbnails.images[0].url }
+    }
 
   }
 

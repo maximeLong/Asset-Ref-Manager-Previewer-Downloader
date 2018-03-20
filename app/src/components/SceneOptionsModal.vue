@@ -173,7 +173,7 @@ export default {
       padding-left: 10px
 
     .delete
-      +button(false, false, #f76363, inherit)
+      +button(false, false, $danger_color, inherit)
       padding: 13px 30px
 
     //invite members

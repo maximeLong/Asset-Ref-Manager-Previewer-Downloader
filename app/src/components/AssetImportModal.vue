@@ -1,7 +1,7 @@
 <template>
 <div id="asset-import-modal">
 
-  <modal :title="'Create Asset'" :onClickaway="handleClickaway">
+  <modal :title="'Import Asset'" :onClickaway="handleClickaway">
 
     <!-- import file -->
     <asset-loader-gltf v-on:loaded="receiveLoaded" v-on:snapTaken="snapTaken = true"></asset-loader-gltf>
@@ -112,7 +112,7 @@ export default {
   methods: {
     //-- button methods
     handleClickaway: function() {
-      this.$store.commit('SET_ASSET_IMPORT_MODAL_IS_OPEN', false);
+      this.$store.commit('SET_ASSET_IMPORT_MODAL', {isOpen: false});
     },
     updateFormAssetName: function(e) { this.$store.commit('SET_FORM_ASSETNAME', e.target.value); },
     receiveLoaded: function() {
@@ -140,12 +140,6 @@ export default {
           vertices:   this.modelGeometryInfo.render.vertices
         }
       }
-
-      // Instantiate a FormData() object + add information to it
-      // const formData = new FormData();
-      // formData.append('file', this.modelFile, this.formAssetName + '.glb');
-      // formData.append('modelInfo', JSON.stringify(modelInfo));
-      //formData.append('currentScene', this.currentScene._id)
 
       //do a RESTful thing here so that files can be handled
       this.$store.dispatch('firebaseStore/createAsset', {assetData: modelInfo, assetFile: this.modelFile});

@@ -21,6 +21,7 @@
       </transition>
     </div>
 
+    <!-- asset info -->
     <div class="asset-information">
       <div class="related-information">
         <div class="title">Model Information</div>
@@ -32,8 +33,11 @@
             <div class="key" v-for="(value, key) in relatedInfo">{{value}}</div>
           </div>
         </div>
-      </div>
 
+        <!-- owner info -->
+        <div class="remove-btn" v-if="userIsCreator" @click="deleteAsset">Delete Asset Completely</div>
+
+      </div>
       <div class="performance-information">
         <div class="performance-chart"></div>
         <div class="performance-number">
@@ -82,9 +86,11 @@ export default {
     bar.animate(this.performanceBar);
   },
   computed: {
-    activeAsset: function() { return this.$store.state.firebaseStore.currentAsset },
-    performance: function() { return this.$store.state.firebaseStore.currentAsset.performanceInfo },
-    fileURL: function()     { return this.activeAsset.assetUrl },
+    user: function()          { return this.$store.state.firebaseStore.user },
+    userIsCreator: function() { return this.user.uid == this.activeAsset.creator ? true : false },
+    activeAsset: function()   { return this.$store.state.firebaseStore.currentAsset },
+    performance: function()   { return this.$store.state.firebaseStore.currentAsset.performanceInfo },
+    fileURL: function()       { return this.activeAsset.assetUrl },
     modelSizeFormatted: function() {
       const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
       let l = 0, n = parseInt(this.activeAsset.modelSize, 10) || 0;
@@ -107,8 +113,7 @@ export default {
     relatedInfo: function() {
       return {
         "file size":  this.modelSizeFormatted,
-        "materials": this.performance.drawCalls,
-        "created at": moment(this.activeAsset.createdAt).fromNow()
+        "materials": this.performance.drawCalls
       }
     },
   },
@@ -117,6 +122,14 @@ export default {
     handleClickaway: function() {
       this.$store.commit('SET_ASSET_INFO_MODAL_IS_OPEN', false);
     },
+    deleteAsset: function() {
+      this.$store.dispatch('firebaseStore/deleteAsset', this.activeAsset._id)
+        .then((success)=> {
+          this.$store.commit('SET_ASSET_INFO_MODAL_IS_OPEN', false);
+          console.log('successfully deleted')
+        })
+    },
+
     // -- use these if you need them
     emitSuccess: function()   { console.log('success loading model') },
     handleFailure: function() { console.log('failure loaded' )}
@@ -171,6 +184,10 @@ export default {
           margin-right: 30px
         .key,.value
           padding-bottom: 7px
+
+      .remove-btn
+        margin-top: 20px
+        +button(false, false, $danger_color, 250px)
 
 
     .performance-information

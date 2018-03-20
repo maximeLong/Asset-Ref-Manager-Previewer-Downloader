@@ -19,7 +19,7 @@
 
         <!-- full screen modals -->
         <scene-options-modal v-if="sceneOptionsModalIsOpen"></scene-options-modal>
-        <asset-import-modal v-if="assetImportModalIsOpen"></asset-import-modal>
+        <asset-import-modal v-if="assetImportModal.isOpen"></asset-import-modal>
         <asset-info-modal v-if="assetInfoModalIsOpen"></asset-info-modal>
 
       </div>
@@ -61,7 +61,7 @@ export default {
       'userPanel',
       'route',
       'sceneOptionsModalIsOpen',
-      'assetImportModalIsOpen',
+      'assetImportModal',
       'assetInfoModalIsOpen'
     ])
   }

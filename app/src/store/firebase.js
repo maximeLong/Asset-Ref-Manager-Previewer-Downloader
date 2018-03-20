@@ -265,7 +265,7 @@ export const firebaseStore = {
       });
 
       //close the modal before response is done
-      store.commit('SET_ASSET_IMPORT_MODAL_IS_OPEN', false, {root: true});
+      store.commit('SET_ASSET_IMPORT_MODAL', {isOpen: false}, {root: true});
       store.commit('SET_ASSET_STANDIN', true, {root: true});
     },
 
@@ -333,7 +333,7 @@ export const firebaseStore = {
         assetsCollection.doc(assetId).get()
           .then((doc)=> {
             if (doc.exists) {
-              store.commit('SET_CURRENT_ASSET', doc.data());
+              store.commit('SET_CURRENT_ASSET', _.merge({_id: doc.id}, doc.data()) );
               resolve()
             } else {
               console.log({message: 'no asset info -- this is bad'})
@@ -343,18 +343,17 @@ export const firebaseStore = {
       })
     },
 
-    deleteAsset: function(store, {sceneId, assetId}) {
+    deleteAsset: function(store, assetId) {
       return new Promise((resolve, reject) => {
         var batch = firestore.batch()
 
-        scenesLinkAssetsCollection.where('sceneId', '==', sceneId).get()
+        scenesLinkAssetsCollection.where('assetId', '==', assetId).get()
           .then((querySnapshot)=> {
             //delete all scenes_link_assets docs with sceneId
             //NOTE: permissions need to thought out
             querySnapshot.forEach((doc)=> { batch.delete(doc.ref) })
             //delete current assets
             batch.delete(assetsCollection.doc(assetId))
-
             batch.commit()
               .then((success)=> resolve() )
               .catch((error)=> reject(error) )
@@ -367,7 +366,6 @@ export const firebaseStore = {
         var defaultUrl = 'https://api.sketchfab.com/v3/search?type=models&downloadable=true&staffpicked=true&sort_by=-publishedAt';
         var searchUrl = 'https://api.sketchfab.com/v3/search?type=models&downloadable=true&q=' + search;
         var fetchUrl = search ? searchUrl : defaultUrl;
-
         fetch(fetchUrl)
           .then(function(response) {
             return response.json();

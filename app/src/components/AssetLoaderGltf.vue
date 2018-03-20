@@ -1,8 +1,26 @@
 <template>
 <div id="asset-loader-gltf">
 
-  <!-- assetLoader should just emit the model url from a component-->
-  <div id="asset-loader" v-show="!loaded">
+  <!-- sketchfab drop and directions -->
+  <div id="sketchfab-container" v-if="panelType == 'sketchfab' && !loaded">
+    <div id="directions">
+      <div class="subtitle">1. Go to Sketchfab.com</div>
+      <div class="button" @click="goToModel">Link to Sketchfab Model</div>
+      <div class="subtitle">2. Download gLTF Model</div>
+      <div class="text">Click the <i class="material-icons">file_download</i> icon below the model,
+      and select the Autoconverted format (gLTF)</div>
+      <div class="subtitle">3. unzip and drop contents</div>
+      <div class="text">Unzip the package and drop the contents on this window to the right</div>
+    </div>
+    <div id="asset-loader">
+      <div class="placeholder">
+        <p>Drop un-zipped model contents</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- normal file drop -->
+  <div id="asset-loader" v-show="panelType == 'file' && !loaded">
     <div class="placeholder">
       <p>Drag glTF 2.0 file or folder here</p>
     </div>
@@ -53,6 +71,9 @@ export default {
   computed: {
     user: function()           { return this.$store.state.auth.user },
     currentScene: function()   { return this.$store.getters['scenes/current'] },
+    panelType: function()      { return this.$store.state.assetImportModal.panelType },
+    relatedAsset: function()   { return this.$store.state.assetImportModal.relatedAsset }
+
   },
   methods: {
 
@@ -61,6 +82,10 @@ export default {
       this.loaded = true;
       this.$store.commit('SET_MODEL_FILE_SIZE', file.size);
       this.$store.commit('SET_MODEL_FILE', file);
+    },
+
+    goToModel: function() {
+      window.open(this.relatedAsset.original.viewerUrl, '_blank')
     },
 
     // -- emit events up to whatever component is using the loader
@@ -79,6 +104,29 @@ export default {
 @import src/styles/main
 
 #asset-loader-gltf
+
+  #sketchfab-container
+    +flexbox
+    +flex-direction(row)
+    #asset-loader
+      +flex(1)
+
+    #directions
+      +flex(1)
+      padding-right: 15px
+      .subtitle
+        +systemType(small)
+        color: $active_color
+        margin-bottom: 5px
+      .button
+        +button(false, false)
+        padding: 10px 0
+        margin-bottom: 20px
+      .text
+        +userType(small)
+        margin-bottom: 20px
+      i
+        font-size: 18px
 
   #asset-loader
     +flexbox

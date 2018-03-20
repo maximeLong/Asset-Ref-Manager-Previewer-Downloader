@@ -84,9 +84,9 @@ export const store = new Vuex.Store({
   },
 
   state: {
-    userPanel: { open: false, panelType: 'userInfo' }, //panelType can be : 'signIn', 'createAccount', 'userInfo', 'team'
+    userPanel: { open: false, panelType: 'userInfo' }, //panelType can be: 'signIn', 'createAccount', 'userInfo', 'team'
+    assetImportModal: { isOpen: false, panelType: 'file', relatedAsset: undefined }, //panelType can be: 'file', 'sketchfab'
     sceneOptionsModalIsOpen: false, //scene options panel
-    assetImportModalIsOpen: false,    //import asset panel
     assetInfoModalIsOpen: false,      //asset info panel
 
     //various form info holders
@@ -110,13 +110,14 @@ export const store = new Vuex.Store({
   mutations: {
     SET_USER_PANEL: function(state, {open, panelType}) {
       state.userPanel.open = open;
-      if (panelType != undefined) {
-        state.userPanel.panelType = panelType;
-      }
+      if (panelType != undefined) { state.userPanel.panelType = panelType; }
     },
-
+    SET_ASSET_IMPORT_MODAL: function(state, {isOpen, panelType, relatedAsset}) {
+      state.assetImportModal.isOpen = isOpen;
+      if (panelType != undefined) { state.assetImportModal.panelType = panelType; }
+      if (relatedAsset != undefined) { state.assetImportModal.relatedAsset = relatedAsset }
+    },
     SET_ASSET_INFO_MODAL_IS_OPEN: function(state, val)        { state.assetInfoModalIsOpen = val; },
-    SET_ASSET_IMPORT_MODAL_IS_OPEN: function(state, val)      { state.assetImportModalIsOpen = val; },
     SET_SCENE_OPTIONS_MODAL_IS_OPEN: function(state, val)     { state.sceneOptionsModalIsOpen = val; },
 
     SET_FORM_ASSETNAME: function(state, val)    { state.formAssetName = val },
