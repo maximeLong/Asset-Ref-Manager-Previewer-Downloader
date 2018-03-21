@@ -1,5 +1,6 @@
 //firebase hooks
-import { firebase, storage, assetsCollection, scenesLinkAssetsCollection } from '../plugins/initApp'
+import firebase from '@firebase/app';
+import { firestore, storage, assetsCollection, scenesLinkAssetsCollection } from '../plugins/initApp'
 
 
 export const assets = {
@@ -12,6 +13,8 @@ export const assets = {
       //send file to cloud storage
       var storageRef = storage.ref();
       var uploadTask = storageRef.child('gltf/' + assetData.name + '.glb').put(assetFile);
+
+      console.log(store)
 
       uploadTask.on('state_changed', function(snapshot){
         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -36,8 +39,8 @@ export const assets = {
         var assetRef = assetsCollection.doc();
         var batch = firestore.batch();
         batch.set(assetRef, assetData);
-        batch.set(scenesLinkAssetsCollection.doc(store.getters['currentScene']._id + '_' + assetRef.id), {
-          sceneId: store.getters['currentScene']._id,
+        batch.set(scenesLinkAssetsCollection.doc(store.rootGetters['scenes/currentScene']._id + '_' + assetRef.id), {
+          sceneId: store.rootGetters['scenes/currentScene']._id,
           assetId: assetRef.id,
           assetThumbnailImage: assetData.thumbnailImage, //NOTE: duplicate in data model
           assetName: assetData.name //NOTE: duplicate in data model
@@ -98,8 +101,8 @@ export const assets = {
         var batch = firestore.batch()
 
         multiSelectList.forEach((asset)=> {
-          batch.set(scenesLinkAssetsCollection.doc(store.getters['currentScene']._id + '_' + asset.original._id), {
-            sceneId: store.getters['currentScene']._id,
+          batch.set(scenesLinkAssetsCollection.doc(store.rootGetters['scenes/currentScene']._id + '_' + asset.original._id), {
+            sceneId: store.rootGetters['scenes/currentScene']._id,
             assetId: asset.original._id,
             assetThumbnailImage: asset.original.thumbnailImage, //NOTE: duplicate in data model
             assetName: asset.original.name //NOTE: duplicate in data model

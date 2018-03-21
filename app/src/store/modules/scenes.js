@@ -95,10 +95,10 @@ export const scenes = {
         var batch = firestore.batch()
 
         batch.set(sceneRef, sceneData);
-        batch.set(scenesLinkUsersCollection.doc(sceneRef.id + '_' + store.state.user.uid), {
+        batch.set(scenesLinkUsersCollection.doc(sceneRef.id + '_' + store.rootState.users.user.uid), {
           sceneId: sceneRef.id,
-          userId: store.state.user.uid,
-          userEmail: store.state.user.email, //NOTE: duplicate in data model
+          userId: store.rootState.users.user.uid,
+          userEmail: store.rootState.users.user.email, //NOTE: duplicate in data model
           admin: true
         })
         batch.commit().then((success)=> { resolve() })
