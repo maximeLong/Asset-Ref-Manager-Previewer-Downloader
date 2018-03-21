@@ -14,17 +14,10 @@
 export default {
   name: 'noScene',
   data: function(){
-    return {
-
-    }
+    return {}
   },
-  computed: {
-    user: function()            { return this.$store.state.auth.user },
-    userIsLoggedIn: function()  { return this.user ? true : false },
-  },
-  methods: {
-
-  }
+  computed: {},
+  methods: {}
 
 }
 </script>

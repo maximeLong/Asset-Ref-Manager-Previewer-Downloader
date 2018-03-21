@@ -71,8 +71,8 @@ export default {
   computed: {
     user: function()           { return this.$store.state.auth.user },
     currentScene: function()   { return this.$store.getters['scenes/current'] },
-    panelType: function()      { return this.$store.state.assetImportModal.panelType },
-    relatedAsset: function()   { return this.$store.state.assetImportModal.relatedAsset }
+    panelType: function()      { return this.$store.state.ux.assetImportModal.panelType },
+    relatedAsset: function()   { return this.$store.state.ux.assetImportModal.relatedAsset }
 
   },
   methods: {
@@ -80,8 +80,8 @@ export default {
     handleDropConversion: function(file) {
       this.glbUrl = URL.createObjectURL(file);
       this.loaded = true;
-      this.$store.commit('SET_MODEL_FILE_SIZE', file.size);
-      this.$store.commit('SET_MODEL_FILE', file);
+      this.$store.commit('ux/SET_MODEL_FILE_SIZE', file.size);
+      this.$store.commit('ux/SET_MODEL_FILE', file);
     },
 
     goToModel: function() {

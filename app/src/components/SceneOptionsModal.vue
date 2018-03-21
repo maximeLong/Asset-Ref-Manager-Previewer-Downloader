@@ -59,22 +59,22 @@ export default {
     }
   },
   mounted: function() {
-    this.$store.commit('SET_FORM_SCENENAME', this.currentScene.name)
+    this.$store.commit('ux/SET_FORM_SCENENAME', this.currentScene.name)
   },
   destroyed: function() {
-    this.$store.commit('SET_FORM_SCENENAME', '')
+    this.$store.commit('ux/SET_FORM_SCENENAME', '')
   },
 
   computed: {
-    user: function()          { return this.$store.state.firebaseStore.user },
-    currentScene: function()  { return this.$store.getters['firebaseStore/currentScene'] },
-    scenes: function()        { return this.$store.state.firebaseStore.populatedScenes },
+    user: function()          { return this.$store.state.users.user },
+    currentScene: function()  { return this.$store.getters['scenes/currentScene'] },
+    scenes: function()        { return this.$store.state.scenes.populatedScenes },
     formHasChanged: function()  {
       if (this.formSceneName !== this.currentScene.name || this.localInvites.length) {
         return true
       } else { return false }
     },
-    ...mapState([
+    ...mapState('ux',[
       'formSceneName',
       'formInviteEmail'
     ])
@@ -82,11 +82,11 @@ export default {
   methods: {
     //-- button methods
     handleClickaway: function() {
-      this.$store.commit('SET_SCENE_OPTIONS_MODAL_IS_OPEN', false);
+      this.$store.commit('ux/SET_SCENE_OPTIONS_MODAL_IS_OPEN', false);
     },
     editTitle: function() {
       this.changeNameFormIsOpen = true;
-      this.$store.commit('SET_FORM_SCENENAME', this.currentScene.name);
+      this.$store.commit('ux/SET_FORM_SCENENAME', this.currentScene.name);
     },
     saveChanges: function() {
       if (this.formHasChanged) {
@@ -96,11 +96,11 @@ export default {
 
     //-- update form info
     //
-    updateFormSceneName: function(e) { this.$store.commit('SET_FORM_SCENENAME', e.target.value) },
-    updateFormInviteEmail: function(e) { this.$store.commit('SET_FORM_INVITEEMAIL', e.target.value) },
+    updateFormSceneName: function(e) { this.$store.commit('ux/SET_FORM_SCENENAME', e.target.value) },
+    updateFormInviteEmail: function(e) { this.$store.commit('ux/SET_FORM_INVITEEMAIL', e.target.value) },
     addToInvites: function(){
       this.localInvites.push(this.formInviteEmail)
-      this.$store.commit('SET_FORM_INVITEEMAIL', '')
+      this.$store.commit('ux/SET_FORM_INVITEEMAIL', '')
     },
     removeInvite: function(inviteIndex){
       this.localInvites.splice(inviteIndex, 1)
@@ -113,7 +113,7 @@ export default {
         name: this.formSceneName,
         invites: mergedInvites
       }
-      this.$store.dispatch('firebaseStore/patchSceneInfo', {sceneId: this.currentScene._id, patchedData: patchedData})
+      this.$store.dispatch('scenes/patchSceneInfo', {sceneId: this.currentScene._id, patchedData: patchedData})
         .then(response => {
           this.handleClickaway()
         })
@@ -121,7 +121,7 @@ export default {
     },
 
     tryDeleteScene: function() {
-      this.$store.dispatch('firebaseStore/deleteScene', this.currentScene._id)
+      this.$store.dispatch('scenes/deleteScene', this.currentScene._id)
         .then(response => {
 
           //BUG: this throws errors because modal is listening to deleted info

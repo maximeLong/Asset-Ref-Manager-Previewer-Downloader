@@ -56,10 +56,9 @@ export default {
   },
   methods: {},
   computed: {
-    ...mapState([
+    ...mapState('ux', [
       'activePanel',
       'userPanel',
-      'route',
       'sceneOptionsModalIsOpen',
       'assetImportModal',
       'assetInfoModalIsOpen'

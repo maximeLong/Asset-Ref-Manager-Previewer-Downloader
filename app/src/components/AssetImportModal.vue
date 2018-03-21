@@ -65,16 +65,16 @@ export default {
   },
   destroyed: function() {
     //release model information from store
-    this.$store.commit('SET_FORM_ASSETNAME', '')
-    this.$store.commit('SET_MODEL_GEOMETRY_INFO', {})
-    this.$store.commit('SET_MODEL_FILE_SIZE', '')
-    this.$store.commit('SET_MODEL_SNAPSHOT', undefined)
-    this.$store.commit('SET_MODEL_FILE', undefined)
+    this.$store.commit('ux/SET_FORM_ASSETNAME', '')
+    this.$store.commit('ux/SET_MODEL_GEOMETRY_INFO', {})
+    this.$store.commit('ux/SET_MODEL_FILE_SIZE', '')
+    this.$store.commit('ux/SET_MODEL_SNAPSHOT', undefined)
+    this.$store.commit('ux/SET_MODEL_FILE', undefined)
   },
 
   computed: {
-    user: function()            { return this.$store.state.firebaseStore.user },
-    currentScene: function()    { return this.$store.getters['firebaseStore/currentScene'] },
+    user: function()            { return this.$store.state.users.user },
+    currentScene: function()    { return this.$store.getters['scenes/currentScene'] },
     assetIsOk: function()  {
       if (this.loaded && this.formAssetName.length && this.snapTaken) { return true } else { return false }
     },
@@ -100,7 +100,7 @@ export default {
       }
       return(n.toFixed(n >= 10 || l < 1 ? 0 : 1) + ' ' + units[l]);
     },
-    ...mapState([
+    ...mapState('ux', [
       'formAssetName',
       'modelGeometryInfo',
       'modelFileSize',
@@ -112,9 +112,9 @@ export default {
   methods: {
     //-- button methods
     handleClickaway: function() {
-      this.$store.commit('SET_ASSET_IMPORT_MODAL', {isOpen: false});
+      this.$store.commit('ux/SET_ASSET_IMPORT_MODAL', {isOpen: false});
     },
-    updateFormAssetName: function(e) { this.$store.commit('SET_FORM_ASSETNAME', e.target.value); },
+    updateFormAssetName: function(e) { this.$store.commit('ux/SET_FORM_ASSETNAME', e.target.value); },
     receiveLoaded: function() {
       this.loaded = true;
     },
@@ -142,7 +142,7 @@ export default {
       }
 
       //do a RESTful thing here so that files can be handled
-      this.$store.dispatch('firebaseStore/createAsset', {assetData: modelInfo, assetFile: this.modelFile});
+      this.$store.dispatch('assets/createAsset', {assetData: modelInfo, assetFile: this.modelFile});
 
     }
   }

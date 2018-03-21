@@ -22,9 +22,7 @@ export default {
   },
 
   computed: {
-    userIsLoggedIn: function()  { return this.user ? true : false },
-    user: function()            { return this.$store.state.auth.user },
-    ...mapState([
+    ...mapState('ux',[
       'userPanel',
       'formEmail',
       'formPassword'
@@ -32,12 +30,11 @@ export default {
   },
 
   methods: {
-    updateFormEmail: function(e)    { this.$store.commit('SET_FORM_EMAIL', e.target.value) },
-    updateFormPassword: function(e) { this.$store.commit('SET_FORM_PASSWORD', e.target.value) },
+    updateFormEmail: function(e)    { this.$store.commit('ux/SET_FORM_EMAIL', e.target.value) },
+    updateFormPassword: function(e) { this.$store.commit('ux/SET_FORM_PASSWORD', e.target.value) },
 
     tryCreateAccount: function(email, password) {
-      this.$store.dispatch('firebaseStore/createUser', {email: email, password: password})
-      //this.$store.dispatch('createUser', {email: email, password: password})
+      this.$store.dispatch('users/createUser', {email: email, password: password})
     }
   }
 

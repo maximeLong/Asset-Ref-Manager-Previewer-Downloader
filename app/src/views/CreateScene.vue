@@ -46,9 +46,9 @@ export default {
     ContentBox
   },
   computed: {
-    user: function()    { return this.$store.state.firebaseStore.user },
-    scenes: function()  { return this.$store.state.firebaseStore.populatedScenes },
-    ...mapState([
+    user: function()    { return this.$store.state.users.user },
+    scenes: function()  { return this.$store.state.scenes.populatedScenes },
+    ...mapState('ux',[
       'formSceneName',
       'formInviteEmail'
     ])
@@ -60,7 +60,7 @@ export default {
         name: this.formSceneName,
         invites: this.localInvites
       }
-      this.$store.dispatch('firebaseStore/createScene', sceneData)
+      this.$store.dispatch('scenes/createScene', sceneData)
         .then(response => {
           this.$router.push({ name: 'Scene', params: { scene_id: this.scenes[this.scenes.length-1]._id }})
         })
@@ -69,11 +69,11 @@ export default {
         })
     },
 
-    updateFormSceneName: function(e) { this.$store.commit('SET_FORM_SCENENAME', e.target.value) },
-    updateFormInviteEmail: function(e) { this.$store.commit('SET_FORM_INVITEEMAIL', e.target.value) },
+    updateFormSceneName: function(e) { this.$store.commit('ux/SET_FORM_SCENENAME', e.target.value) },
+    updateFormInviteEmail: function(e) { this.$store.commit('ux/SET_FORM_INVITEEMAIL', e.target.value) },
     addToInvites: function(){
       this.localInvites.push(this.formInviteEmail)
-      this.$store.commit('SET_FORM_INVITEEMAIL', '')
+      this.$store.commit('ux/SET_FORM_INVITEEMAIL', '')
     },
     removeInvite: function(inviteIndex){
       this.localInvites.splice(inviteIndex, 1)

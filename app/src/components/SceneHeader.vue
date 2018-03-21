@@ -41,9 +41,9 @@
 export default {
   name: 'sceneHeader',
   computed: {
-    user: function()            { return this.$store.state.firebaseStore.user },
-    currentScene: function()    { return this.$store.getters['firebaseStore/currentScene'] },
-    usersInCurrentScene: function() { return this.$store.state.firebaseStore.usersInCurrentScene },
+    user: function()            { return this.$store.state.users.user },
+    currentScene: function()    { return this.$store.getters['scenes/currentScene'] },
+    usersInCurrentScene: function() { return this.$store.state.scenes.usersInCurrentScene },
     usersMinusUser: function() {
       return this.usersInCurrentScene.filter((user)=> { return user.userId !== this.user.uid })
     },
@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     openSceneOptions: function() {
-      this.$store.commit('SET_SCENE_OPTIONS_MODAL_IS_OPEN', true)
+      this.$store.commit('ux/SET_SCENE_OPTIONS_MODAL_IS_OPEN', true)
     }
   }
 

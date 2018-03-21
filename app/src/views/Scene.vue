@@ -49,21 +49,21 @@ export default {
     this.getSceneData()
   },
   computed: {
-    user: function()              { return this.$store.state.firebaseStore.user },
-    currentSceneIndex: function() { return this.$store.state.firebaseStore.currentSceneIndex },
-    scenes: function()            { return this.$store.state.firebaseStore.populatedScenes },
-    currentScene: function()      { return this.$store.getters['firebaseStore/currentScene'] }
+    user: function()              { return this.$store.state.users.user },
+    currentSceneIndex: function() { return this.$store.state.scenes.currentSceneIndex },
+    scenes: function()            { return this.$store.state.scenes.populatedScenes },
+    currentScene: function()      { return this.$store.getters['scenes/currentScene'] }
   },
   methods: {
     getSceneData: function() {
 
       //get users in scene
-      this.$store.dispatch('firebaseStore/getUsersByScene', this.$route.params.scene_id)
+      this.$store.dispatch('scenes/getUsersByScene', this.$route.params.scene_id)
 
       //change the currentSceneIndex > updates currentScene getter
       var sceneIndex = _.findIndex(this.scenes, {_id: this.$route.params.scene_id} );
       if (sceneIndex !== -1) {
-        this.$store.commit('firebaseStore/SET_CURRENT_SCENE_INDEX', sceneIndex);
+        this.$store.commit('scenes/SET_CURRENT_SCENE_INDEX', sceneIndex);
       }
     }
   },

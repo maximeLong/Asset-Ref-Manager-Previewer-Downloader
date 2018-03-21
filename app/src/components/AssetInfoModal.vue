@@ -86,10 +86,10 @@ export default {
     bar.animate(this.performanceBar);
   },
   computed: {
-    user: function()          { return this.$store.state.firebaseStore.user },
+    user: function()          { return this.$store.state.users.user },
     userIsCreator: function() { return this.user.uid == this.activeAsset.creator ? true : false },
-    activeAsset: function()   { return this.$store.state.firebaseStore.currentAsset },
-    performance: function()   { return this.$store.state.firebaseStore.currentAsset.performanceInfo },
+    activeAsset: function()   { return this.$store.state.assets.currentAsset },
+    performance: function()   { return this.$store.state.assets.currentAsset.performanceInfo },
     fileURL: function()       { return this.activeAsset.assetUrl },
     modelSizeFormatted: function() {
       const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -120,12 +120,12 @@ export default {
   methods: {
     //-- button methods
     handleClickaway: function() {
-      this.$store.commit('SET_ASSET_INFO_MODAL_IS_OPEN', false);
+      this.$store.commit('ux/SET_ASSET_INFO_MODAL_IS_OPEN', false);
     },
     deleteAsset: function() {
-      this.$store.dispatch('firebaseStore/deleteAsset', this.activeAsset._id)
+      this.$store.dispatch('assets/deleteAsset', this.activeAsset._id)
         .then((success)=> {
-          this.$store.commit('SET_ASSET_INFO_MODAL_IS_OPEN', false);
+          this.$store.commit('ux/SET_ASSET_INFO_MODAL_IS_OPEN', false);
           console.log('successfully deleted')
         })
     },

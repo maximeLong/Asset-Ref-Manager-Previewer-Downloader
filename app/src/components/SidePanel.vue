@@ -20,16 +20,6 @@
       </div>
     </div>
 
-    <!-- team scenes bar, add team -->
-    <!-- <div class="sidebar-title">Team Scenes</div>
-    <div class="sidebar-subtitle" v-if="currentTeam">{{currentTeam.name}}</div>
-    <div class="scenes team">
-      <div class="scenes-list">
-        <div class="scene-item" v-for="team in teams">{{team.name}}</div>
-      </div>
-    </div> -->
-
-
   </div>
 </template>
 
@@ -41,11 +31,8 @@ export default {
     return {}
   },
   computed: {
-    scenes: function(){ return this.$store.state.firebaseStore.populatedScenes },
-    currentScene: function() { return this.$store.getters['firebaseStore/currentScene'] },
-
-    teams: function(){ return this.$store.getters['teams/list']},
-    currentTeam: function() { return this.$store.state.currentTeam },
+    scenes: function(){ return this.$store.state.scenes.populatedScenes },
+    currentScene: function() { return this.$store.getters['scenes/currentScene'] },
   },
   methods: {
     goToScene: function(id) {

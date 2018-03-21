@@ -29,6 +29,6 @@ export const initApp = (store)=> {
   this.scenesLinkUsersCollection = firebase.firestore().collection('scenes_link_users');
 
   //initialize auth watcher > kicks off appLoad on auth
-  store.dispatch('firebaseStore/watchAuthChange');
+  store.dispatch('users/watchAuthChange');
 
 }

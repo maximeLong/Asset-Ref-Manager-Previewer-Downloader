@@ -22,7 +22,7 @@ export default {
 
   methods: {
     tryLogOut: function() {
-      this.$store.dispatch('firebaseStore/signOut')
+      this.$store.dispatch('users/signOut')
     },
   }
 

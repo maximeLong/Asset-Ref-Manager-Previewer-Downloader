@@ -34,22 +34,22 @@ export default {
     }
   },
   computed: {
-    user: function()            { return this.$store.state.firebaseStore.user },
+    user: function()            { return this.$store.state.users.user },
     userIsLoggedIn: function()  { return this.user ? true : false },
-    userPanel: function()       { return this.$store.state.userPanel }
+    userPanel: function()       { return this.$store.state.ux.userPanel }
   },
   methods: {
     openCreatePanel: function() {
-      this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'createAccount'})
+      this.$store.commit('ux/SET_USER_PANEL', {open: true, panelType: 'createAccount'})
     },
     openTeamPanel: function() {
-      this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'team'})
+      this.$store.commit('ux/SET_USER_PANEL', {open: true, panelType: 'team'})
     },
     openUserInfoPanel: function() {
-      this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'userInfo'})
+      this.$store.commit('ux/SET_USER_PANEL', {open: true, panelType: 'userInfo'})
     },
     openSignInPanel: function() {
-      this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'signIn'})
+      this.$store.commit('ux/SET_USER_PANEL', {open: true, panelType: 'signIn'})
     }
 
   }

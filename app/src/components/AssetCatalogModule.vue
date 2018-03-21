@@ -59,7 +59,6 @@
 
 <script>
 import AssetCatalogSchema from './AssetCatalogSchema'
-import _ from 'lodash'
 
 export default {
   name: 'assetCatalogModule',
@@ -82,13 +81,13 @@ export default {
   },
 
   computed: {
-    user: function()           { return this.$store.state.firebaseStore.user },
-    currentScene: function()   { return this.$store.getters['firebaseStore/currentScene'] },
-    assetStandin: function()   { return this.$store.state.assetStandin },
+    user: function()           { return this.$store.state.users.user },
+    currentScene: function()   { return this.$store.getters['scenes/currentScene'] },
+    assetStandin: function()   { return this.$store.state.ux.assetStandin },
     isSceneAdmin: function() { return this.currentScene.admin ? true : false },
 
     sceneAssets: function() {
-      return this.$store.state.firebaseStore.assetsInCurrentScene.map((link)=> {
+      return this.$store.state.assets.assetsInCurrentScene.map((link)=> {
         return {
           name: link.assetName,
           thumb: link.assetThumbnailImage,
@@ -99,7 +98,7 @@ export default {
       })
     },
     userAssets: function() {
-      return this.$store.state.firebaseStore.assetsByCurrentUser.map((asset)=> {
+      return this.$store.state.assets.assetsByCurrentUser.map((asset)=> {
         return {
           name: asset.name,
           thumb: asset.thumbnailImage,
@@ -110,7 +109,7 @@ export default {
       })
     },
     sketchfabAssets: function() {
-      return this.$store.state.firebaseStore.sketchfabAssets.map((asset)=> {
+      return this.$store.state.apis.sketchfabAssets.map((asset)=> {
         return {
           name: asset.name,
           thumb: this.parseSketchfabThumb(asset), //avoids undefined error
@@ -125,35 +124,35 @@ export default {
 
   methods: {
     openAssetImportModal: function() {
-      this.$store.commit('SET_ASSET_IMPORT_MODAL', {isOpen: true, panelType: 'file'})
+      this.$store.commit('ux/SET_ASSET_IMPORT_MODAL', {isOpen: true, panelType: 'file'})
     },
 
     //get asset collections
     getSceneAssets: function() {
-      this.$store.dispatch('firebaseStore/getAssetsByScene', this.currentScene._id)
+      this.$store.dispatch('assets/getAssetsByScene', this.currentScene._id)
     },
     getUserAssets: function() {
       if (!this.userAssets.length) {
-        this.$store.dispatch('firebaseStore/getAssetsByUser', this.user.uid)
+        this.$store.dispatch('assets/getAssetsByUser', this.user.uid)
         .then( (success)=> { this.assetList = 'user' })
       } else { this.assetList = 'user' }
     },
 
     //handle asset open actions
     openDepthcastAsset: function(asset) {
-      this.$store.dispatch('firebaseStore/getAsset', asset.assetId)
+      this.$store.dispatch('assets/getAsset', asset.assetId)
       .then( response => {
-        this.$store.commit('SET_ASSET_INFO_MODAL_IS_OPEN', true);
+        this.$store.commit('ux/SET_ASSET_INFO_MODAL_IS_OPEN', true);
       });
     },
 
     //handle the multiselect actions
     removeAssetsFromScene: function(multiSelectedAssets) {
-      this.$store.dispatch('firebaseStore/removeAssetsByScene', multiSelectedAssets)
+      this.$store.dispatch('assets/removeAssetsByScene', multiSelectedAssets)
       .then( response => { console.log('successfully removed') });
     },
     addAssetsToScene: function(multiSelectedAssets) {
-      this.$store.dispatch('firebaseStore/addAssetsToScene', multiSelectedAssets)
+      this.$store.dispatch('assets/addAssetsToScene', multiSelectedAssets)
       .then( response => {
         this.assetList = 'scene'
         console.log('successfully added')
@@ -163,16 +162,16 @@ export default {
     //sketchfab
     getSketchfabAssets: function(manualOverride) {
       if (!this.sketchfabAssets.length || manualOverride == true) {
-        this.$store.dispatch('firebaseStore/getSketchfabAssets', null)
+        this.$store.dispatch('apis/getSketchfabAssets', null)
         .then( (success)=> { this.assetList = 'sketchfab' })
       } else { this.assetList = 'sketchfab' }
     },
     searchSketchfab: function(search) {
-      this.$store.dispatch('firebaseStore/getSketchfabAssets', search)
+      this.$store.dispatch('apis/getSketchfabAssets', search)
       .then( (success)=> { console.log('search success') })
     },
     openSketchfabAsset: function(asset) {
-      this.$store.commit('SET_ASSET_IMPORT_MODAL', {isOpen: true, panelType: 'sketchfab', relatedAsset: asset})
+      this.$store.commit('ux/SET_ASSET_IMPORT_MODAL', {isOpen: true, panelType: 'sketchfab', relatedAsset: asset})
     },
     parseSketchfabThumb: function(asset) {
       try { return asset.thumbnails.images[2].url }
