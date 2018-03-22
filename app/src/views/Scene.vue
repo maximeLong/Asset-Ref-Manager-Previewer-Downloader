@@ -7,8 +7,8 @@
     <div id="scene-modules">
       <div class="module"
         v-for="module in modules"
-        :class="{ active : activeModule == module.name }"
-        @click="activeModule = module.name">{{module.name}}</div>
+        :class="{ active : activeModule == module.name, inactive : module.inactive }"
+        @click="handleModuleClick(module)">{{module.name}}</div>
     </div>
 
     <!-- catalog -->
@@ -36,11 +36,11 @@ export default {
   data: function() {
     return {
       modules: [
-        { name: 'Asset Catalog' },
-        { name: 'Notes' },
-        { name: 'Interactive Stream' },
-        { name: 'Performance Monitor' },
-        { name: 'Director Panel' }
+        { name: 'Asset Catalog', inactive: false },
+        { name: 'Interactive Stream', inactive: false },
+        { name: 'Notes', inactive: true },
+        { name: 'Performance Monitor', inactive: true },
+        { name: 'Director Panel', inactive: true }
       ],
       activeModule: 'Asset Catalog'
     }
@@ -55,11 +55,16 @@ export default {
     currentScene: function()      { return this.$store.getters['scenes/currentScene'] }
   },
   methods: {
-    getSceneData: function() {
 
+    handleModuleClick: function(module) {
+      if (!module.inactive) {
+        this.activeModule = module.name;
+      }
+    },
+
+    getSceneData: function() {
       //get users in scene
       this.$store.dispatch('scenes/getUsersByScene', this.$route.params.scene_id)
-
       //change the currentSceneIndex > updates currentScene getter
       var sceneIndex = _.findIndex(this.scenes, {_id: this.$route.params.scene_id} );
       if (sceneIndex !== -1) {
@@ -112,6 +117,27 @@ export default {
             background-color: $active_color_light
             top: 43px
             width: 100%
+        &.inactive
+          color: $border_color_light
+          cursor: default
+          position: relative
+          &::before
+            content: ''
+            opacity: 0
+            +transition(.35s ease all)
+          &:hover
+            &::before
+              opacity: 1
+              +transition(.35s ease all)
+              content: 'coming soon!'
+              position: absolute
+              color: white
+              background-color: $side_panel_color
+              top: 40px
+              text-align: center
+              padding: 10px 0px
+              width: 120px
+
 
     #scene-active-module
       background-color: $content_box_background

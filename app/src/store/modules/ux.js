@@ -25,7 +25,8 @@ export const ux = {
     modelSnapshot: undefined,
 
     //model standin that exists between upload click and server response
-    assetStandin: false
+    assetStandin: { isOn: false, progress: 0 },
+    currentAssetCatalog: 'scene'
   },
 
   mutations: {
@@ -53,6 +54,10 @@ export const ux = {
     SET_MODEL_FILE: function(state, val)            { state.modelFile = val },
     SET_MODEL_SNAPSHOT: function(state, val)        { state.modelSnapshot = val },
 
-    SET_ASSET_STANDIN: function(state, val) { state.assetStandin = val },
+    SET_ASSET_STANDIN: function(state, {isOn, progress}) {
+      state.assetStandin.isOn = isOn;
+      state.assetStandin.progress = progress;
+    },
+    SET_CURRENT_ASSET_CATALOG: function(state, val) { state.currentAssetCatalog = val }
   }
 }

@@ -4,9 +4,9 @@
   <!-- menu -->
   <div class="catalog-options">
     <div class="group">
-      <div class="option" @click="assetList = 'scene'" :class="{active : assetList == 'scene'}">Scene Assets</div>
-      <div class="option" @click="getUserAssets" :class="{active : assetList == 'user'}">My Assets</div>
-      <div class="option" @click="getSketchfabAssets" :class="{active : assetList == 'sketchfab'}">Sketchfab</div>
+      <div class="option" @click="getSceneAssets" :class="{active : currentAssetCatalog == 'scene'}">Scene Assets</div>
+      <div class="option" @click="getUserAssets" :class="{active : currentAssetCatalog == 'user'}">My Assets</div>
+      <div class="option" @click="getSketchfabAssets" :class="{active : currentAssetCatalog == 'sketchfab'}">Sketchfab</div>
     </div>
     <div class="group">
       <div class="option import" @click="openAssetImportModal">Import from file</div>
@@ -15,9 +15,10 @@
 
   <!-- catalog views, provide key to force component to non-reuse -->
   <transition name="fade" mode="out-in">
-    <asset-catalog-schema v-if="assetList == 'scene'" key="scene"
+    <asset-catalog-schema v-if="currentAssetCatalog == 'scene'" key="scene"
       :schemaAssets="sceneAssets"
-      :assetIsUploading="assetStandin"
+      :assetIsUploading="assetStandin.isOn"
+      :assetUploadProgress="assetStandin.progress"
       :multiSelectEnabled="isSceneAdmin"
       :multiSelectData="{
         icon: 'delete',
@@ -27,9 +28,10 @@
       :normalClick="openDepthcastAsset"
     ></asset-catalog-schema>
 
-    <asset-catalog-schema v-if="assetList == 'user'" key="user"
+    <asset-catalog-schema v-if="currentAssetCatalog == 'user'" key="user"
       :schemaAssets="userAssets"
-      :assetIsUploading="assetStandin"
+      :assetIsUploading="assetStandin.isOn"
+      :assetUploadProgress="assetStandin.progress"
       :multiSelectEnabled="isSceneAdmin"
       :multiSelectData="{
         icon: 'add_box',
@@ -39,7 +41,7 @@
       :normalClick="openDepthcastAsset"
     ></asset-catalog-schema>
 
-    <asset-catalog-schema v-if="assetList == 'sketchfab'" key="sketchfab"
+    <asset-catalog-schema v-if="currentAssetCatalog == 'sketchfab'" key="sketchfab"
       :schemaAssets="sketchfabAssets"
       :multiSelectEnabled="false"
       :searchEnabled="true"
@@ -66,16 +68,13 @@ export default {
     AssetCatalogSchema
   },
   data: function() {
-    return {
-      assetList: 'scene'
-    }
+    return {}
   },
 
   //get sceneAssets on module mount, and on scene change (since module will stay active)
   mounted: function() {this.getSceneAssets()},
   watch: {
     currentScene: function() {
-      this.assetList = 'scene'
       this.getSceneAssets()
     }
   },
@@ -85,6 +84,7 @@ export default {
     currentScene: function()   { return this.$store.getters['scenes/currentScene'] },
     assetStandin: function()   { return this.$store.state.ux.assetStandin },
     isSceneAdmin: function() { return this.currentScene.admin ? true : false },
+    currentAssetCatalog: function() { return this.$store.state.ux.currentAssetCatalog },
 
     sceneAssets: function() {
       return this.$store.state.assets.assetsInCurrentScene.map((link)=> {
@@ -129,13 +129,14 @@ export default {
 
     //get asset collections
     getSceneAssets: function() {
+      this.$store.commit('ux/SET_CURRENT_ASSET_CATALOG', 'scene')
       this.$store.dispatch('assets/getAssetsByScene', this.currentScene._id)
     },
     getUserAssets: function() {
+      this.$store.commit('ux/SET_CURRENT_ASSET_CATALOG', 'user')
       if (!this.userAssets.length) {
         this.$store.dispatch('assets/getAssetsByUser', this.user.uid)
-        .then( (success)=> { this.assetList = 'user' })
-      } else { this.assetList = 'user' }
+      }
     },
 
     //handle asset open actions
@@ -154,17 +155,17 @@ export default {
     addAssetsToScene: function(multiSelectedAssets) {
       this.$store.dispatch('assets/addAssetsToScene', multiSelectedAssets)
       .then( response => {
-        this.assetList = 'scene'
+        this.currentAssetCatalog = 'scene'
         console.log('successfully added')
       });
     },
 
     //sketchfab
     getSketchfabAssets: function(manualOverride) {
+      this.$store.commit('ux/SET_CURRENT_ASSET_CATALOG', 'sketchfab')
       if (!this.sketchfabAssets.length || manualOverride == true) {
         this.$store.dispatch('apis/getSketchfabAssets', null)
-        .then( (success)=> { this.assetList = 'sketchfab' })
-      } else { this.assetList = 'sketchfab' }
+      }
     },
     searchSketchfab: function(search) {
       this.$store.dispatch('apis/getSketchfabAssets', search)

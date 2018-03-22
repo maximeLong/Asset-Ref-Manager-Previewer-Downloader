@@ -14,17 +14,15 @@ export const assets = {
       var storageRef = storage.ref();
       var uploadTask = storageRef.child('gltf/' + assetData.name + '.glb').put(assetFile);
 
-      console.log(store)
-
       uploadTask.on('state_changed', function(snapshot){
         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ' + progress + '% done');
+        store.commit('ux/SET_ASSET_STANDIN', {isOn: true, progress: progress}, {root: true});
+        store.commit('ux/SET_CURRENT_ASSET_CATALOG', 'scene', {root: true});
         switch (snapshot.state) {
           case firebase.storage.TaskState.PAUSED: // or 'paused'
             console.log('Upload is paused');
             break;
           case firebase.storage.TaskState.RUNNING: // or 'running'
-            console.log('Upload is running');
             break;
           }
       }, function(error) {  //error
@@ -46,14 +44,14 @@ export const assets = {
           assetName: assetData.name //NOTE: duplicate in data model
         })
         batch.commit().then((success)=> {
-          store.commit('ux/SET_ASSET_STANDIN', false, {root: true});
+          store.commit('ux/SET_ASSET_STANDIN', {isOn: false, progress: 0}, {root: true});
           console.log('asset completed')
         })
       });
 
       //close the modal before response is done
       store.commit('ux/SET_ASSET_IMPORT_MODAL', {isOpen: false}, {root: true});
-      store.commit('ux/SET_ASSET_STANDIN', true, {root: true});
+      store.commit('ux/SET_ASSET_STANDIN', {isOn: true, progress: 0}, {root: true});
     },
 
     getAssetsByScene: function(store, sceneId) {

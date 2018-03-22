@@ -41,7 +41,8 @@
     <transition name="fade">
       <div class="asset asset-standin" v-if="assetIsUploading">
         <div class="asset-image-container">
-          <dot-loader :color="'#4e4e4e'" :size="'30px'"></dot-loader>
+          <dot-loader :color="'#e4bb86'" :size="'30px'"></dot-loader>
+          <div class="loading-bar" :style="{ 'width': assetUploadProgress + '%' }"></div>
         </div>
       </div>
     </transition>
@@ -72,6 +73,7 @@ export default {
   props: {
     schemaAssets: Array,
     assetIsUploading: Boolean,
+    assetUploadProgress: Number,
     normalClick: Function,
     //optional settings
     multiSelectEnabled: Boolean,
@@ -116,7 +118,9 @@ export default {
     },
 
     handleMultiSelectClick: function() {
-      this.multiSelectData.click(this.multiSelectedAssets)
+      if (this.multiSelectedAssets.length) {
+        this.multiSelectData.click(this.multiSelectedAssets)
+      }
     },
     toggleMultiSelectMode: function() {
       if (this.multiSelectModeIsOn) {
@@ -259,8 +263,17 @@ export default {
 
     .asset-standin
       .asset-image-container
+        position: relative
         +flexbox
         +align-items(center)
         +justify-content(center)
+        .loading-bar
+          +transition(.15s ease all)
+          position: absolute
+          bottom: 0
+          width: 100%
+          height: 12px
+          background-color: $active_color_light
+
 
 </style>

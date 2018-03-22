@@ -10,11 +10,6 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "feathers": "^2.2.3",
-    "feathers-authentication-client": "^0.3.3",
-    "feathers-hooks": "^2.1.2",
-    "feathers-socketio": "^2.0.1",
-    "feathers-vuex": "^1.0.4",
     "fetch": "^1.1.0",
     "firebase": "^4.10.1",
     "gltf-validator": "^2.0.0-dev.1.4",
