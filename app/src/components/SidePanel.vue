@@ -2,50 +2,38 @@
   <div id="side-panel-content">
 
     <div id="logo">
-      <div class="icon"></div>
+      <div class="icon">Depthcast</div>
     </div>
 
     <!-- main scenes bar, add scene -->
     <div class="sidebar-title">
-      <div>My Scenes</div>
+      <div>Scenes</div>
       <router-link to="/createscene">+</router-link>
     </div>
     <div class="scenes">
       <div class="scenes-list">
         <div class="scene-item"
-          v-for="scene in scenes"
+          v-for="scene in populatedScenes"
           @click="goToScene(scene._id)"
           :class="{ active : checkActive(scene) }">
           {{scene.name}}</div>
       </div>
     </div>
 
-    <!-- team scenes bar, add team -->
-    <!-- <div class="sidebar-title">Team Scenes</div>
-    <div class="sidebar-subtitle" v-if="currentTeam">{{currentTeam.name}}</div>
-    <div class="scenes team">
-      <div class="scenes-list">
-        <div class="scene-item" v-for="team in teams">{{team.name}}</div>
-      </div>
-    </div> -->
-
-
   </div>
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'sidePanel',
   data: function(){
-    return {
-    }
+    return {}
   },
   computed: {
-    teams: function(){ return this.$store.getters['teams/list']},
-    scenes: function(){ return this.$store.getters['scenes/list'] },
-    currentTeam: function() { return this.$store.state.currentTeam },
-    currentScene: function() { return this.$store.getters['scenes/current'] }
+    ...mapState('scenes',   ['populatedScenes']),
+    ...mapGetters('scenes', ['currentScene']),
   },
   methods: {
     goToScene: function(id) {
@@ -68,22 +56,27 @@ export default {
   width: 100%
 
   #logo
-    +flexbox
-    +align-items(center)
-    +justify-content(center)
-    width: 60px
+    width: 100%
     height: $header_panel_height
     margin-bottom: 20px
-    background-color: white
+    background-color: #424242
+    padding: 12px 15px
     +clickable
     .icon
-      height: 30px
-      width: 30px
-      border: 2px solid $action_color
-      border-radius: 100px
+      +systemType(small)
+      letter-spacing: 4px
+      font-weight: normal
+      font-size: 13px
+      +flexbox
+      +align-items(center)
+      +justify-content(center)
+      color: white
+      width: 100%
+      height: 100%
+      border: 1px solid white
 
   .sidebar-title, .sidebar-subtitle
-    +systemType(big)
+    +systemType(average)
     color: white
     padding: 0 15px
     +flexbox
@@ -97,20 +90,20 @@ export default {
     border-top: 1px solid $border_color_mid
     padding-top: 10px
     margin: 10px 0 50px 0
-    +userType(average)
+    +userType(small)
     color: white
     &.teams
       margin-bottom: 0
 
     .scenes-list
       .scene-item
-        padding: 3px 15px
+        padding: 7px 15px
         +clickable
         &:hover
           background-color: $side_panel_hover
           +transition(.25s ease-in-out all)
         &.active
-          color: $action_color
+          color: $active_color_light
 
 
 

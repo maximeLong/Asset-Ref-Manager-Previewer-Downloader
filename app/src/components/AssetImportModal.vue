@@ -1,7 +1,7 @@
 <template>
 <div id="asset-import-modal">
 
-  <modal :title="'Create Asset'" :onClickaway="handleClickaway">
+  <modal :title="'Import Asset'" :onClickaway="handleClickaway">
 
     <!-- import file -->
     <asset-loader-gltf v-on:loaded="receiveLoaded" v-on:snapTaken="snapTaken = true"></asset-loader-gltf>
@@ -45,9 +45,9 @@
 </div>
 </template>
 <script>
+import { mapState, mapGetters } from 'vuex'
 import Modal from '../components/Modal'
 import AssetLoaderGltf from '../components/AssetLoaderGltf'
-import { mapState } from 'vuex'
 import _ from 'lodash'
 
 
@@ -65,22 +65,29 @@ export default {
   },
   destroyed: function() {
     //release model information from store
-    this.$store.commit('SET_FORM_ASSETNAME', '')
-    this.$store.commit('SET_MODEL_GEOMETRY_INFO', {})
-    this.$store.commit('SET_MODEL_FILE_SIZE', '')
-    this.$store.commit('SET_MODEL_SNAPSHOT', undefined)
-    this.$store.commit('SET_MODEL_FILE', undefined)
+    this.$store.commit('ux/SET_FORM_ASSETNAME', '')
+    this.$store.commit('ux/SET_MODEL_GEOMETRY_INFO', {})
+    this.$store.commit('ux/SET_MODEL_FILE_SIZE', '')
+    this.$store.commit('ux/SET_MODEL_SNAPSHOT', undefined)
+    this.$store.commit('ux/SET_MODEL_FILE', undefined)
   },
 
   computed: {
-    user: function()            { return this.$store.state.auth.user },
-    currentScene: function()   { return this.$store.getters['scenes/current'] },
+    ...mapState('ux', [
+      'formAssetName',
+      'modelGeometryInfo',
+      'modelFileSize',
+      'modelName',
+      'modelFile',
+      'modelSnapshot'
+    ]),
+    ...mapState('users',    ['user']),
+    ...mapGetters('scenes', ['currentScene']),
+
     assetIsOk: function()  {
       if (this.loaded && this.formAssetName.length && this.snapTaken) { return true } else { return false }
     },
-    modelVertices: function() {
-      return this.modelGeometryInfo.render.vertices
-    },
+    modelVertices: function() { return this.modelGeometryInfo.render.vertices },
     barSize: function() {
       if (this.modelVertices <= 20000) {
         return 'small'
@@ -99,22 +106,14 @@ export default {
           l++;
       }
       return(n.toFixed(n >= 10 || l < 1 ? 0 : 1) + ' ' + units[l]);
-    },
-    ...mapState([
-      'formAssetName',
-      'modelGeometryInfo',
-      'modelFileSize',
-      'modelName',
-      'modelFile',
-      'modelSnapshot'
-    ])
+    }
   },
   methods: {
     //-- button methods
     handleClickaway: function() {
-      this.$store.commit('SET_ASSET_IMPORT_MODAL_IS_OPEN', false);
+      this.$store.commit('ux/SET_ASSET_IMPORT_MODAL', {isOpen: false});
     },
-    updateFormAssetName: function(e) { this.$store.commit('SET_FORM_ASSETNAME', e.target.value); },
+    updateFormAssetName: function(e) { this.$store.commit('ux/SET_FORM_ASSETNAME', e.target.value); },
     receiveLoaded: function() {
       this.loaded = true;
     },
@@ -128,9 +127,8 @@ export default {
     tryCreateAsset: function() {
       const modelInfo = {
         name:           this.formAssetName,
-        creator:        this.user._id,
-        scenes:         [this.currentScene._id],
-        likes:          [],
+        creator:        this.user.uid,
+        creatorEmail:   this.user.email,
         modelSize:      this.modelFileSize,
         thumbnailImage: this.modelSnapshot,
         performanceInfo: {
@@ -142,14 +140,8 @@ export default {
         }
       }
 
-      // Instantiate a FormData() object + add information to it
-      const formData = new FormData();
-      formData.append('file', this.modelFile, this.formAssetName + '.glb');
-      formData.append('modelInfo', JSON.stringify(modelInfo));
-      //formData.append('currentScene', this.currentScene._id)
-
       //do a RESTful thing here so that files can be handled
-      this.$store.dispatch('createAsset', formData);
+      this.$store.dispatch('assets/createAsset', {assetData: modelInfo, assetFile: this.modelFile});
 
     }
   }

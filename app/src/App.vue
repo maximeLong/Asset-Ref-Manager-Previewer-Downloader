@@ -10,17 +10,16 @@
 
       <div id="header-panel">
         <app-header></app-header>
-        <scene-header v-if="sceneIsOpen"></scene-header>
         <options-panel v-if="userPanel.open"></options-panel>
       </div>
 
-      <div id="app-content" :class="{ openScene : sceneIsOpen }">
+      <div id="app-content">
         <!-- views -->
         <router-view></router-view>
 
         <!-- full screen modals -->
         <scene-options-modal v-if="sceneOptionsModalIsOpen"></scene-options-modal>
-        <asset-import-modal v-if="assetImportModalIsOpen"></asset-import-modal>
+        <asset-import-modal v-if="assetImportModal.isOpen"></asset-import-modal>
         <asset-info-modal v-if="assetInfoModalIsOpen"></asset-info-modal>
 
       </div>
@@ -33,12 +32,9 @@
 <script>
 
 import AppHeader from './components/AppHeader'
-import SceneHeader from './components/SceneHeader'
-
 import SceneOptionsModal from './components/SceneOptionsModal'
 import AssetImportModal from './components/AssetImportModal'
 import AssetInfoModal from './components/AssetInfoModal'
-
 import OptionsPanel from './components/OptionsPanel'
 import SidePanel from './components/SidePanel'
 
@@ -49,7 +45,6 @@ export default {
   name: 'app',
   components: {
     AppHeader,
-    SceneHeader,
     SceneOptionsModal,
     AssetImportModal,
     AssetInfoModal,
@@ -57,40 +52,15 @@ export default {
     SidePanel
   },
   data: function() {
-    return {
-    }
+    return {}
   },
-  mounted () {
-    //basically mirrors sign-in action without passing an argument
-    this.$store.dispatch('auth/authenticate')
-    .then(success => {
-      this.$store.dispatch('signInLoad')
-      .then(success => {
-        //check what the entry route is and if user isn't trying to access an endpoint - send to loading route
-        if (this.$store.state.route.name !== 'Scene') {
-          this.$router.push({ name: 'SceneLoading' })
-        }
-      })
-    })
-    .catch(error => {
-      console.log(error)
-    })
-  },
-  methods: {
-  },
+  methods: {},
   computed: {
-
-    sceneIsOpen: function() {
-      if (this.$store.getters['scenes/current'] == null || this.route.name != 'Scene') { return false } else {
-        return true
-      }
-    },
-    ...mapState([
+    ...mapState('ux', [
       'activePanel',
       'userPanel',
-      'route',
       'sceneOptionsModalIsOpen',
-      'assetImportModalIsOpen',
+      'assetImportModal',
       'assetInfoModalIsOpen'
     ])
   }

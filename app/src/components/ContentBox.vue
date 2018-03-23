@@ -20,16 +20,8 @@ export default {
   props: {
     title: String
   },
-  components: {
-  },
   data: function(){
-    return {
-    }
-  },
-  computed: {
-  },
-  methods: {
-
+    return {}
   }
 
 }
@@ -39,7 +31,7 @@ export default {
 @import src/styles/main
 .content-box
   background-color: $content_box_background
-  border-radius: 3px
+  border-radius: 2px
   margin-bottom: 30px
   box-shadow: 2px 2px 10px rgba(103, 103, 103, 0.3)
   z-index: 9
@@ -49,6 +41,7 @@ export default {
   .content-header
     padding: 15px 30px
     border-bottom: 1px solid $border_color_light
+    height: 50px
     +flexbox
     +align-items(center)
     +justify-content(flex-start)

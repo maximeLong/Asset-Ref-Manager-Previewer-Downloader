@@ -7,7 +7,6 @@ import { sync } from 'vuex-router-sync'
 import {store} from './store/store';
 import router from './router' // vue-router instance
 const unsync = sync(store, router) // done. Returns an unsync callback fn
-
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

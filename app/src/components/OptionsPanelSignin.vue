@@ -16,27 +16,17 @@ import { mapState } from 'vuex'
 
 export default {
   data: function(){
-    return {
-
-    }
+    return {}
   },
-
   computed: {
-    userIsLoggedIn: function()  { return this.user ? true : false },
-    user: function()            { return this.$store.state.auth.user },
-    ...mapState([
-      'userPanel',
-      'formEmail',
-      'formPassword'
-    ])
+    ...mapState('ux', ['userPanel','formEmail','formPassword'])
   },
-
   methods: {
-    updateFormEmail: function(e)    { this.$store.commit('SET_FORM_EMAIL', e.target.value) },
-    updateFormPassword: function(e) { this.$store.commit('SET_FORM_PASSWORD', e.target.value) },
+    updateFormEmail: function(e)    { this.$store.commit('ux/SET_FORM_EMAIL', e.target.value) },
+    updateFormPassword: function(e) { this.$store.commit('ux/SET_FORM_PASSWORD', e.target.value) },
 
     trySignIn: function(email, password) {
-      this.$store.dispatch('signInUser', {email: email, password: password})
+      this.$store.dispatch('users/signIn', {email: email, password: password})
     }
 
   }

@@ -1,72 +1,149 @@
 <template>
 <div id="scene">
 
-    <!-- modules -->
-    <div class="scene-modules">
-      <content-box :title="'Scene Modules'">
-        <div class="buttons" slot="buttons">
-          <div class="button active">scene performance</div>
-          <div class="button">notes</div>
-          <div class="button">control panel</div>
-        </div>
+  <scene-header></scene-header>
 
-        <div class="default-message" v-if="!sceneModules.length">no modules plugged in yet!</div>
-        <div class="module-canvas" v-else>
-
-        </div>
-      </content-box>
+  <div class="scene-main">
+    <div id="scene-modules">
+      <div class="module"
+        v-for="module in modules"
+        :class="{ active : activeModule == module.name, inactive : module.inactive }"
+        @click="handleModuleClick(module)">{{module.name}}</div>
     </div>
 
-    <!-- palette information -->
-    <asset-catalog></asset-catalog>
+    <!-- catalog -->
+    <div id="scene-active-module">
+      <asset-catalog-module v-if="activeModule == 'Asset Catalog'"></asset-catalog-module>
+    </div>
+  </div>
 
 </div>
-
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex'
+
 import ContentBox from '../components/ContentBox'
-import AssetCatalog from '../components/AssetCatalog'
+import AssetCatalogModule from '../components/AssetCatalogModule'
+import SceneHeader from '../components/SceneHeader'
+
 
 export default {
   name: 'scene',
   components: {
     ContentBox,
-    AssetCatalog
+    AssetCatalogModule,
+    SceneHeader
   },
   data: function() {
     return {
-      sceneModules: [],
-      activeModule: {}
+      modules: [
+        { name: 'Asset Catalog', inactive: false },
+        { name: 'Interactive Stream', inactive: false },
+        { name: 'Notes', inactive: true },
+        { name: 'Performance Monitor', inactive: true },
+        { name: 'Director Panel', inactive: true }
+      ],
+      activeModule: 'Asset Catalog'
     }
   },
+  mounted: function() {
+    this.getSceneData()
+  },
   computed: {
-    user: function()            { return this.$store.state.auth.user },
-    currentScene: function()    { return this.$store.state.currentScene },
+    ...mapState('users',    ['user']),
+    ...mapState('scenes',   ['currentSceneIndex', 'populatedScenes']),
+    ...mapGetters('scenes', ['currentScene']),
   },
   methods: {
-    fetchData: function() {
-      //mirror of beforeEnter on router
-      this.$store.dispatch('scenes/get', [this.$route.params.scene_id])
-      .then(success => {
-        console.log('scene success', success)
-      })
-      .catch(error => { console.log('scene error', error) })
+
+    handleModuleClick: function(module) {
+      if (!module.inactive) {
+        this.activeModule = module.name;
+      }
+    },
+
+    getSceneData: function() {
+      //get users in scene
+      this.$store.dispatch('scenes/getUsersByScene', this.$route.params.scene_id)
+      //change the currentSceneIndex > updates currentScene getter
+      var sceneIndex = _.findIndex(this.populatedScenes, {_id: this.$route.params.scene_id} );
+      if (sceneIndex !== -1) {
+        this.$store.commit('scenes/SET_CURRENT_SCENE_INDEX', sceneIndex);
+      }
     }
   },
   watch: {
-    '$route': 'fetchData'
+    //imitate mounted() on scene change
+    $route (to, from) {
+      if (to.name == 'Scene') {
+        this.getSceneData()
+      }
+    }
   }
 
 }
 </script>
 
-<style scoped lang="sass">
+<style lang="sass">
 @import src/styles/main
 
 #scene
-  padding: 50px 30px 30px 30px
-  .scene-assets
-    margin-top: 40px
+  height: 100%
+
+  .scene-main
+    padding: 0 30px 30px 30px
+    height: calc(100% - 100px)
+
+    #scene-modules
+      +flexbox
+      +align-items(center)
+      +justify-content(space-between)
+      height: 60px
+      margin-top: -30px
+      background-color: white
+      border: 1px solid $border_color_light
+      padding: 0 30px
+      +systemType(small)
+      .module
+        +clickable
+        padding: 12px 0px
+        &.active
+          position: relative
+          color: $active_color
+          &::before
+            content: ''
+            position: absolute
+            height: 8px
+            background-color: $active_color_light
+            top: 43px
+            width: 100%
+        &.inactive
+          color: $border_color_light
+          cursor: default
+          position: relative
+          &::before
+            content: ''
+            opacity: 0
+            +transition(.35s ease all)
+          &:hover
+            &::before
+              opacity: 1
+              +transition(.35s ease all)
+              content: 'coming soon!'
+              position: absolute
+              color: white
+              background-color: $side_panel_color
+              top: 40px
+              text-align: center
+              padding: 10px 0px
+              width: 120px
+
+
+    #scene-active-module
+      background-color: $content_box_background
+      box-shadow: 2px 2px 10px rgba(103, 103, 103, 0.3)
+      margin-top: 30px
+      height: calc(100% - 90px)
 
 </style>

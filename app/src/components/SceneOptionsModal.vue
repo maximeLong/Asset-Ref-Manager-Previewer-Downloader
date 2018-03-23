@@ -13,28 +13,26 @@
 
     <!-- members form -->
     <div class="invite form">
-      <div class="form-title">Members</div>
-
+      <div class="form-title">Invites</div>
       <div class="openInviteForm button" @click="inviteFormIsOpen = true" v-if="!inviteFormIsOpen">+</div>
       <input :value="formInviteEmail" v-if="inviteFormIsOpen"
         @input="updateFormInviteEmail"
         @keyup.enter="addToInvites" placeholder="email address">
-
       <div class="invites button"
         v-for="(invite, index) in localInvites"
         @click="removeInvite(index)">{{invite[0]}}<div class="tooltip">{{invite}}</div>
       </div>
-
       <div class="invites existing button" v-for="invite in currentScene.invites"
         >{{invite[0]}}<div class="tooltip">{{invite}}</div>
       </div>
-
-      <div class="members" v-for="user in currentScene.users"
-         :style="{ 'background-image' : 'url(' + user.profileImage.big + ')'}">
-         <div class="tooltip">{{user.email}}</div>
-      </div>
-
     </div>
+
+    <!-- Danger Zone -->
+    <div class="delete form">
+      <div class="form-title">Danger Zone</div>
+      <div class="delete button" @click="tryDeleteScene">Delete Scene</div>
+    </div>
+
     <div class="edit-buttons">
       <div class="save-button button" :class="{ 'not-active' : !formHasChanged }" @click="saveChanges">Save Changes</div>
       <div class="cancel-button" @click="handleClickaway">Cancel</div>
@@ -45,9 +43,8 @@
 </div>
 </template>
 <script>
+import { mapState, mapGetters } from 'vuex'
 import Modal from '../components/Modal'
-import { mapState } from 'vuex'
-import { mapActions } from 'vuex'
 import _ from 'lodash'
 
 
@@ -62,34 +59,32 @@ export default {
     }
   },
   mounted: function() {
-    this.$store.commit('SET_FORM_SCENENAME', this.currentScene.name)
+    this.$store.commit('ux/SET_FORM_SCENENAME', this.currentScene.name)
   },
   destroyed: function() {
-    this.$store.commit('SET_FORM_SCENENAME', '')
+    this.$store.commit('ux/SET_FORM_SCENENAME', '')
   },
 
   computed: {
-    user: function()            { return this.$store.state.auth.user },
-    userIsLoggedIn: function()  { return this.user ? true : false },
-    currentScene: function()   { return this.$store.getters['scenes/current'] },
+    ...mapState('users',    ['user']),
+    ...mapState('scenes',   ['populatedScenes']),
+    ...mapState('ux',       ['formSceneName','formInviteEmail']),
+    ...mapGetters('scenes', ['currentScene']),
+
     formHasChanged: function()  {
       if (this.formSceneName !== this.currentScene.name || this.localInvites.length) {
         return true
       } else { return false }
-    },
-    ...mapState([
-      'formSceneName',
-      'formInviteEmail'
-    ])
+    }
   },
   methods: {
     //-- button methods
     handleClickaway: function() {
-      this.$store.commit('SET_SCENE_OPTIONS_MODAL_IS_OPEN', false);
+      this.$store.commit('ux/SET_SCENE_OPTIONS_MODAL_IS_OPEN', false);
     },
     editTitle: function() {
       this.changeNameFormIsOpen = true;
-      this.$store.commit('SET_FORM_SCENENAME', this.currentScene.name);
+      this.$store.commit('ux/SET_FORM_SCENENAME', this.currentScene.name);
     },
     saveChanges: function() {
       if (this.formHasChanged) {
@@ -99,34 +94,45 @@ export default {
 
     //-- update form info
     //
-    updateFormSceneName: function(e) { this.$store.commit('SET_FORM_SCENENAME', e.target.value) },
-    updateFormInviteEmail: function(e) { this.$store.commit('SET_FORM_INVITEEMAIL', e.target.value) },
+    updateFormSceneName: function(e) { this.$store.commit('ux/SET_FORM_SCENENAME', e.target.value) },
+    updateFormInviteEmail: function(e) { this.$store.commit('ux/SET_FORM_INVITEEMAIL', e.target.value) },
     addToInvites: function(){
       this.localInvites.push(this.formInviteEmail)
-      this.$store.commit('SET_FORM_INVITEEMAIL', '')
+      this.$store.commit('ux/SET_FORM_INVITEEMAIL', '')
     },
     removeInvite: function(inviteIndex){
       this.localInvites.splice(inviteIndex, 1)
     },
 
     // -- patch scene
-    //
     tryPatchScene: function() {
       var mergedInvites = _.concat(this.currentScene.invites, this.localInvites);
-      this.patchScene([this.currentScene._id, {
+      var patchedData = {
         name: this.formSceneName,
         invites: mergedInvites
-      }, {} ])
-      .then(response => {
-        console.log('success');
-        this.handleClickaway()
-      })
-      .catch(error => { console.log(error) })
-
+      }
+      this.$store.dispatch('scenes/patchSceneInfo', {sceneId: this.currentScene._id, patchedData: patchedData})
+        .then(response => {
+          this.handleClickaway()
+        })
+        .catch(error => { console.log(error) })
     },
-    ...mapActions('scenes', {
-      patchScene: 'patch'
-    })
+
+    tryDeleteScene: function() {
+      this.$store.dispatch('scenes/deleteScene', this.currentScene._id)
+        .then(response => {
+
+          //BUG: this throws errors because modal is listening to deleted info
+          this.handleClickaway()
+          if (this.populatedScenes.length) {
+            this.$router.push({ name: 'Scene', params: { scene_id: this.populatedScenes[0]._id }})
+          } else {
+            this.$router.push({ name: 'NoScene' })
+          }
+
+        })
+        .catch(error => { console.log(error) })
+    }
   }
 
 }
@@ -152,7 +158,7 @@ export default {
 
 
     .form-title
-      +flex(0 0 100px)
+      +flex(0 0 120px)
       +systemType(small)
     input
       font-weight: bold
@@ -163,6 +169,10 @@ export default {
       +clickable
       color: $action_color
       padding-left: 10px
+
+    .delete
+      +button(false, false, $danger_color, inherit)
+      padding: 13px 30px
 
     //invite members
     .openInviteForm,.invites,.members

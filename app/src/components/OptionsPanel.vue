@@ -6,11 +6,6 @@
       v-if="userPanel.panelType == 'signIn'">
     </options-panel-signin>
 
-    <!-- team pannel -->
-    <options-panel-team
-      v-if="userPanel.panelType == 'team'">
-    </options-panel-team>
-
     <!-- create account -->
     <options-panel-create-account
       v-if="userPanel.panelType == 'createAccount'">
@@ -30,21 +25,17 @@ import { mixin as clickaway } from 'vue-clickaway'
 
 import OptionsPanelCreateAccount from './OptionsPanelCreateAccount'
 import OptionsPanelSignin from './OptionsPanelSignin'
-import OptionsPanelTeam from './OptionsPanelTeam'
 import OptionsPanelUserInfo from './OptionsPanelUserInfo'
 
 export default {
   components: {
     OptionsPanelCreateAccount,
     OptionsPanelSignin,
-    OptionsPanelTeam,
     OptionsPanelUserInfo
   },
   mixins: [ clickaway ],
   computed: {
-    ...mapState([
-      'userPanel'
-    ])
+    ...mapState('ux', ['userPanel'])
   },
 
   methods: {
@@ -61,7 +52,7 @@ export default {
       if (whiteList.includes(e.target.className)) {
         return
       } else {
-        this.$store.commit('SET_USER_PANEL', {open: false})
+        this.$store.commit('ux/SET_USER_PANEL', {open: false})
       }
     }
   }

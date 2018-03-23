@@ -2,15 +2,10 @@
   <div id="header-content">
 
     <div class="left-section">
-      <div class="asset-marketplace">asset marketplace</div>
+      <div class="asset-marketplace">asset marketplace (beta)</div>
     </div>
 
     <div class="middle-section">
-      <!--
-      <div class="team-account" v-if="userIsLoggedIn" @click="openTeamPanel">
-        <div class="team-name">Your Teams</div>
-      </div>
-      -->
       <div class="create-account" v-if="!userIsLoggedIn" @click="openCreatePanel">
         <div class="create-account-text">Create Account</div>
       </div>
@@ -19,7 +14,7 @@
     <div class="right-section">
       <div class="user-account" v-if="userIsLoggedIn" @click="openUserInfoPanel">
         <div class="account-name">{{user.email}}</div>
-        <div class="account-image" :style="{ 'background-image' : 'url(' + user.profileImage.big + ')'}"></div>
+        <div class="account-image" :style="{ 'background-image' : 'url(' + user.thumbnail_big + ')'}"></div>
       </div>
       <div class="sign-in" v-if="!userIsLoggedIn" @click="openSignInPanel">
         <div class="sign-in-text">Sign In</div>
@@ -30,31 +25,27 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 export default {
   name: 'appHeader',
-  data: function(){
-    return {
-
-    }
+  data: function() {
+    return {}
   },
   computed: {
-    user: function()            { return this.$store.state.auth.user },
+    ...mapState('users',  ['user']),
+    ...mapState('ux',     ['userPanel']),
     userIsLoggedIn: function()  { return this.user ? true : false },
-    userPanel: function()       { return this.$store.state.userPanel }
   },
   methods: {
     openCreatePanel: function() {
-      this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'createAccount'})
-    },
-    openTeamPanel: function() {
-      this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'team'})
+      this.$store.commit('ux/SET_USER_PANEL', {open: true, panelType: 'createAccount'})
     },
     openUserInfoPanel: function() {
-      this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'userInfo'})
+      this.$store.commit('ux/SET_USER_PANEL', {open: true, panelType: 'userInfo'})
     },
     openSignInPanel: function() {
-      this.$store.commit('SET_USER_PANEL', {open: true, panelType: 'signIn'})
+      this.$store.commit('ux/SET_USER_PANEL', {open: true, panelType: 'signIn'})
     }
 
   }
@@ -99,10 +90,10 @@ $margin_amount: 30px
     +align-items(center)
     +justify-content(flex-end)
     height: 100%
-    +flex(0 0 210px)
+    +flex(0 0 250px)
     margin-left: 30px
     .asset-marketplace
-      +button(false,false)
+      +button(false,false, $side_panel_color)
       padding: 10px
 
   .middle-section
@@ -147,7 +138,8 @@ $margin_amount: 30px
       .account-image
         width: 45px
         height: 45px
-        border: 1px solid $border_color
+        border: 3px solid $border_color_light
+        box-shadow: inset 0px 0px 0px 3px white
         border-radius: 100%
         margin-left: 15px
         background-size: contain

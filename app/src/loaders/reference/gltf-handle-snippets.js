@@ -20,8 +20,8 @@ handleGltfDrop: function(rootFile, rootPath, fileMap) {
   var totalSize = 0;
   fileMap.forEach((file, path)=> {
     totalSize += file.size
-    this.$store.commit('SET_MODEL_FILE_SIZE', totalSize);
-    this.$store.commit('SET_MODEL_FILE', file);
+    this.$store.commit('ux/SET_MODEL_FILE_SIZE', totalSize);
+    this.$store.commit('ux/SET_MODEL_FILE', file);
   });
 }
 
@@ -50,7 +50,7 @@ loader.setCrossOrigin('anonymous');
 
 this.load(url, loader)
 .then(()=> {
-  this.$store.commit('SET_MODEL_GEOMETRY_INFO', this.renderer.info);
+  this.$store.commit('ux/SET_MODEL_GEOMETRY_INFO', this.renderer.info);
   this.loaded = true;
   this.$emit('loadSuccess');
 })

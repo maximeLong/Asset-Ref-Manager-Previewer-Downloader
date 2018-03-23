@@ -3,7 +3,7 @@
 
     <transition name="fade">
       <div class="loader" v-if="!loaded">
-        <dot-loader :color="'#4e4e4e'"></dot-loader>
+        <dot-loader :color="'#e4bb86'"></dot-loader>
       </div>
     </transition>
 
@@ -100,11 +100,6 @@ export default {
     }
   },
 
-  computed: {
-    user: function()            { return this.$store.state.auth.user },
-    device: function()          { return this.$store.state.device },
-  },
-
   methods: {
 
     prepLoad: function() {
@@ -117,7 +112,7 @@ export default {
         this.load(url, loader)
         .then(()=> {
           this.loaded = true;
-          this.$store.commit('SET_MODEL_GEOMETRY_INFO', this.renderer.info);
+          this.$store.commit('ux/SET_MODEL_GEOMETRY_INFO', this.renderer.info);
           this.$emit('loadSuccess');
         })
         .catch((error) => {
@@ -275,7 +270,7 @@ export default {
       var dataURL = this.renderer.domElement.toDataURL("image/jpeg", 0.75);
       this.snapshot = dataURL;
       this.snapshotIsTaken = true;
-      this.$store.commit('SET_MODEL_SNAPSHOT', dataURL)
+      this.$store.commit('ux/SET_MODEL_SNAPSHOT', dataURL)
       setTimeout( ()=> {
         this.$emit('snapTaken');
         this.snapshotIsTaken = false
@@ -332,8 +327,8 @@ export default {
     left: 15px
     z-index: 1
     border-radius: 50px
-    padding: 10px
-    background-color: grey
+    background-color: $action_color
+    opacity: .8
     width: 40px
     height: 40px
     +flexbox
@@ -341,10 +336,11 @@ export default {
     +justify-content(center)
     +clickable
     div
-      height: 25px
-      width: 25px
+      height: 100%
+      width: 100%
       background: url('../assets/wireframe.svg')
       background-repeat: no-repeat
       background-position: 50% 50%
+      background-size: 67%
 
 </style>

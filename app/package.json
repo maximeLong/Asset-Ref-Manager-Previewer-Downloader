@@ -10,15 +10,13 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "feathers": "^2.2.3",
-    "feathers-authentication-client": "^0.3.3",
-    "feathers-hooks": "^2.1.2",
-    "feathers-socketio": "^2.0.1",
-    "feathers-vuex": "^1.0.4",
     "fetch": "^1.1.0",
+    "firebase": "^4.10.1",
     "gltf-validator": "^2.0.0-dev.1.4",
     "lodash": "^4.17.4",
+    "md5": "^2.2.1",
     "moment": "^2.20.1",
+    "progressbar.js": "^1.0.1",
     "socket.io": "^2.0.3",
     "three": "^0.89.0",
     "vue": "^2.5.11",
