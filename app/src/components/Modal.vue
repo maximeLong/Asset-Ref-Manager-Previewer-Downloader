@@ -26,12 +26,7 @@ export default {
   },
   mixins: [ clickaway ],
   data: function(){
-    return {
-
-    }
-  },
-  computed: {
-
+    return {}
   },
   methods: {
     clickawayWrapper: function(e) {

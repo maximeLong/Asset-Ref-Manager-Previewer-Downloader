@@ -20,16 +20,8 @@ export default {
   props: {
     title: String
   },
-  components: {
-  },
   data: function(){
-    return {
-    }
-  },
-  computed: {
-  },
-  methods: {
-
+    return {}
   }
 
 }

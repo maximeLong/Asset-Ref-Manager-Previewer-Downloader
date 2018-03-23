@@ -8,18 +8,11 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import { mapActions } from 'vuex'
 
 export default {
   data: function(){
     return {}
   },
-
-  computed: {
-
-  },
-
   methods: {
     tryLogOut: function() {
       this.$store.dispatch('users/signOut')

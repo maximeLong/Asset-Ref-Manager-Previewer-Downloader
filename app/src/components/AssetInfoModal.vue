@@ -1,15 +1,15 @@
 <template>
 <div id="asset-info-modal">
 
-  <modal :title="activeAsset.name" :onClickaway="handleClickaway">
+  <modal :title="currentAsset.name" :onClickaway="handleClickaway">
 
     <div class="asset-preview">
       <div class="asset-image" v-if="!loaded"
-        :style="{ 'background-image': 'url(' + activeAsset.thumbnailImage + ')' }">
+        :style="{ 'background-image': 'url(' + currentAsset.thumbnailImage + ')' }">
       </div>
       <asset-viewer v-else
         :assetIsBinary="true"
-        :binaryUrl="fileURL"
+        :binaryUrl="assetUrl"
         :showSnapButton="false"
         :showWireframeButton="true"
         v-on:loadSuccess="emitSuccess"
@@ -53,10 +53,9 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Modal from '../components/Modal'
 import AssetViewer from '../components/AssetViewer'
-import { mapState } from 'vuex'
-import { mapActions } from 'vuex'
 import _ from 'lodash'
 import moment from 'moment'
 const ProgressBar = require('progressbar.js')
@@ -86,14 +85,15 @@ export default {
     bar.animate(this.performanceBar);
   },
   computed: {
-    user: function()          { return this.$store.state.users.user },
-    userIsCreator: function() { return this.user.uid == this.activeAsset.creator ? true : false },
-    activeAsset: function()   { return this.$store.state.assets.currentAsset },
+    ...mapState('users',    ['user']),
+    ...mapState('assets',   ['currentAsset']),
+    
+    userIsCreator: function() { return this.user.uid == this.currentAsset.creator ? true : false },
     performance: function()   { return this.$store.state.assets.currentAsset.performanceInfo },
-    fileURL: function()       { return this.activeAsset.assetUrl },
+    assetUrl: function()       { return this.currentAsset.assetUrl },
     modelSizeFormatted: function() {
       const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-      let l = 0, n = parseInt(this.activeAsset.modelSize, 10) || 0;
+      let l = 0, n = parseInt(this.currentAsset.modelSize, 10) || 0;
       while(n >= 1024){
         n = n/1024;
         l++;
@@ -123,7 +123,7 @@ export default {
       this.$store.commit('ux/SET_ASSET_INFO_MODAL_IS_OPEN', false);
     },
     deleteAsset: function() {
-      this.$store.dispatch('assets/deleteAsset', this.activeAsset._id)
+      this.$store.dispatch('assets/deleteAsset', this.currentAsset._id)
         .then((success)=> {
           this.$store.commit('ux/SET_ASSET_INFO_MODAL_IS_OPEN', false);
           console.log('successfully deleted')

@@ -15,9 +15,7 @@ export default {
   name: 'noScene',
   data: function(){
     return {}
-  },
-  computed: {},
-  methods: {}
+  }
 
 }
 </script>

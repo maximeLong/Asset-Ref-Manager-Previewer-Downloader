@@ -25,25 +25,21 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 export default {
   name: 'appHeader',
-  data: function(){
-    return {
-
-    }
+  data: function() {
+    return {}
   },
   computed: {
-    user: function()            { return this.$store.state.users.user },
+    ...mapState('users',  ['user']),
+    ...mapState('ux',     ['userPanel']),
     userIsLoggedIn: function()  { return this.user ? true : false },
-    userPanel: function()       { return this.$store.state.ux.userPanel }
   },
   methods: {
     openCreatePanel: function() {
       this.$store.commit('ux/SET_USER_PANEL', {open: true, panelType: 'createAccount'})
-    },
-    openTeamPanel: function() {
-      this.$store.commit('ux/SET_USER_PANEL', {open: true, panelType: 'team'})
     },
     openUserInfoPanel: function() {
       this.$store.commit('ux/SET_USER_PANEL', {open: true, panelType: 'userInfo'})

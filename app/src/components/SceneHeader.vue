@@ -37,17 +37,18 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'sceneHeader',
   computed: {
-    user: function()            { return this.$store.state.users.user },
-    currentScene: function()    { return this.$store.getters['scenes/currentScene'] },
-    usersInCurrentScene: function() { return this.$store.state.scenes.usersInCurrentScene },
+    ...mapState('users',    ['user']),
+    ...mapState('scenes',   ['usersInCurrentScene']),
+    ...mapGetters('scenes', ['currentScene']),
+
     usersMinusUser: function() {
       return this.usersInCurrentScene.filter((user)=> { return user.userId !== this.user.uid })
     },
-
     userIsInScene: function() {
       return _.some(this.usersInCurrentScene, {'userId': this.user.uid}) ? true : false
     },

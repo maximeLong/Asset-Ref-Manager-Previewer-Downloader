@@ -43,8 +43,8 @@
 </div>
 </template>
 <script>
+import { mapState, mapGetters } from 'vuex'
 import Modal from '../components/Modal'
-import { mapState } from 'vuex'
 import _ from 'lodash'
 
 
@@ -66,18 +66,16 @@ export default {
   },
 
   computed: {
-    user: function()          { return this.$store.state.users.user },
-    currentScene: function()  { return this.$store.getters['scenes/currentScene'] },
-    scenes: function()        { return this.$store.state.scenes.populatedScenes },
+    ...mapState('users',    ['user']),
+    ...mapState('scenes',   ['populatedScenes']),
+    ...mapState('ux',       ['formSceneName','formInviteEmail']),
+    ...mapGetters('scenes', ['currentScene']),
+
     formHasChanged: function()  {
       if (this.formSceneName !== this.currentScene.name || this.localInvites.length) {
         return true
       } else { return false }
-    },
-    ...mapState('ux',[
-      'formSceneName',
-      'formInviteEmail'
-    ])
+    }
   },
   methods: {
     //-- button methods
@@ -126,8 +124,8 @@ export default {
 
           //BUG: this throws errors because modal is listening to deleted info
           this.handleClickaway()
-          if (this.scenes.length) {
-            this.$router.push({ name: 'Scene', params: { scene_id: this.scenes[0]._id }})
+          if (this.populatedScenes.length) {
+            this.$router.push({ name: 'Scene', params: { scene_id: this.populatedScenes[0]._id }})
           } else {
             this.$router.push({ name: 'NoScene' })
           }

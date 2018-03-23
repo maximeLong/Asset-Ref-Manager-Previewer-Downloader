@@ -21,6 +21,8 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex'
+
 import ContentBox from '../components/ContentBox'
 import AssetCatalogModule from '../components/AssetCatalogModule'
 import SceneHeader from '../components/SceneHeader'
@@ -49,10 +51,9 @@ export default {
     this.getSceneData()
   },
   computed: {
-    user: function()              { return this.$store.state.users.user },
-    currentSceneIndex: function() { return this.$store.state.scenes.currentSceneIndex },
-    scenes: function()            { return this.$store.state.scenes.populatedScenes },
-    currentScene: function()      { return this.$store.getters['scenes/currentScene'] }
+    ...mapState('users',    ['user']),
+    ...mapState('scenes',   ['currentSceneIndex', 'populatedScenes']),
+    ...mapGetters('scenes', ['currentScene']),
   },
   methods: {
 
@@ -66,7 +67,7 @@ export default {
       //get users in scene
       this.$store.dispatch('scenes/getUsersByScene', this.$route.params.scene_id)
       //change the currentSceneIndex > updates currentScene getter
-      var sceneIndex = _.findIndex(this.scenes, {_id: this.$route.params.scene_id} );
+      var sceneIndex = _.findIndex(this.populatedScenes, {_id: this.$route.params.scene_id} );
       if (sceneIndex !== -1) {
         this.$store.commit('scenes/SET_CURRENT_SCENE_INDEX', sceneIndex);
       }

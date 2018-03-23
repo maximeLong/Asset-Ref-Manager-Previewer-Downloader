@@ -60,6 +60,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex'
 import AssetCatalogSchema from './AssetCatalogSchema'
 
 export default {
@@ -80,12 +81,11 @@ export default {
   },
 
   computed: {
-    user: function()           { return this.$store.state.users.user },
-    currentScene: function()   { return this.$store.getters['scenes/currentScene'] },
-    assetStandin: function()   { return this.$store.state.ux.assetStandin },
-    isSceneAdmin: function() { return this.currentScene.admin ? true : false },
-    currentAssetCatalog: function() { return this.$store.state.ux.currentAssetCatalog },
+    ...mapState('users',    ['user']),
+    ...mapState('ux',       ['assetStandin', 'currentAssetCatalog']),
+    ...mapGetters('scenes', ['currentScene']),
 
+    isSceneAdmin: function() { return this.currentScene.admin ? true : false },
     sceneAssets: function() {
       return this.$store.state.assets.assetsInCurrentScene.map((link)=> {
         return {
@@ -155,7 +155,7 @@ export default {
     addAssetsToScene: function(multiSelectedAssets) {
       this.$store.dispatch('assets/addAssetsToScene', multiSelectedAssets)
       .then( response => {
-        this.currentAssetCatalog = 'scene'
+        this.$store.commit('ux/SET_CURRENT_ASSET_CATALOG', 'scene')
         console.log('successfully added')
       });
     },

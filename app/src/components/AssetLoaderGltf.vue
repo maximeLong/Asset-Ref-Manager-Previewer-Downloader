@@ -39,7 +39,7 @@
 </div>
 </template>
 <script>
-
+import { mapState, mapGetters } from 'vuex'
 import converter from '@/loaders/gltf/gltfToGlb'
 import AssetViewer from '../components/AssetViewer'
 
@@ -69,11 +69,11 @@ export default {
   },
 
   computed: {
-    user: function()           { return this.$store.state.auth.user },
-    currentScene: function()   { return this.$store.getters['scenes/current'] },
-    panelType: function()      { return this.$store.state.ux.assetImportModal.panelType },
-    relatedAsset: function()   { return this.$store.state.ux.assetImportModal.relatedAsset }
+    ...mapState('ux',       ['assetImportModal']),
+    ...mapGetters('scenes', ['currentScene']),
 
+    panelType: function()      { return this.assetImportModal.panelType },
+    relatedAsset: function()   { return this.assetImportModal.relatedAsset }
   },
   methods: {
 

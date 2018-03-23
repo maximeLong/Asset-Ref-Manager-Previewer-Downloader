@@ -35,9 +35,7 @@ export default {
   },
   mixins: [ clickaway ],
   computed: {
-    ...mapState('ux',[
-      'userPanel'
-    ])
+    ...mapState('ux', ['userPanel'])
   },
 
   methods: {

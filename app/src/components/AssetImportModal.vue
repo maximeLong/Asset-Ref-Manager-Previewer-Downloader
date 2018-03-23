@@ -45,9 +45,9 @@
 </div>
 </template>
 <script>
+import { mapState, mapGetters } from 'vuex'
 import Modal from '../components/Modal'
 import AssetLoaderGltf from '../components/AssetLoaderGltf'
-import { mapState } from 'vuex'
 import _ from 'lodash'
 
 
@@ -73,14 +73,21 @@ export default {
   },
 
   computed: {
-    user: function()            { return this.$store.state.users.user },
-    currentScene: function()    { return this.$store.getters['scenes/currentScene'] },
+    ...mapState('ux', [
+      'formAssetName',
+      'modelGeometryInfo',
+      'modelFileSize',
+      'modelName',
+      'modelFile',
+      'modelSnapshot'
+    ]),
+    ...mapState('users',    ['user']),
+    ...mapGetters('scenes', ['currentScene']),
+
     assetIsOk: function()  {
       if (this.loaded && this.formAssetName.length && this.snapTaken) { return true } else { return false }
     },
-    modelVertices: function() {
-      return this.modelGeometryInfo.render.vertices
-    },
+    modelVertices: function() { return this.modelGeometryInfo.render.vertices },
     barSize: function() {
       if (this.modelVertices <= 20000) {
         return 'small'
@@ -99,15 +106,7 @@ export default {
           l++;
       }
       return(n.toFixed(n >= 10 || l < 1 ? 0 : 1) + ' ' + units[l]);
-    },
-    ...mapState('ux', [
-      'formAssetName',
-      'modelGeometryInfo',
-      'modelFileSize',
-      'modelName',
-      'modelFile',
-      'modelSnapshot'
-    ])
+    }
   },
   methods: {
     //-- button methods

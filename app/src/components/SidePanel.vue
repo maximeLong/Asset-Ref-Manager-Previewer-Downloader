@@ -13,7 +13,7 @@
     <div class="scenes">
       <div class="scenes-list">
         <div class="scene-item"
-          v-for="scene in scenes"
+          v-for="scene in populatedScenes"
           @click="goToScene(scene._id)"
           :class="{ active : checkActive(scene) }">
           {{scene.name}}</div>
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'sidePanel',
@@ -31,8 +32,8 @@ export default {
     return {}
   },
   computed: {
-    scenes: function(){ return this.$store.state.scenes.populatedScenes },
-    currentScene: function() { return this.$store.getters['scenes/currentScene'] },
+    ...mapState('scenes',   ['populatedScenes']),
+    ...mapGetters('scenes', ['currentScene']),
   },
   methods: {
     goToScene: function(id) {

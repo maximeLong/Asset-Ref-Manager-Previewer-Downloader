@@ -46,12 +46,9 @@ export default {
     ContentBox
   },
   computed: {
-    user: function()    { return this.$store.state.users.user },
-    scenes: function()  { return this.$store.state.scenes.populatedScenes },
-    ...mapState('ux',[
-      'formSceneName',
-      'formInviteEmail'
-    ])
+    ...mapState('users',  ['user']),
+    ...mapState('scenes', ['populatedScenes']),
+    ...mapState('ux',     ['formSceneName','formInviteEmail'])
   },
   methods: {
     tryCreateScene: function() {
@@ -62,7 +59,7 @@ export default {
       }
       this.$store.dispatch('scenes/createScene', sceneData)
         .then(response => {
-          this.$router.push({ name: 'Scene', params: { scene_id: this.scenes[this.scenes.length-1]._id }})
+          this.$router.push({ name: 'Scene', params: { scene_id: this.populatedScenes[this.populatedScenes.length-1]._id }})
         })
         .catch(error => {
           console.log(error)
